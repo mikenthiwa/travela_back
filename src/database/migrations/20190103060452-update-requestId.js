@@ -10,7 +10,7 @@ module.exports = {
     queryInterface.changeColumn('Comments', 'requestId',
       {
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull: true,
       })
   )
 };

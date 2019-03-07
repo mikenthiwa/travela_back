@@ -1,5 +1,6 @@
 const mockData = {
   userMock: {
+    id: 10,
     fullName: 'Samuel Kubai',
     email: 'captan.ameria@andela.com',
     userId: '-MUyHJmKrxA90lPNQ1FOLNm',

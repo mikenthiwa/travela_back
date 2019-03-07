@@ -22,6 +22,11 @@ class UserHelper {
     return axios.get(`${process.env.ANDELA_PROD_API}/users?email=${workEmail}`);
   }
 
+  static getManagerOnProduction(id) {
+    return axios.get(`${process.env.ANDELA_PROD_API}/users?bamboo_hr_id=${id}`);
+  }
+
+
   static generateTravelaUser(productionUser, bambooUser) {
     const locations = productionUser.data.values[0].location != null
       ? productionUser.data.values[0].location.name

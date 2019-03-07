@@ -162,7 +162,7 @@ describe('Comments controller', () => {
           .end((err, res) => {
             if (err) done(err);
             const {
-              comment, requestId
+              comment, requestId,
             } = res.body.comment;
             expect(res.statusCode).toEqual(201);
             expect(res.body.success).toBe(true);
@@ -193,14 +193,13 @@ describe('Comments controller', () => {
           .end((err, res) => {
             if (err) done(err);
             const {
-              comment, documentId, userId
+              comment, documentId
             } = res.body.comment;
             expect(res.statusCode).toEqual(201);
             expect(res.body.success).toBe(true);
             expect(res.body.message).toEqual(expectedResponse.message);
             expect(comment).toEqual(expectedResponse.comment.comment);
             expect(documentId).toEqual(expectedResponse.comment.documentId);
-            expect(userId).toEqual(expectedResponse.comment.userId);
             done();
           });
       });
@@ -251,6 +250,7 @@ describe('Comments controller', () => {
       });
       it('returns 200 and updates a comment', (done) => {
         const { id } = mockData.commentMock;
+
         request
           .put(`/api/v1/comments/${id}`)
           .set('authorization', token)

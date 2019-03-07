@@ -117,7 +117,8 @@ class UserRoleController {
         userOnProduction.data.values[0].bamboo_hr_id
       );
       const managerOnBamboo = await UserHelper.getUserOnBamboo(userOnBamboo.data.supervisorEId);
-      const managerOnProduction = await UserHelper.getUserOnProduction(managerOnBamboo);
+      const managerOnProduction = await
+      UserHelper.getManagerOnProduction(userOnBamboo.data.supervisorEId);
       const travelaUser = UserHelper.generateTravelaUser(managerOnProduction, managerOnBamboo);
       const userLocation = UserHelper.getUserLocation(userOnBamboo.data.location);
       const [managerResult] = await models.User.findOrCreate({
@@ -381,7 +382,7 @@ class UserRoleController {
       const deletedRole = await models.UserRole.destroy(query);
       const msg = `User can no longer perform operations associated with the role: '${
         req.roleName
-      }'`; // eslint-disable-line
+        }'`; // eslint-disable-line
       const message = [200, msg, true];
       if (deletedRole) return UserRoleController.response(res, message);
 

@@ -106,6 +106,18 @@ describe('Test Suite for Trips Controller', () => {
           supervisor: 'Samuel Kubai'
         }
       });
+      moxios.stubRequest(`${process.env.ANDELA_PROD_API}/users?bamboo_hr_id=92`, {
+        status: 200,
+        response: {
+          values: [{
+            email: 'william.sserubiri@andela.com',
+            name: 'ssewilliam',
+            id: '92',
+            location: { name: 'Kampala' },
+            picture: 'http//:gif.jpg'
+          }]
+        }
+      });
       moxios.stubRequest(`${process.env.ANDELA_PROD_API}/users?email=william.sserubiri@andela.com`, {
         status: 200,
         response: {
@@ -164,6 +176,18 @@ describe('Test Suite for Trips Controller', () => {
           workEmail: 'william.sserubiri@andela.com',
           supervisorEId: '9',
           supervisor: 'Samuel Kubai'
+        }
+      });
+      moxios.stubRequest(`${process.env.ANDELA_PROD_API}/users?bamboo_hr_id=92`, {
+        status: 200,
+        response: {
+          values: [{
+            email: 'william.sserubiri@andela.com',
+            name: 'ssewilliam',
+            id: '92',
+            location: { name: 'Kampala' },
+            picture: 'http//:gif.jpg'
+          }]
         }
       });
       moxios.stubRequest(`${process.env.ANDELA_PROD_API}/users?email=william.sserubiri@andela.com`, {

@@ -1370,6 +1370,16 @@ describe('Requests Controller', () => {
         done();
       });
 
+      it('should return request details of a user', async (done) => {
+        const res = await request(app)
+          .get(`/api/v1/requests/${mockOpenRequest.id}`)
+          .set('authorization', requesterToken);
+        done();
+        expect(res.status).toBe(200);
+        expect(res.body.requestData.id).toEqual(mockOpenRequest.id);
+        done();
+      });
+
       it('should throw validation error when newStatus does not match expected input',
         async (done) => {
           const res = await request(app)

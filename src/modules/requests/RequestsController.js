@@ -287,6 +287,8 @@ class RequestsController {
         requestData.dataValues.approver = approver.approverId;
         requestData.dataValues.timeApproved = approver.updatedAt;
         requestData.dataValues.approverImage = approverImage.picture;
+        requestData.dataValues.budgetApprovedBy = approver.budgetApprover;
+        requestData.dataValues.budgetApprovedAt = approver.budgetApprovedAt;
       }
       return res.status(200).json({
         success: true,

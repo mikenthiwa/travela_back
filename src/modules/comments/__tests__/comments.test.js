@@ -162,14 +162,13 @@ describe('Comments controller', () => {
           .end((err, res) => {
             if (err) done(err);
             const {
-              comment, requestId, userId
+              comment, requestId
             } = res.body.comment;
             expect(res.statusCode).toEqual(201);
             expect(res.body.success).toBe(true);
             expect(res.body.message).toEqual(expectedResponse.message);
             expect(comment).toEqual(expectedResponse.comment.comment);
             expect(requestId).toEqual(expectedResponse.comment.requestId);
-            expect(userId).toEqual(expectedResponse.comment.userId);
             done();
           });
       });

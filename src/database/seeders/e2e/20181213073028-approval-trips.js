@@ -62,7 +62,7 @@ module.exports = {
     ],
     {},
   ),
-  
+
   down: (
     queryInterface,
       Sequelize, //eslint-disable-line

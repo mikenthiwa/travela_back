@@ -6,36 +6,12 @@ import Utils from '../../../helpers/Utils';
 import { role } from '../../userRole/__tests__/mocks/mockData';
 import NotificationEngine from '../../notifications/NotificationEngine';
 import UserRoleController from '../../userRole/UserRoleController';
-
+import ApprovalsController from '../ApprovalsController';
 
 global.io = {
   sockets: {
     emit: (event, dataToBeEmitted) => dataToBeEmitted
   }
-};
-
-const req = {  // eslint-disable-line
-  user: {
-    UserInfo: {
-      id: 9099,
-      userId: '-kkkfkfkfnninn7',
-      fullName: 'Peter Paul',
-      name: 'Peter Paul',
-      email: 'peter.paul@andela.com',
-      picture: 'fake.png'
-    }
-  },
-  params: {
-    requestId: 1
-  }
-};
-
-const mockBudgetApproval = {
-  requestId: 1,
-  status: 'Approved',
-  approverId: 'Peter Paul',
-  createdAt: '2018-09-26T15:47:47.582Z',
-  updatedAt: '2018-09-26T15:47:47.582Z'
 };
 
 const payload = {
@@ -46,20 +22,7 @@ const payload = {
     name: 'Peter Paul',
     email: 'peter.paul@andela.com',
     picture: 'fake.png'
-  },
-};
-
-const mockBudgetAlreadyApproved = {
-  id: 2,
-  requestId: 1,
-  status: 'Approved',
-  budgetStatus: 'Approved',
-  approverId: 'Peter Paul',
-  createdAt: '2018-09-26T15:47:47.582Z',
-  updatedAt: '2018-09-26T15:47:47.582Z',
-  deletedAt: null,
-  budgetApprover: 'Peter Paul',
-  budgetCreatedAt: '2019-09-26T15:47:47.582Z'
+  }
 };
 
 const mockRequest = {
@@ -77,22 +40,32 @@ const mockRequest = {
   createdAt: '2018-09-26T15:47:47.582Z'
 };
 
-const userRoles = [{
-  id: 1,
-  userId: 9099,
-  roleId: 53019,
-  centerId: 12345,
-  createdAt: '2018-09-26T15:47:47.582Z',
-  updatedAt: '2018-09-26T15:47:47.582Z'
-},
-{
-  id: 2,
-  userId: 9099,
-  roleId: 60000,
-  centerId: 12345,
-  createdAt: '2018-09-26T15:47:47.582Z',
-  updatedAt: '2018-09-26T15:47:47.582Z'
-}];
+const userRoles = [
+  {
+    id: 1,
+    userId: 9099,
+    roleId: 53019,
+    centerId: 12345,
+    createdAt: '2018-09-26T15:47:47.582Z',
+    updatedAt: '2018-09-26T15:47:47.582Z'
+  },
+  {
+    id: 2,
+    userId: 9099,
+    roleId: 60000,
+    centerId: 12345,
+    createdAt: '2018-09-26T15:47:47.582Z',
+    updatedAt: '2018-09-26T15:47:47.582Z'
+  },
+  {
+    id: 3,
+    userId: 9099,
+    roleId: 70001,
+    centerId: 12345,
+    createdAt: '2018-09-26T15:47:47.582Z',
+    updatedAt: '2018-09-26T15:47:47.582Z'
+  }
+];
 
 const userMock = {
   id: 9099,
@@ -133,16 +106,19 @@ const token = Utils.generateTestToken(payload);
 describe('Budget checker', () => {
   beforeAll(async () => {
     moxios.install();
-  
+
     await models.UserRole.destroy({ force: true, truncate: { cascade: true } });
     await models.Role.destroy({ force: true, truncate: { cascade: true } });
-    
+
     await models.Center.destroy({ force: true, truncate: { cascade: true } });
     await models.Approval.destroy({ force: true, truncate: { cascade: true } });
     await models.Request.sync({ force: true, truncate: { cascade: true } });
-    await models.Notification.destroy({ force: true, truncate: { cascade: true } });
+    await models.Notification.destroy({
+      force: true,
+      truncate: { cascade: true }
+    });
     await models.User.sync({ force: true, truncate: { cascade: true } });
-    
+
     process.env.DEFAULT_ADMIN = 'peter.paul@andela.com';
     await models.Center.create(centerMock);
     await models.Role.bulkCreate(role);
@@ -157,7 +133,10 @@ describe('Budget checker', () => {
 
     await models.Approval.destroy({ force: true, truncate: { cascade: true } });
     await models.Request.destroy({ force: true, truncate: { cascade: true } });
-    await models.Notification.destroy({ force: true, truncate: { cascade: true } });
+    await models.Notification.destroy({
+      force: true,
+      truncate: { cascade: true }
+    });
     await models.UserRole.destroy({ force: true, truncate: { cascade: true } });
     await models.Role.destroy({ force: true, truncate: { cascade: true } });
     await models.User.destroy({ force: true, truncate: { cascade: true } });
@@ -179,9 +158,10 @@ describe('Budget checker', () => {
         done();
       });
   });
-
   it('should send  notifications to budget checker manager', async (done) => {
-    UserRoleController.getRecipient = jest.fn()
+    jest.spyOn(ApprovalsController, 'sendEmailTofinanceMembers');
+    UserRoleController.getRecipient = jest
+      .fn()
       .mockReturnValue({ fullName: 'Peter Paul' }, { userId: null });
     NotificationEngine.notify = jest.fn();
     request(app)
@@ -190,43 +170,15 @@ describe('Budget checker', () => {
       .set('authorization', token)
       .send({ budgetStatus: 'Approved' })
       .end((err) => {
-        const [args] = NotificationEngine
-          .notify.mock.calls[NotificationEngine.notify.mock.calls.length - 1];
+        const [args] = NotificationEngine.notify.mock.calls[
+          NotificationEngine.notify.mock.calls.length - 1
+        ];
         expect(args.notificationType).toEqual('general');
         if (err) return done(err);
         done();
+        expect(
+          ApprovalsController.sendEmailTofinanceMembers
+        ).toHaveBeenCalled();
       });
   });
-
-  it('should reject double update budget status approval',
-    async (done) => {
-      await models.Approval.destroy({ force: true, truncate: { cascade: true } });
-      await models.Approval.create(mockBudgetAlreadyApproved);
-      request(app)
-        .put('/api/v1/approvals/budgetStatus/1')
-        .set('Content-Type', 'application/json')
-        .set('authorization', token)
-        .send({ budgetStatus: 'Approved' })
-        .end((err, res) => {
-          if (err) return done(err);
-          expect(res.status).toBe(400);
-          done();
-        });
-    });
-
-  it('should update budget status',
-    async (done) => {
-      await models.Approval.destroy({ force: true, truncate: { cascade: true } });
-      await models.Approval.create(mockBudgetApproval);
-      request(app)
-        .put('/api/v1/approvals/budgetStatus/1')
-        .set('Content-Type', 'application/json')
-        .set('authorization', token)
-        .send({ budgetStatus: 'Approved' })
-        .end((err, res) => {
-          if (err) return done(err);
-          expect(res.status).toBe(200);
-          done();
-        });
-    });
 });

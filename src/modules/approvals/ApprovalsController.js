@@ -1,3 +1,4 @@
+
 import models from '../../database/models';
 import { asyncWrapper, retrieveParams } from '../../helpers/requests';
 import { countByStatus, getTotalCount, countVerifiedByStatus } from '../../helpers/requests/paginationHelper';
@@ -9,6 +10,7 @@ import NotificationEngine from '../notifications/NotificationEngine';
 import UserRoleController from '../userRole/UserRoleController';
 import TravelChecklistController from '../travelChecklist/TravelChecklistController';
 import BudgetApprovalsController from './BudgetApprovalsController';
+import TravelReadinessUtils from '../travelReadinessDocuments/TravelReadinessUtils';
 
 const noResult = 'No records found';
 let params = {};
@@ -53,7 +55,9 @@ class ApprovalsController {
   static async sendResult(req, res, result) {
     const count = await ApprovalsController.getStatusCount(req, res);
     const pagination = Pagination.getPaginationData(
-      params.page, params.limit, getTotalCount(params.status, count)
+      params.page,
+      params.limit,
+      getTotalCount(params.status, count)
     );
 
     const { fillWithRequestData } = ApprovalsController;
@@ -204,6 +208,41 @@ class ApprovalsController {
       `${process.env.REDIRECT_URL}/redirect/requests/${request.id}/checklist`,
       requestId: request.id
     };
+  }
+
+  // Finance team email notification
+  static async sendEmailTofinanceMembers(updatedRequest, user) {
+    const { userId: requesterId, name: requesterName, id } = updatedRequest;
+    const {
+      UserInfo: { name: budgetCheckerName }
+    } = user;
+
+    const { location: requesterLocation } = await models.User.findOne({
+      where: {
+        userId: requesterId
+      }
+    });
+
+    const {
+      users: finaceTeamMembers
+    } = await UserRoleController.calculateUserRole('70001');
+
+    const financeMembers = await TravelReadinessUtils.getRoleMembers(
+      finaceTeamMembers,
+      requesterLocation
+    );
+
+    const data = {
+      topic: `Successful Budget Check for ${requesterName}'s Trip`,
+      type: 'Notify finance team',
+      details: { requesterName, budgetCheckerName },
+      redirectLink: `${process.env.REDIRECT_URL}/requests/${id}`
+    };
+
+    // 4.Test this
+    if (financeMembers.length) {
+      NotificationEngine.sendMailToMany(finaceTeamMembers, data);
+    }
   }
 }
 

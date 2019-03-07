@@ -4,27 +4,27 @@ export const user = {
     email: 'captain.america@andela.com',
     userId: 'JFENDVNDK',
     picture: 'captain.png',
-    location: 'Lagos',
+    location: 'Lagos'
   },
   user2: {
     fullName: 'black window ',
     email: 'black.window@andela.com',
     userId: 'JNDVNFSFDK',
     picture: 'black.png',
-    location: 'Lagos',
+    location: 'Lagos'
   },
   user3: {
     fullName: 'spider girl',
     email: 'spider@girl.com',
     userId: 'JVNDK',
     picture: 'spider.png',
-    location: 'Lagos',
+    location: 'Lagos'
   },
   user4: {
     fullName: 'spider girl',
     email: 'spider@andela.com',
     picture: 'spidergirl.png',
-    location: 'Lagos',
+    location: 'Lagos'
   },
   user5: {
     id: 11001,
@@ -111,7 +111,15 @@ export const role = [
   {
     id: 60000,
     roleName: 'Budget Checker',
-    description: 'Can view and and approve an approved request from line manager',
+    description:
+      'Can view and and approve an approved request from line manager',
+    createdAt: '2018-08-16 012:11:52.181+01',
+    updatedAt: '2018-08-16 012:11:52.181+01'
+  },
+  {
+    id: 70001,
+    roleName: 'Finance team member',
+    description: 'Can view budget approvals by the budget checker',
     createdAt: '2018-08-16 012:11:52.181+01',
     updatedAt: '2018-08-16 012:11:52.181+01'
   }
@@ -164,10 +172,13 @@ export const userMock = [
   }
 ];
 
-export const userRoles = [{
-  userId: 20200,
-  roleId: 29187
-}, {
-  userId: 20201,
-  roleId: 401938
-}];
+export const userRoles = [
+  {
+    userId: 20200,
+    roleId: 29187
+  },
+  {
+    userId: 20201,
+    roleId: 401938
+  }
+];

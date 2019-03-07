@@ -281,7 +281,9 @@ const allMyApprovals = [mockOpenRequest, mockApprovedRequest, mockRejectedReques
   theRequest => ({
     requestId: theRequest.id,
     status: theRequest.status,
-    approverId: theRequest.manager
+    approverId: theRequest.manager,
+    budgetStatus: theRequest.status
+
   })
 );
 

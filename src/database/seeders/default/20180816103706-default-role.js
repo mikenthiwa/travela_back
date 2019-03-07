@@ -45,6 +45,13 @@ module.exports = {
         description: 'Verifies that departments can afford travel expenses',
         createdAt: '2018-08-16 012:11:52.181+01',
         updatedAt: '2018-08-16 012:11:52.181+01',
+      },
+      {
+        id: 70001,
+        roleName: 'Finance Team Member',
+        description: 'Receives notifications for budget approvals',
+        createdAt: '2018-08-16 012:11:52.181+01',
+        updatedAt: '2018-08-16 012:11:52.181+01',
       }
     ],
     {},

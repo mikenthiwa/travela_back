@@ -60,11 +60,8 @@ export default class BudgetApprovalsController {
       const requestToApprove = await models.Approval.find({
         where: { requestId: req.params.requestId }
       });
-  
       const budgeterLocation = await validateBudgetChecker(req);
-  
       const { status, budgetStatus } = requestToApprove;
-  
       const error = BudgetApprovalsController.approvals(budgetStatus);
       if (error) { return Error.handleError(error, 400, res); }
       if (['Approved'].includes(status) && budgeterLocation.result) {
@@ -79,6 +76,12 @@ export default class BudgetApprovalsController {
         );
         await ApprovalsController.sendNotificationAfterApproval(req, req.user, updatedRequest[1][0], res);
         await BudgetApprovalsController.sendNotificationToManager(req, updatedRequest[1][0]);
+        if (req.body.budgetStatus === 'Approved') {
+          ApprovalsController.sendEmailTofinanceMembers(
+            updatedRequest[1][0],
+            req.user
+          );
+        }
         return res.status(200).json({
           success: true,
           message: 'Success',

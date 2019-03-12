@@ -6,11 +6,11 @@ module.exports = {
     [
       {
         id: '1',
-        origin: 'Kampala',
-        destination: 'Nairobi',
+        origin: 'Nairobi, Kenya',
+        destination: 'Lagos, Nigeria',
         bedId: null,
-        returnDate: '2018-10-16',
-        departureDate: '2018-09-16',
+        returnDate: `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate() + 5}`,
+        departureDate: `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate() + 2}`,
         requestId: '3451',
         createdAt: '2018-08-16 012:11:52.181+01',
         updatedAt: '2018-08-16 012:11:52.181+01',

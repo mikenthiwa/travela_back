@@ -6,7 +6,7 @@ module.exports = {
         name: 'Travel Ticket Details',
         requiresFiles: false,
         deleteReason: null,
-        destinationName: 'Default',
+        destinationName: 'Lagos, Nigeria',
         createdAt: '2018-10-05T08:36:11.170Z',
         updatedAt: '2018-10-05T08:36:11.170Z',
       },

@@ -116,7 +116,9 @@ const mailTemplate = (
     picture
   })}
     </p>
-    ${returnButton(type, redirectLink)}
+    ${type === 'Send delete email verification'
+    ? ''
+    : returnButton(type, redirectLink)}
   </div>
   <div
     style="box-sizing: border-box;

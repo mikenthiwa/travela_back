@@ -24,6 +24,8 @@ const switchButtonText = (type) => {
       return 'Login';
     case 'Approved':
       return 'Fill Checklist';
+    case 'Notify Travel Admins Checklist Completion':
+      return 'Verify';
     default:
       return 'View Request';
   }

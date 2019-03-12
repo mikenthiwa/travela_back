@@ -109,11 +109,13 @@ class NotificationController {
     return commentData;
   }
 
+  /* istanbul ignore next */
+  // This function is not being used yet
+  // because mailgun API key is needed to make it work
   static async receivedComment(req, res) {
     try {
       const comment = req.body['stripped-text'];
-      const subject = req.body.Subject;
-      const separateMessage = subject.split('#');
+      const separateMessage = req.body.Subject.split('#');
       const [, requestId, recipientId, senderId] = separateMessage;
       const recipient = await UserRoleController.getRecipient(null, recipientId);
       const sender = await UserRoleController.getRecipient(null, senderId);
@@ -123,10 +125,9 @@ class NotificationController {
       const userRole = await models.UserRole.findOne({
         where: { userId: sender.id }
       });
-      if (userRole.roleId === 53019) { /* istanbul ignore next */
+      if (userRole.roleId === 53019) {
         redirectLink = `/requests/${requestId}`;
       }
-
       const newNotificationDetail = {
         senderId,
         recipientId,
@@ -136,9 +137,7 @@ class NotificationController {
         senderName: sender.fullName,
         senderImage: sender.picture
       };
-
       NotificationEngine.notify(newNotificationDetail);
-
       CommentsController.sendEmail(senderId, recipient.email,
         recipient.fullName, sender.fullName, redirectLink, requestId, recipientId, newComment);
       return res.status(201).json({
@@ -146,7 +145,7 @@ class NotificationController {
         message: 'Comment created',
         comment: newComment,
       });
-    } catch (error) { /* istanbul ignore next */
+    } catch (error) {
       CustomError.handleError(error.message, 500, res);
     }
   }

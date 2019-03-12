@@ -1,3 +1,4 @@
+import { Op } from 'sequelize';
 import NotificationEngine from '../notifications/NotificationEngine';
 import UserRoleController from '../userRole/UserRoleController';
 import Validator from '../../middlewares/Validator';
@@ -27,7 +28,8 @@ class TravelReadinessUtils {
     };
     const { location: userLocation } = await Validator.getUserFromDb(query);
     const { users: travelMembers } = await UserRoleController.calculateUserRole('339458');
-    const travelTeamMembers = await TravelReadinessUtils.getRoleMembers(travelMembers, userLocation);
+    const travelTeamMembers = await TravelReadinessUtils
+      .getRoleMembers(travelMembers, userLocation);
     const data = {
       sender: documentDeleter,
       topic: 'Deletion of travel document',
@@ -46,7 +48,9 @@ class TravelReadinessUtils {
     const availableRoleMembers = await models.User.findAll({
       where: {
         id: availableRoleMemberIds,
-        location: userLocation
+        location: {
+          [Op.in]: userLocation instanceof Array ? userLocation : [userLocation]
+        }
       },
       attributes: ['fullName', 'email'],
       raw: true

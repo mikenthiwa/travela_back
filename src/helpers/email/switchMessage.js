@@ -3,12 +3,12 @@ import checkoutTemplate from './checkoutTemplate';
 export const travelReadinessVerification = (msgDetail) => {
   const messageInfo = 'Login to your travela account for details.';
   const message = `has been verified by ${msgDetail.senderName} on
-   ${msgDetail.details.createdAt}. ${messageInfo}`;
+    ${msgDetail.details.createdAt}. ${messageInfo}`;
   const docType = `Your ${msgDetail.details.type}`;
   if (msgDetail.details.type !== 'other') {
     if (msgDetail.details.type === 'passport') {
       return `${docType} with number ${msgDetail.details.data.passportNumber}
-       ${message}`;
+      ${message}`;
     }
     return `${docType} to ${msgDetail.details.data.country} ${message}`;
   } return `${docType} document, ${msgDetail.details.data.name} ${message}`;
@@ -46,7 +46,7 @@ const attachRequesterToMail = msgDetail => (
     <br><br>
     <span style='color: #4f4f4f'>
     While you wait for your manager's approval, you can login to Travela
-     and view
+    and view
     the checklist you will be required to fulfil as you plan your trip.</span>
     <br><br>
     <span style='color: #4f4f4f '>Thank you.</span>.`);
@@ -79,7 +79,7 @@ const switchMessage = (msgDetail) => {
         approval decision.`;
     case 'Approved':
       return `Congratulations, your travel request has just been approved
-       by your manager on Travela.
+      by your manager on Travela.
         Kindly fill out your travel checklist items by clicking on the button
         below.`;
     case 'Rejected':
@@ -139,14 +139,24 @@ const switchMessage = (msgDetail) => {
       }</b> has now been approved
       by <b>${msgDetail.details.RequesterManager}
 </b>. Please login to Travela to review the details and advise on availability
- of budget for this trip.`;
+of budget for this trip.`;
     case 'Notify finance team':
       return `A travel request for <b>${
         msgDetail.details.requesterName
       }</b> has now been approved by ${
         msgDetail.details.budgetCheckerName
       }. Please make arrangements to make funds available for this trip.`;
-
+    case 'Notify Travel Admins of Manager Approval':
+      return `<b>${msgDetail.details.requesterName}</b>'s manager has approved \
+      their request.<br/> <br/>
+            Please make arrangements for the booked accommodation for this trip \
+            and verify the trip accordingly.<br/>
+            Thank you.`;
+    case 'Notify Travel Admins Checklist Completion':
+      return `<b>${msgDetail.senderName}</b> has completed the checklist for \
+      <b>${msgDetail.details.requestId}</b> trip.</br>
+                Please  login and verify the trip accordingly</br><br/>
+                Thank you`;
     default:
       return '';
   }

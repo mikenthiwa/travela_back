@@ -5,6 +5,8 @@ import TravelChecklistHelper from '../../helpers/travelChecklist';
 import TripsController from '../trips/TripsController';
 import CustomError from '../../helpers/Error';
 import Centers from '../../helpers/centers';
+import { getTravelTeamEmailData } from '../../helpers/approvals';
+import NotificationEngine from '../notifications/NotificationEngine';
 
 const { Op } = models.Sequelize;
 
@@ -318,6 +320,8 @@ export default class TravelChecklistController {
     try {
       const { requestId, checklistItemId } = req.params;
       const { file, tripId } = req.body;
+      const previousPercentage = await TravelChecklistController
+        .checkListPercentageNumber(req, res, requestId);
       const query = {
         where: { tripId, checklistItemId },
         defaults: { value: file, id: Utils.generateUniqueId() }
@@ -332,6 +336,10 @@ export default class TravelChecklistController {
 
       const percentageCompleted = await TravelChecklistController
         .checkListPercentageNumber(req, res, requestId);
+      if (percentageCompleted >= 100 && previousPercentage < 100) {
+        const request = await models.Request.findByPk(requestId);
+        TravelChecklistController.sendEmailToTravelAdmin(request, req.user);
+      }
       res.status(201).json({
         success: true,
         message: 'Submission uploaded successfully',
@@ -340,6 +348,17 @@ export default class TravelChecklistController {
       });
     } catch (error) { /* istanbul ignore next */
       return CustomError.handleError(error, 500, res);
+    }
+  }
+
+  static async sendEmailToTravelAdmin(request, user) {
+    const { UserInfo: { name } } = user;
+    const data = await getTravelTeamEmailData(request, name,
+      'Notify Travel Admins Checklist Completion',
+      '100% Checklist Completion');
+
+    if (data) {
+      NotificationEngine.sendMailToMany(data.travelAdmins, data.data);
     }
   }
 

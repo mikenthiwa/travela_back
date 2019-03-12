@@ -15,6 +15,7 @@ const getRequests = (requestId, models) => models.Request.find({
       include: [
         {
           model: models.TravelReason,
+          paranoid: false,
           as: 'reasons',
         },
         {

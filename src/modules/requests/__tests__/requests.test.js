@@ -9,6 +9,7 @@ import RequestsController from '../RequestsController';
 import UserRoleController from '../../userRole/UserRoleController';
 import NotificationEngine from '../../notifications/NotificationEngine';
 import TravelChecklistController from '../../travelChecklist/TravelChecklistController';
+import ApprovalsController from '../../approvals/ApprovalsController';
 
 const request = supertest;
 
@@ -1350,6 +1351,7 @@ describe('Requests Controller', () => {
     });
 
     describe('Requesters Manager', () => {
+      ApprovalsController.sendNotificationToTravelAdmin = jest.fn();
       it('should successfully update a requests status', async (done) => {
         const res = await request(app)
           .put(`/api/v1/approvals/${mockOpenRequest.id}`)
@@ -1357,6 +1359,7 @@ describe('Requests Controller', () => {
           .send({ newStatus: 'Approved' });
         expect(res.statusCode).toEqual(200);
         expect(res.body.success).toEqual(true);
+        expect(ApprovalsController.sendNotificationToTravelAdmin).toHaveBeenCalled();
         expect(res.body.message).toEqual('Request approved successfully');
         done();
       });

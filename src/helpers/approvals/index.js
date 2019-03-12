@@ -3,6 +3,7 @@ import {
   createSearchClause, getModelSearchColumns
 } from '../requests/index';
 import UserRoleController from '../../modules/userRole/UserRoleController';
+import TravelReadinessUtils from '../../modules/travelReadinessDocuments/TravelReadinessUtils';
 
 const { Op } = models.Sequelize;
 
@@ -184,4 +185,33 @@ export const validateBudgetChecker = async (req) => {
     };
   }
   return { result: false };
+};
+
+export const getTravelTeamEmailData = async (
+  request,
+  requesterName,
+  type = 'Notify Travel Admins of Manager Approval',
+  topic = 'Manager Approval'
+) => {
+  const { id, name } = request;
+  const trips = await models.Trip.findAll({ where: { requestId: id } });
+  if (trips) {
+    const locations = trips.reduce((tripLocations, trip) => {
+      tripLocations.push(trip.origin, trip.destination);
+      return tripLocations;
+    }, []).map(location => location.split(',')[0]);
+
+    const { users: travelAdmin } = await UserRoleController.calculateUserRole('29187');
+    const travelAdmins = await TravelReadinessUtils.getRoleMembers(travelAdmin, locations);
+
+    const data = {
+      sender: requesterName,
+      topic,
+      type,
+      details: { requestId: id, requesterName: name },
+      redirectLink: `${process.env.REDIRECT_URL}/requests/my-verifications/${id}`
+    };
+    return travelAdmins.length ? { travelAdmins, data } : null;
+  }
+  return null;
 };

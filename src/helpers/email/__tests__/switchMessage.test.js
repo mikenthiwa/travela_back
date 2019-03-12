@@ -142,4 +142,25 @@ describe('switchMessage helper', () => {
     expect(verifiedMessage.split(' ')).toContain('verified');
     done();
   });
+  it(`should return appropriate message to notify travel admins when
+    managers approve a request`, (done) => {
+    const verifiedMessage = switchMessage({
+      type: 'Notify Travel Admins of Manager Approval',
+      details: { requesterName: 'Tester' }
+    });
+    expect(verifiedMessage.split(' ')).toContain('<b>Tester</b>\'s', 'manager', 'approved');
+    done();
+  });
+  it(`should return appropriate message to notify travel admins of
+    100% checklist completion`, (done) => {
+    const verifiedMessage = switchMessage({
+      type: 'Notify Travel Admins Checklist Completion',
+      senderName: 'AnotherTester',
+      details: {
+        requestId: 'We342'
+      }
+    });
+    expect(verifiedMessage.split(' ')).toContain('<b>AnotherTester</b>', 'completed', 'We342');
+    done();
+  });
 });

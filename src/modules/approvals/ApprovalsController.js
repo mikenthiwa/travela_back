@@ -1,8 +1,10 @@
 
 import models from '../../database/models';
 import { asyncWrapper, retrieveParams } from '../../helpers/requests';
-import { countByStatus, getTotalCount, countVerifiedByStatus } from '../../helpers/requests/paginationHelper';
-import { createApprovalSubquery } from '../../helpers/approvals';
+import { countByStatus, getTotalCount, countVerifiedByStatus } from
+  '../../helpers/requests/paginationHelper';
+import { createApprovalSubquery, getTravelTeamEmailData }
+  from '../../helpers/approvals';
 import Error from '../../helpers/Error';
 import Pagination from '../../helpers/Pagination';
 import Utils from '../../helpers/Utils';
@@ -21,8 +23,8 @@ class ApprovalsController {
     return request;
   }
 
-  static async createApproval(newRequest) {
-    const approvalData = { requestId: newRequest.id, approverId: newRequest.manager, status: newRequest.status };
+  static async createApproval({ id, manager, status }) {
+    const approvalData = { requestId: id, approverId: manager, status };
     const newApproval = await models.Approval.create(approvalData);
     return newApproval;
   }
@@ -70,7 +72,6 @@ class ApprovalsController {
       request.dataValues.travelCompletion = travelCompletion;
       return request;
     }));
-    
     return res.status(200)
       .json({
         success: true,
@@ -121,7 +122,9 @@ class ApprovalsController {
         const updatedRequest = await request.update({
           status: newStatus
         });
-
+        if (newStatus === 'Approved') {
+          ApprovalsController.sendNotificationToTravelAdmin(user, updatedRequest);
+        }
         ApprovalsController.sendNotificationAfterApproval(req, user, updatedRequest, res);
         const {
           id, userId, name: requesterName, manager
@@ -148,7 +151,7 @@ class ApprovalsController {
       return Error.handleError(error, 404, res);
     }
     const { status } = requestToApprove;
-    
+
     const error = BudgetApprovalsController.approvals(status);
     if (error) {
       return Error.handleError(error, 400, res);
@@ -242,6 +245,16 @@ class ApprovalsController {
     // 4.Test this
     if (financeMembers.length) {
       NotificationEngine.sendMailToMany(finaceTeamMembers, data);
+    }
+  }
+
+  static async sendNotificationToTravelAdmin(user, updatedRequest) {
+    const { UserInfo: { name } } = user;
+    const data = await getTravelTeamEmailData(updatedRequest, name);
+
+    if (data) {
+      const { travelAdmins, data: emailData } = data;
+      NotificationEngine.sendMailToMany(travelAdmins, emailData);
     }
   }
 }

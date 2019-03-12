@@ -221,32 +221,30 @@ describe('Update center test', () => {
   });
 
   it('should update travel team member center', (done) => {
+    let userId;
     // Hackish way to find the travel team member before the
     // patch is being used
     request(app)
       .get('/api/v1/user/roles/339458')
       .set('Content-Type', 'application/json')
       .set('authorization', token)
-      .send({})
       .end((err, res) => {
-        expect(res.body.result.users[0].email).toEqual('black.windows@andela.com');
-        expect(res.body.result.users[0].id).toEqual(3);
+        userId = res.body.result.users[0].id;
         if (err) return done(err);
-      });
-
-    request(app)
-      .patch('/api/v1/center/user/3')
-      .set('Content-Type', 'application/json')
-      .set('authorization', token)
-      .send({
-        center: 'Nairobi, Kenya'
-      })
-      .expect(200)
-      .end((err, res) => {
-        expect(res.body.success).toEqual(true);
-        expect(res.body.message).toEqual('Center updated successfully');
-        if (err) return done(err);
-        done();
+        request(app)
+          .patch(`/api/v1/center/user/${userId}`)
+          .set('Content-Type', 'application/json')
+          .set('authorization', token)
+          .send({
+            center: 'Nairobi, Kenya'
+          })
+          .expect(200)
+          .end((error, response) => {
+            expect(response.body.success).toEqual(true);
+            expect(response.body.message).toEqual('Center updated successfully');
+            if (error) return done(error);
+            done();
+          });
       });
   });
 

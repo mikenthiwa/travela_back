@@ -10,6 +10,7 @@ import UserRoleController from '../../userRole/UserRoleController';
 import NotificationEngine from '../../notifications/NotificationEngine';
 import TravelChecklistController from '../../travelChecklist/TravelChecklistController';
 import ApprovalsController from '../../approvals/ApprovalsController';
+import RequestUtils from '../RequestUtils';
 
 const request = supertest;
 
@@ -1599,6 +1600,8 @@ describe('Requests Controller', () => {
         TravelChecklistController.checkListPercentageNumber = jest.fn().mockImplementationOnce(
           () => 100
         );
+        jest.spyOn(RequestUtils, 'sendEmailToFinanceTeam');
+        NotificationEngine.sendMailToMany = jest.fn();
         const redirect = 'redirect/requests/';
         const notifySpy = jest.spyOn(NotificationEngine, 'notify');
         const sendMailSpy = jest.spyOn(NotificationEngine, 'sendMail');
@@ -1622,6 +1625,15 @@ describe('Requests Controller', () => {
               topic: 'Travel Request Verified',
               type: 'Verified'
             });
+            const [args] = NotificationEngine.notify.mock.calls[
+              NotificationEngine.notify.mock.calls.length - 1
+            ];
+            expect(args.notificationType).toEqual('general');
+            if (err) return done(err);
+            done();
+            expect(
+              RequestUtils.sendEmailToFinanceTeam
+            ).toHaveBeenCalled();
             done();
           });
       });

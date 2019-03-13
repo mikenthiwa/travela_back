@@ -24,7 +24,6 @@ import RequestTransactions from './RequestTransactions';
 import RequestUtils from './RequestUtils';
 
 dotenv.config();
-
 const { Op } = models.Sequelize;
 const noResult = 'No records found';
 let params = {};
@@ -370,6 +369,7 @@ class RequestsController {
       );
       NotificationEngine.notify(notificationData);
       NotificationEngine.sendMail(emailData);
+      RequestUtils.sendEmailToFinanceTeam(request);
       return res.status(200)
         .json({ success: true, message: 'Verification Successful', updatedRequest: { request } });
     } catch (error) {

@@ -157,6 +157,15 @@ of budget for this trip.`;
       <b>${msgDetail.details.requestId}</b> trip.</br>
                 Please  login and verify the trip accordingly</br><br/>
                 Thank you`;
+
+    case 'Notify finance team members':
+      return `
+      <b> ${msgDetail.details.requesterName}</b> has now been verified as travel ready.
+
+ Please view travel request and make arrangements to disburse travel stipend for this trip.
+
+Thank you`;
+
     default:
       return '';
   }

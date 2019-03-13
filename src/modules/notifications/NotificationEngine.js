@@ -83,6 +83,7 @@ export default class NotificationEngine {
 
   static sendMailToMany(recipients, data) {
     const { emails, recipientVars } = NotificationEngine.prepareMultipleReceipients(recipients);
+
     const destination = '';
     const mailData = {
       from: `Travela <${process.env.MAIL_SENDER}>`,

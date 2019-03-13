@@ -4,6 +4,9 @@ import { generateRangeQuery } from '../../helpers/requests';
 import models from '../../database/models';
 import BaseException from '../../exceptions/baseException';
 import RoomsManager from '../guestHouse/RoomsManager';
+import TravelReadinessUtils from '../travelReadinessDocuments/TravelReadinessUtils';
+import UserRoleController from '../userRole/UserRoleController';
+import NotificationEngine from '../notifications/NotificationEngine';
 
 const { Op } = models.Sequelize;
 export default class RequestUtils {
@@ -74,5 +77,40 @@ export default class RequestUtils {
       where: { userId, id: requestId },
     });
     return request;
+  }
+
+  // Finance team email notification
+  static async sendEmailToFinanceTeam(request) {
+    const {
+      userId: requesterId, name: requesterName, id
+    } = request;
+    const { location: requesterLocation } = await models.User.findOne({
+      where: {
+        userId: requesterId
+      }
+    });
+    
+    const data = {
+      requestId: id,
+      topic: `Successful Travel Readiness Verification for ${requesterName}'s Trip`,
+      type: 'Notify finance team members',
+      details: {
+        requesterName,
+      },
+      redirectLink: `${process.env.REDIRECT_URL}/requests/my-verifications/${id}`
+    };
+
+    const {
+      users: financeTeamMembers
+    } = await UserRoleController.calculateUserRole('70001');
+
+    const financeTeam = await TravelReadinessUtils.getRoleMembers(
+      financeTeamMembers,
+      requesterLocation
+    );
+
+    if (financeTeam.length) {
+      NotificationEngine.sendMailToMany(financeTeamMembers, data);
+    }
   }
 }

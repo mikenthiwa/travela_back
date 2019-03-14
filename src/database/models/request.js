@@ -24,7 +24,10 @@ export default (sequelize, DataTypes) => {
       allowNull: false,
       type: DataTypes.STRING,
       validate: {
-        is: ['^[a-zA-Z0-9_ ]*$'],
+        notEmpty: {
+          args: true,
+          msg: 'Manager name cannot be empty',
+        },
       },
     },
     gender: {

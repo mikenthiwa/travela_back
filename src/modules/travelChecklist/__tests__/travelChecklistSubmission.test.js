@@ -7,6 +7,7 @@ import {
 	checklistSubmission, checklist, requestMock,
 	tripsMock, bedData, roomData, guestHouse, userData
 } from './mocks/mockData';
+import { documentsData, commentMock} from './__mocks__/mockData';
 import TravelChecklistController from "../TravelChecklistController";
 
 class Error {
@@ -38,7 +39,9 @@ describe('Travel Checklist Submission', () => {
 				.destroy({ force: true, truncate: { cascade: true } });
 			await models.ChecklistSubmission
 				.destroy({ force: true, truncate: { cascade: true } });
-			await models.ChecklistItem.sync({ force: true });
+            await models.ChecklistItem.sync({ force: true });
+            await models.Comment.destroy({ force: true, truncate: { cascade: true } });
+            await models.TravelReadinessDocuments.destroy({ force: true, truncate: { cascade: true } });
 			await models.Request.destroy({ force: true, truncate: { cascade: true } });
 			await models.Trip.sync({ force: true });
 			await models.User.sync({ force: true, truncate: { cascade: true } });
@@ -49,7 +52,9 @@ describe('Travel Checklist Submission', () => {
 			await models.Room.create(roomData)
 			await models.Bed.bulkCreate(bedData)
 			await models.Trip.bulkCreate(tripsMock)
-			await models.ChecklistItem.create(checklist)
+            await models.ChecklistItem.create(checklist)
+            await models.Comment.create(commentMock);
+            await models.TravelReadinessDocuments.bulkCreate(documentsData);
 			await models.ChecklistSubmission.create(checklistSubmission)
 		})
 
@@ -204,7 +209,45 @@ describe('Travel Checklist Submission', () => {
 					expect(TravelChecklistController.sendEmailToTravelAdmin).toHaveBeenCalled();
 					done();
 				});
-		});
+        });
+        
+        it('should return 404 if document does not exist', (done) => {
+            request
+            .post('/api/v1/checklists/35678/submissions/46664')
+            .set('Content-Type', 'application/json')
+            .set('authorization', token)
+            .send({
+                tripId: 'trip-12',
+                file: {'url': 'xyz', 'documentId': '1234'}
+            })
+            .end((err, res) => {
+                if (err) return done(err);
+                expect(res.status).toEqual(404);
+                expect(res.body.success).toEqual(false);
+                expect(res.body.message)
+                    .toEqual('Document with id 1234 does not exist');
+                done();
+            });
+        });
+
+        it('should return 404 if document does not exist', (done) => {
+            request
+            .post('/api/v1/checklists/35678/submissions/46664')
+            .set('Content-Type', 'application/json')
+            .set('authorization', token)
+            .send({
+                tripId: 'trip-12',
+                file: {'url': 'xyz', 'documentId': 'SyOyr_AtC'}
+            })
+            .end((err, res) => {
+                if (err) return done(err);
+                expect(res.status).toEqual(201);
+                expect(res.body.success).toEqual(true);
+                expect(res.body.message)
+                    .toEqual('Submission uploaded successfully');
+                done();
+            });
+        });
 	});
 
 	describe('GET checklist submission', () => {
@@ -215,7 +258,9 @@ describe('Travel Checklist Submission', () => {
 				.destroy({ force: true, truncate: { cascade: true } });
 			await models.ChecklistSubmission
 				.destroy({ force: true, truncate: { cascade: true } });
-			await models.ChecklistItem.sync({ force: true });
+            await models.ChecklistItem.sync({ force: true });
+            await models.Comment.destroy({ force: true, truncate: { cascade: true } });
+            await models.TravelReadinessDocuments.destroy({ force: true, truncate: { cascade: true } });
 			await models.Request.destroy({ force: true, truncate: { cascade: true } });
 			await models.Trip.sync({ force: true });
 			await models.User.destroy({ force: true, truncate: { cascade: true } });
@@ -226,7 +271,9 @@ describe('Travel Checklist Submission', () => {
 			await models.Room.create(roomData)
 			await models.Bed.bulkCreate(bedData)
 			await models.Trip.bulkCreate(tripsMock)
-			await models.ChecklistItem.create(checklist)
+            await models.ChecklistItem.create(checklist);
+            await models.Comment.create(commentMock);
+            await models.TravelReadinessDocuments.bulkCreate(documentsData);
 			await models.ChecklistSubmission.create(checklistSubmission)
 		})
 

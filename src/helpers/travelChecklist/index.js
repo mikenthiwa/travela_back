@@ -4,6 +4,7 @@ import { Op } from 'sequelize';
 import models from '../../database/models';
 import TripsController from '../../modules/trips/TripsController';
 import CustomError from '../Error';
+import { getTravelDocument } from '../../modules/travelReadinessDocuments/getTravelDocument.data';
 
 class TravelChecklistHelper {
   static groupCheckList(checklists, groupBy) {
@@ -166,6 +167,20 @@ class TravelChecklistHelper {
       };
     });
     return combinedChecklist;
+  }
+
+  static generateChecklistValue(id, retrievedDoc, file) {
+    const value = id ? {
+      url: retrievedDoc.cloudinaryUrl,
+      fileName: retrievedDoc.imageName
+    } : file;
+    return value;
+  }
+
+  static async retrieveTravelDocumentData(documentId) {
+    const document = await getTravelDocument(documentId, models);
+    const retrievedDoc = document ? document.dataValues.data : null;
+    return retrievedDoc;
   }
 }
 

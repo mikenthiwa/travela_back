@@ -163,6 +163,11 @@ export default class TravelChecklistController {
             model: models.ChecklistItem,
             as: 'checklistSubmissions',
             attributes: ['id']
+          },
+          {
+            model: models.TravelReadinessDocuments,
+            as: 'documentSubmission',
+            attributes: ['id', 'data']
           }]
         });
       }
@@ -322,15 +327,26 @@ export default class TravelChecklistController {
       const { file, tripId } = req.body;
       const previousPercentage = await TravelChecklistController
         .checkListPercentageNumber(req, res, requestId);
+      const { documentId } = file;
+      const id = documentId || null;
+      
+      const retrievedDoc = await TravelChecklistHelper.retrieveTravelDocumentData(documentId);
+      if (!retrievedDoc && documentId) {
+        return res.status(404).json({
+          success: false,
+          message: `Document with id ${documentId} does not exist`,
+        });
+      }
+      const value = TravelChecklistHelper.generateChecklistValue(id, retrievedDoc, file);
       const query = {
         where: { tripId, checklistItemId },
-        defaults: { value: file, id: Utils.generateUniqueId() }
+        defaults: { value, id: Utils.generateUniqueId(), documentId: id },
       };
       const submit = await models.ChecklistSubmission.findOrCreate(query);
       const [submission, created] = submit;
-
       if (!created) {
         submission.value = file;
+        submission.documentId = id;
         await submission.save();
       }
 
@@ -341,10 +357,8 @@ export default class TravelChecklistController {
         TravelChecklistController.sendEmailToTravelAdmin(request, req.user);
       }
       res.status(201).json({
-        success: true,
-        message: 'Submission uploaded successfully',
-        percentageCompleted,
-        submission
+        success: true, message: 'Submission uploaded successfully',
+        percentageCompleted, submission
       });
     } catch (error) { /* istanbul ignore next */
       return CustomError.handleError(error, 500, res);
@@ -383,7 +397,15 @@ export default class TravelChecklistController {
         submissions = JSON.parse(JSON.stringify(submissions));
         submissions = submissions.map((submission) => {
           let { value } = submission;
+          const { documentSubmission, documentId } = submission;
+          if (documentId) {
+            const { data: { imageName, cloudinaryUrl } } = documentSubmission;
+            value = { fileName: imageName, url: cloudinaryUrl };
+            value = JSON.stringify(value);
+          }
           value = JSON.parse(value);
+          // eslint-disable-next-line no-param-reassign
+          delete submission.documentSubmission;
           return { ...submission, value };
         });
         percentageCompleted = await TravelChecklistController

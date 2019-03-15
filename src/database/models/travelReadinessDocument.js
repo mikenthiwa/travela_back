@@ -30,6 +30,10 @@ export default (sequelize, DataTypes) => {
       foreignKey: 'documentId',
       as: 'comments',
     });
+    TravelReadinessDocuments.hasMany(models.ChecklistSubmission, {
+      foreignKey: 'documentId',
+      as: 'documentSubmission',
+    });
   };
   return TravelReadinessDocuments;
 };

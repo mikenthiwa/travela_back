@@ -219,7 +219,8 @@ export const checklistSubmissions = [
     checklistItemId: '1',
     createdAt: new Date(),
     updatedAt: new Date(),
-    deletedAt: null
+    deletedAt: null,
+    documentId: null,
   },
   {
     id: '2',
@@ -228,7 +229,8 @@ export const checklistSubmissions = [
     checklistItemId: '4',
     createdAt: new Date(),
     updatedAt: new Date(),
-    deletedAt: null
+    deletedAt: null,
+    documentId: null,
   },
   {
     id: '3',
@@ -237,7 +239,8 @@ export const checklistSubmissions = [
     checklistItemId: '8',
     createdAt: new Date(),
     updatedAt: new Date(),
-    deletedAt: null
+    deletedAt: null,
+    documentId: null,
   },
   {
     id: '4',
@@ -246,7 +249,8 @@ export const checklistSubmissions = [
     checklistItemId: '6',
     createdAt: new Date(),
     updatedAt: new Date(),
-    deletedAt: null
+    deletedAt: null,
+    documentId: null,
   },
 ];
 
@@ -785,4 +789,68 @@ export const expectedResponse = {
       ]
     }
   ]
+};
+
+export const documentsData = [
+  {
+    id: 'SyOyr_AtC',
+    type: 'visa',
+    data: {
+      imageName: 'image1.jpg',
+      entryType: 'H-2A',
+      country: 'Kenya',
+      dateOfIssue: '02-01-2018',
+      expiryDate: '06-01-2018',
+      cloudinaryUrl: 'https://res.cloudinary.com/ined/image/upload/v1538568663/Logo_blue_2x.png'
+    },
+    userId: '-MUyHJmKrxA90lPNQ1FOLNm',
+    createdAt: '2019-01-04 012:11:52.181+01',
+    updatedAt: '2019-01-16 012:11:52.181+01',
+  },
+  {
+    id: 'b9gnYkdzG',
+    type: 'visa',
+    data: {
+      imageName: 'image2.jpg',
+      entryType: 'H-2A',
+      country: 'Kenya',
+      dateOfIssue: '02-01-2018',
+      expiryDate: '06-01-2018',
+      cloudinaryUrl: 'https://res.cloudinary.com/ined/image/upload/v1538568663/Logo_blue_2x.png'
+    },
+    userId: '-MUyHJmKrxA90lPNQ1FOLNm',
+    createdAt: '2019-01-04 012:11:52.181+01',
+    updatedAt: '2019-01-16 012:11:52.181+01',
+  },
+  {
+    id: 'pk42DLnx4C',
+    type: 'passport',
+    data: {
+      imageName: 'image2.jpg',
+      passportNumber: 'qw357etrty',
+      nationality: 'kenyan',
+      dateOfBirth: '1970-01-01',
+      dateOfIssue: '2018-11-01',
+      placeOfIssue: 'Kenya',
+      expiryDate: '2029-11-01',
+      cloudinaryUrl: 'https://res.cloudinary.com/dbk8ky2'
+    },
+    userId: '-MUyHJmKrxA90lPNQ1FOLNm',
+    createdAt: '2019-01-04 012:11:52.181+01',
+    updatedAt: '2019-01-16 012:11:52.181+01',
+  },
+];
+
+export const commentMock = {
+  id: 'DOCstrange',
+  comment: "I thought we agreed you'd spend only two weeks",
+  isEdited: false,
+  requestId: '-ss60B42oZ-a',
+  userName: 'Doctor Strange',
+  userEmail: 'doctor.strange@andela.com',
+  picture: 'fakepicture.png',
+  createdAt: '2018-08-16 012:11:52.181+01',
+  updatedAt: '2018-08-16 012:11:52.181+01',
+  documentId: null,
+  userId: 10,
 };

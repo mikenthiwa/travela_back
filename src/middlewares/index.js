@@ -13,6 +13,7 @@ import ReminderEmailTemplateValidator from './reminderEmailTemplateValidator';
 import ReminderValidator from './reminderValidator';
 import TravelReasonsValidator from './travelReasonsValidator';
 import TravelStipendValidator from './travelStipendValidator';
+import DepartmentValidation from './DepartmentValidation';
 
 
 const middleware = {
@@ -30,7 +31,8 @@ const middleware = {
   ReminderValidator,
   ReminderEmailTemplateValidator,
   TravelReasonsValidator,
-  TravelStipendValidator
+  TravelStipendValidator,
+  DepartmentValidation
 };
 
 export default middleware;

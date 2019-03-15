@@ -63,6 +63,7 @@ describe('Guest Role Test', () => {
       response: {
         workEmail: 'lisa.doe@andela.com',
         supervisorEId: '92',
+        department: 'Partner-Programs',
         location: 'Nigeria'
       }
     });
@@ -89,7 +90,8 @@ describe('Guest Role Test', () => {
           name: 'ssewilliam',
           id: '92',
           location: { name: 'Kampala' },
-          picture: 'http//:gif.jpg'
+          picture: 'http//:gif.jpg',
+          department: 'Partner-Programs',
         }]
       }
     });
@@ -100,6 +102,7 @@ describe('Guest Role Test', () => {
         values: [{
           email: 'william.sserubiri@andela.com',
           name: 'ssewilliam',
+          department: 'Partner-Programs',
           id: '92',
           location: {
             name: 'Kampala'

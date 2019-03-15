@@ -55,7 +55,8 @@ describe('Travel team role test', () => {
       response: {
         workEmail: 'lisa.doe@andela.com',
         supervisorEId: '92',
-        location: 'Nigeria'
+        location: 'Nigeria',
+        department: 'Partner-Programs',
       }
     });
     moxios.stubRequest(process.env.BAMBOOHR_API.replace('{bambooHRId}', '92'), {
@@ -79,6 +80,7 @@ describe('Travel team role test', () => {
         values: [{
           email: 'william.sserubiri@andela.com',
           name: 'ssewilliam',
+          department: 'Partner-Programs',
           id: '92',
           location: { name: 'Kampala' },
           picture: 'http//:gif.jpg'
@@ -91,6 +93,7 @@ describe('Travel team role test', () => {
         values: [{
           email: 'william.sserubiri@andela.com',
           name: 'ssewilliam',
+          department: 'Partner-Programs',
           id: '92',
           location: {
             name: 'Kampala'
@@ -186,22 +189,6 @@ describe('Travel team role test', () => {
           done();
         });
     });
-    it('should return 400 error if the center is not provided', (done) => {
-      request(app)
-        .put('/api/v1/user/role/update')
-        .set('authorization', token)
-        .send({
-          email: 'test.user@andela.com',
-          roleName: 'travel team member',
-        })
-        .expect(400)
-        .end((err, res) => {
-          expect(res.body.success).toEqual(false);
-          expect(res.body.message)
-            .toEqual('Please provide center');
-          done();
-        });
-    });
     it('should return 404 error if the center does not exist', (done) => {
       request(app)
         .put('/api/v1/user/role/update')
@@ -273,7 +260,8 @@ describe('Travel team role test', () => {
         status: 200,
         response: {
           workEmail: 'lisa.doe@andela.com',
-          supervisorEId: '92'
+          supervisorEId: '92',
+          department: 'Partner-Programs',
         }
       });
       moxios.stubRequest(process.env.BAMBOOHR_API.replace('{bambooHRId}', '92'), {
@@ -297,6 +285,7 @@ describe('Travel team role test', () => {
           values: [{
             email: 'william.sserubiri@andela.com',
             name: 'ssewilliam',
+            department: 'Partner-Programs',
             id: '92',
             location: {
               name: 'Kampala'

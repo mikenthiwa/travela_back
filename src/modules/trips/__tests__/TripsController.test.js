@@ -88,7 +88,8 @@ describe('Test Suite for Trips Controller', () => {
         response: {
           workEmail: 'lisa.doe@andela.com',
           supervisorEId: '92',
-          location: 'Nigeria'
+          location: 'Nigeria',
+          department: 'Partner-Programs',
         }
       });
       moxios.stubRequest(process.env.BAMBOOHR_API.replace('{bambooHRId}', '92'), {
@@ -114,7 +115,8 @@ describe('Test Suite for Trips Controller', () => {
             name: 'ssewilliam',
             id: '92',
             location: { name: 'Kampala' },
-            picture: 'http//:gif.jpg'
+            picture: 'http//:gif.jpg',
+            department: 'Partner-Programs',
           }]
         }
       });
@@ -126,7 +128,8 @@ describe('Test Suite for Trips Controller', () => {
             name: 'ssewilliam',
             id: '92',
             location: { name: 'Kampala' },
-            picture: 'http//:gif.jpg'
+            picture: 'http//:gif.jpg',
+            department: 'Partner-Programs',
           }]
         }
       });
@@ -160,7 +163,8 @@ describe('Test Suite for Trips Controller', () => {
         response: {
           workEmail: 'lisa.doe@andela.com',
           supervisorEId: '92',
-          location: 'Nigeria'
+          location: 'Nigeria',
+          department: 'Partner-Programs',
         }
       });
       moxios.stubRequest(process.env.BAMBOOHR_API.replace('{bambooHRId}', '92'), {
@@ -186,7 +190,8 @@ describe('Test Suite for Trips Controller', () => {
             name: 'ssewilliam',
             id: '92',
             location: { name: 'Kampala' },
-            picture: 'http//:gif.jpg'
+            picture: 'http//:gif.jpg',
+            department: 'Partner-Programs',
           }]
         }
       });
@@ -196,6 +201,7 @@ describe('Test Suite for Trips Controller', () => {
           values: [{
             email: 'william.sserubiri@andela.com',
             name: 'ssewilliam',
+            department: 'Partner-Programs',
             id: '92',
             location: {
               name: 'Kampala'

@@ -5,6 +5,7 @@ import CustomError from '../../helpers/Error';
 import UserHelper from '../../helpers/user';
 import NotificationEngine from '../notifications/NotificationEngine';
 import UserRoleUtils from './UserRoleUtils';
+import DepartmentController from '../department/DepartmentController';
 
 dotenv.config();
 
@@ -130,9 +131,12 @@ class UserRoleController {
           picture: travelaUser.picture,
           fullName: travelaUser.fullName,
           location: travelaUser.location,
-          gender: travelaUser.gender
+          gender: travelaUser.gender,
+          department: travelaUser.department,
+          occupation: travelaUser.occupation
         }
       });
+      await DepartmentController.createDepartment(req, res, managerResult.department);
       const newLocation = !userOnProduction.data.values[0].location
         ? userLocation
         : userOnProduction.data.values[0].location.name;
@@ -147,6 +151,7 @@ class UserRoleController {
       };
       await managerResult.addRole(53019);
       await result.update(updateData);
+      await DepartmentController.createDepartment(req, res, updateData.department);
       return UserRoleController.response(res, message, result);
     } catch (error) {
       /* istanbul ignore next */
@@ -172,19 +177,25 @@ class UserRoleController {
     return data;
   }
 
-  static async createUserFromApi(req) {
+  static async createUserFromApi(req, res) {
     const { data } = await UserRoleController.getUserFromApi(req);
     const user = data.values[0];
     if (data.total === 0) {
       return { found: false };
     }
+    const userOnBamboo = await UserHelper.getUserOnBamboo(user.bamboo_hr_id);
+
     const createdUser = await models.User.create({
       fullName: user.name,
       email: user.email,
       userId: user.id,
       picture: user.picture,
-      location: user.location ? user.location.name : ''
+      location: user.location ? user.location.name : '',
+      department: userOnBamboo.data.department,
+      occupation: userOnBamboo.data.jobTitle,
+      gender: userOnBamboo.data.gender,
     });
+    await DepartmentController.createDepartment(req, res, userOnBamboo.data.department);
     return { createdUser, found: true };
   }
 
@@ -203,16 +214,12 @@ class UserRoleController {
         attributes: ['email', 'fullName', 'userId', 'id']
       });
       if (!user) {
-        const { found, createdUser } = await UserRoleController.createUserFromApi(req);
+        const { found, createdUser } = await UserRoleController.createUserFromApi(req, res);
         if (!found) {
           const message = 'Email does not exist';
           return CustomError.handleError(message, 404, res);
         }
         user = createdUser;
-      }
-      if (!centerId && roleId === 339458) {
-        const message = [400, 'Please provide center', false];
-        return UserRoleController.response(res, message);
       }
       const hasRole = await models.UserRole.find({
         where: { roleId, userId: user.id }

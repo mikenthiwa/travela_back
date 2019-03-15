@@ -193,7 +193,8 @@ describe('User Role Test', () => {
       response: {
         workEmail: 'lisa.doe@andela.com',
         supervisorEId: '92',
-        location: 'Nigeria'
+        location: 'Nigeria',
+        department: 'Partner-Programs',
       }
     });
     moxios.stubRequest(process.env.BAMBOOHR_API.replace('{bambooHRId}', '92'), {
@@ -217,6 +218,7 @@ describe('User Role Test', () => {
         values: [{
           email: 'william.sserubiri@andela.com',
           name: 'ssewilliam',
+          department: 'Partner-Programs',
           id: '92',
           location: { name: 'Kampala' },
           picture: 'http//:gif.jpg'
@@ -230,6 +232,7 @@ describe('User Role Test', () => {
           email: 'william.sserubiri@andela.com',
           name: 'ssewilliam',
           id: '92',
+          department: 'Partner-Programs',
           location: {
             name: 'Kampala'
           },
@@ -271,7 +274,8 @@ describe('User Role Test', () => {
       response: {
         workEmail: 'lisa.doe@andela.com',
         supervisorEId: '92',
-        location: 'Nigeria'
+        location: 'Nigeria',
+        department: 'Partner-Programs',
       }
     });
     moxios.stubRequest(process.env.BAMBOOHR_API.replace('{bambooHRId}', '92'), {
@@ -295,6 +299,7 @@ describe('User Role Test', () => {
         values: [{
           email: 'william.sserubiri@andela.com',
           name: 'ssewilliam',
+          department: 'Partner-Programs',
           id: '92',
           location: { name: 'Kampala' },
           picture: 'http//:gif.jpg'
@@ -307,6 +312,7 @@ describe('User Role Test', () => {
         values: [{
           email: 'william.sserubiri@andela.com',
           name: 'ssewilliam',
+          department: 'Partner-Programs',
           id: '92',
           location: {
             name: 'Kampala'
@@ -575,6 +581,7 @@ describe('User Role Test', () => {
   it('should change the role of a user that has not logged in for the first time', async (done) => {
     axios.get = jest.fn(() => Promise.resolve({
       data: {
+        department: 'Partner-Programs',
         values: [
           {
             id: 'jdddd',
@@ -583,16 +590,16 @@ describe('User Role Test', () => {
             last_name: 'Widow',
             name: 'Black Widow',
             picture: 'photo.jpg?sz=50Vn',
+            department: 'Partner-Programs',
             status: 'active',
             location: {
               name: 'Wakanda'
-            }
+            },
           }
         ],
         total: 1,
       }
     }));
-
     request(app)
       .put('/api/v1/user/role/update')
       .set('Content-Type', 'application/json')

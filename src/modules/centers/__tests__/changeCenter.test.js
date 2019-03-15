@@ -64,7 +64,8 @@ describe('Update center test', () => {
       response: {
         workEmail: 'lisa.doe@andela.com',
         supervisorEId: '92',
-        location: 'Nigeria'
+        location: 'Nigeria',
+        department: 'Partner-Programs',
       }
     });
     moxios.stubRequest(process.env.BAMBOOHR_API.replace('{bambooHRId}', '92'), {
@@ -90,7 +91,8 @@ describe('Update center test', () => {
           name: 'ssewilliam',
           id: '92',
           location: { name: 'Kampala' },
-          picture: 'http//:gif.jpg'
+          picture: 'http//:gif.jpg',
+          department: 'Partner-Programs',
         }]
       }
     });
@@ -104,7 +106,8 @@ describe('Update center test', () => {
           location: {
             name: 'Kampala'
           },
-          picture: 'http//:gif.jpg'
+          picture: 'http//:gif.jpg',
+          department: 'Partner-Programs',
         }]
       }
     });
@@ -138,7 +141,8 @@ describe('Update center test', () => {
       response: {
         workEmail: 'lisa.doe@andela.com',
         supervisorEId: '92',
-        location: 'Nigeria'
+        location: 'Nigeria',
+        department: 'Partner-Programs',
       }
     });
     moxios.stubRequest(process.env.BAMBOOHR_API.replace('{bambooHRId}', '92'), {
@@ -166,7 +170,8 @@ describe('Update center test', () => {
           location: {
             name: 'Kampala'
           },
-          picture: 'http//:gif.jpg'
+          picture: 'http//:gif.jpg',
+          department: 'Partner-Programs',
         }]
       }
     });

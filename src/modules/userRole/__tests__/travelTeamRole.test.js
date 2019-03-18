@@ -221,7 +221,7 @@ describe('Travel team role test', () => {
             expect(res.body.success).toEqual(true);
             expect(res.body.message)
               .toEqual('Role updated successfully');
-            expect(res.body.result.centers[0].location)
+            expect(res.body.result[0].centers[0].location)
               .toEqual('Lagos, Nigeria');
             done();
           });

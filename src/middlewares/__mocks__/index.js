@@ -157,7 +157,8 @@ const middleware = {
     verifyParam: jest.fn(invokeNextMiddleware),
   },
   DepartmentValidation: {
-    validateDepartment: jest.fn(invokeNextMiddleware)
+    validateDepartment: jest.fn(invokeNextMiddleware),
+    validateRoleDepartment: jest.fn(invokeNextMiddleware)
   }
 };
 

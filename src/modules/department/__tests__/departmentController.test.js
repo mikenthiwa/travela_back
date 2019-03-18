@@ -72,7 +72,7 @@ describe('Department Controller', () => {
         .end((err, res) => {
           if (err) return done(err);
           expect(res.body.success).toEqual(true);
-          expect(res.body.message).toEqual('Document list');
+          expect(res.body.message).toEqual('Department List');
           done();
         });
     });

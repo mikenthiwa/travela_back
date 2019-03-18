@@ -606,8 +606,8 @@ describe('User Role Test', () => {
       .set('Authorization', token)
       .send({ email: 'black.widow@andela.com', roleName: 'manager' })
       .end((err, res) => {
-        expect(res.body.result.email).toEqual('black.widow@andela.com');
-        expect(res.body.result.fullName).toEqual('Black Widow');
+        expect(res.body.result[0].email).toEqual('black.widow@andela.com');
+        expect(res.body.result[0].fullName).toEqual('Black Widow');
         if (err) return done(err);
         done();
       });

@@ -61,7 +61,14 @@ class UserRoleController {
                 where: { userId: id }
               }
             }
-          ]
+          ],
+          
+        },
+        {
+          model: models.Department,
+          as: 'budgetCheckerDepartments',
+          attributes: ['id', 'name'],
+          through: { attributes: [] },
         }
       ]
     });
@@ -136,7 +143,7 @@ class UserRoleController {
           occupation: travelaUser.occupation
         }
       });
-      await DepartmentController.createDepartment(req, res, managerResult.department);
+      await DepartmentController.createDepartmentFromEndpoint(managerResult.department);
       const newLocation = !userOnProduction.data.values[0].location
         ? userLocation
         : userOnProduction.data.values[0].location.name;
@@ -151,7 +158,7 @@ class UserRoleController {
       };
       await managerResult.addRole(53019);
       await result.update(updateData);
-      await DepartmentController.createDepartment(req, res, updateData.department);
+      await DepartmentController.createDepartmentFromEndpoint(updateData.department);
       return UserRoleController.response(res, message, result);
     } catch (error) {
       /* istanbul ignore next */
@@ -177,7 +184,7 @@ class UserRoleController {
     return data;
   }
 
-  static async createUserFromApi(req, res) {
+  static async createUserFromApi(req) {
     const { data } = await UserRoleController.getUserFromApi(req);
     const user = data.values[0];
     if (data.total === 0) {
@@ -195,7 +202,7 @@ class UserRoleController {
       occupation: userOnBamboo.data.jobTitle,
       gender: userOnBamboo.data.gender,
     });
-    await DepartmentController.createDepartment(req, res, userOnBamboo.data.department);
+    await DepartmentController.createDepartmentFromEndpoint(userOnBamboo.data.department);
     return { createdUser, found: true };
   }
 
@@ -204,7 +211,9 @@ class UserRoleController {
       const {
         roleId,
         centerId,
-        body: { email, center, roleName },
+        body: {
+          email, center, roleName, departments
+        },
         user: {
           UserInfo: { name }
         }
@@ -213,8 +222,9 @@ class UserRoleController {
         where: { email },
         attributes: ['email', 'fullName', 'userId', 'id']
       });
+      let dept;
       if (!user) {
-        const { found, createdUser } = await UserRoleController.createUserFromApi(req, res);
+        const { found, createdUser } = await UserRoleController.createUserFromApi(req);
         if (!found) {
           const message = 'Email does not exist';
           return CustomError.handleError(message, 404, res);
@@ -231,9 +241,13 @@ class UserRoleController {
       });
       user.dataValues.centers = [{ id: result.centerId, location: center }];
       const message = [200, 'Role updated successfully', true];
-
+      if (roleId === 60000) {
+        dept = await DepartmentController.assignDepartments(departments, user);
+      }
       await UserRoleController.sendNotificationEmail(user, roleName, name);
-      UserRoleController.response(res, message, user);
+      const results = [user, dept];
+
+      UserRoleController.response(res, message, results);
     } catch (error) {
       /* istanbul ignore next */
       res.status(500).json({

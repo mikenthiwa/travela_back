@@ -4,7 +4,9 @@ import UserRoleController from './UserRoleController';
 import UpdateUserRoleController from './UpdateRoleController';
 
 
-const { authenticate, Validator, RoleValidator } = middlewares;
+const {
+  authenticate, Validator, RoleValidator, DepartmentValidation
+} = middlewares;
 const Router = express.Router();
 
 Router.get('/user',
@@ -70,6 +72,7 @@ Router.put(
   RoleValidator.roleExists,
   Validator.centerExists,
   RoleValidator.validateRoleAssignment,
+  DepartmentValidation.validateRoleDepartment,
   UserRoleController.updateUserRole
 );
 

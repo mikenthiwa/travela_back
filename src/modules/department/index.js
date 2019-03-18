@@ -25,7 +25,7 @@ Router.post(
     'Travel Team Member'
   ]),
   DepartmentValidation.validateDepartment,
-  DepartmentController.createDepartment,
+  DepartmentController.createDepartmentFromApi,
 );
 
 export default Router;

@@ -86,6 +86,11 @@ export default (sequelize, DataTypes) => {
       foreignKey: 'createdBy',
       sourceKey: 'id'
     });
+    User.belongsToMany(models.Department, {
+      foreignKey: 'userId',
+      as: 'budgetCheckerDepartments',
+      through: models.UsersDepartments
+    });
   };
   return User;
 };

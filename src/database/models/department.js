@@ -6,8 +6,12 @@ export default (sequelize, DataTypes) => {
       unique: true
     },
   }, {});
-  Department.associate = () => {
-    // associations can be defined here
+  Department.associate = (models) => {
+    Department.belongsToMany(models.User, {
+      foreignKey: 'departmentId',
+      as: 'users',
+      through: models.UsersDepartments
+    });
   };
   return Department;
 };

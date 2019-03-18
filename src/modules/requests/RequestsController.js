@@ -52,8 +52,8 @@ class RequestsController {
         id: Utils.generateUniqueId(),
         userId: req.user.UserInfo.id,
         picture: req.user.UserInfo.picture,
+        stipendBreakdown: JSON.stringify(requestDetails.stipendBreakdown)
       };
-      
 
       const multipleRoomsData = trips.map(trip => ({
         arrivalDate: (requestData.tripType === 'oneWay' || (requestData.tripType === 'multi' && !trip.returnDate))
@@ -289,6 +289,9 @@ class RequestsController {
         requestData.dataValues.budgetApprovedBy = approver.budgetApprover;
         requestData.dataValues.budgetApprovedAt = approver.budgetApprovedAt;
       }
+      requestData.dataValues.stipend = requestData.dataValues.stipendBreakdown
+        ? JSON.parse(requestData.dataValues.stipendBreakdown) : requestData.dataValues.stipend;
+      delete requestData.dataValues.stipendBreakdown;
       return res.status(200).json({
         success: true,
         requestData,

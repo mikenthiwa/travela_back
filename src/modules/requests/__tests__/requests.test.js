@@ -86,6 +86,13 @@ const mockNewRequest = generateMock.request(
         returnDate: moment().add(4, 'days').format('YYYY-MM-DD'),
       })
     ],
+    stipendBreakdown: [{
+      subTotal: 600,
+      location: 'New York, United States',
+      dailyRate: 300,
+      duration: 2,
+      centerExists: true
+    }],
     comments: {},
   }
 );
@@ -103,6 +110,13 @@ const mockNewRequestWithComment = generateMock.request(
         returnDate: moment().add(27, 'days').format('YYYY-MM-DD'),
       })
     ],
+    stipendBreakdown: [{
+      subTotal: 600,
+      location: 'New York, United States',
+      dailyRate: 300,
+      duration: 2,
+      centerExists: true
+    }],
     comments: { comment: '<p>this is it</p>' },
   }
 );
@@ -189,7 +203,14 @@ const mockOpenRequest = generateMock.request(
           }
         )
       }
-    ]
+    ],
+    stipendBreakdown: JSON.stringify([{
+      subTotal: 600,
+      location: 'New York, United States',
+      dailyRate: 300,
+      duration: 2,
+      centerExists: true
+    }]),
   }
 );
 
@@ -209,7 +230,14 @@ const mockApprovedRequest = generateMock.request(
           }
         )
       }
-    ]
+    ],
+    stipendBreakdown: JSON.stringify([{
+      subTotal: 600,
+      location: 'New York, United States',
+      dailyRate: 300,
+      duration: 2,
+      centerExists: true
+    }]),
   }
 );
 
@@ -229,7 +257,14 @@ const mockRejectedRequest = generateMock.request(
           }
         )
       }
-    ]
+    ],
+    stipendBreakdown: JSON.stringify([{
+      subTotal: 600,
+      location: 'New York, United States',
+      dailyRate: 300,
+      duration: 2,
+      centerExists: true
+    }]),
   }
 );
 
@@ -785,6 +820,37 @@ describe('Requests Controller', () => {
         done();
       });
 
+      it('should return 422 and stipendBreakDown must be an array error', async (done) => {
+        const res = await request(app)
+          .post('/api/v1/requests')
+          .set('authorization', requesterToken)
+          .send({
+            ...mockNewRequest,
+            stipendBreakdown: 'jhjsgvd'
+          });
+        expect(res.status).toEqual(422);
+        expect(res.body.errors[0].msg).toEqual('stipendBreakdown must be an array');
+        done();
+      });
+
+      it('should return 422 and missing subTotal error', async (done) => {
+        const res = await request(app)
+          .post('/api/v1/requests')
+          .set('authorization', requesterToken)
+          .send({
+            ...mockNewRequest,
+            stipendBreakdown: [{
+              location: 'New York, United States',
+              dailyRate: 300,
+              duration: 2,
+              centerExists: true
+            }],
+          });
+        expect(res.status).toEqual(422);
+        expect(res.body.errors[0].msg).toEqual('subTotal is missing for object at position 1');
+        done();
+      });
+
       it('should throw 422 error while creating a request that is not multi-trip with'
         + ' more than one trip', async (done) => {
         const expectedResponse = {
@@ -1078,7 +1144,8 @@ describe('Requests Controller', () => {
                     ...updateDetails.trips[0],
                     bedId: 1234,
                   }
-                ]
+                ],
+                stipendBreakdown: JSON.parse(updateDetails.stipendBreakdown)
               }
             )
             .end((err, res) => {
@@ -1118,7 +1185,10 @@ describe('Requests Controller', () => {
         request(app)
           .put(`/api/v1/requests/${mockApprovedRequest.id}`)
           .set('authorization', requesterToken)
-          .send(updateDetails)
+          .send({
+            ...updateDetails,
+            stipendBreakdown: JSON.parse(updateDetails.stipendBreakdown)
+          })
           .end((err, res) => {
             expect(res).toMatchObject(expectedResponse);
             done();
@@ -1136,7 +1206,10 @@ describe('Requests Controller', () => {
         request(app)
           .put('/api/v1/requests/abcdef')
           .set('authorization', requesterToken)
-          .send(updateDetails)
+          .send({
+            ...updateDetails,
+            stipendBreakdown: JSON.parse(updateDetails.stipendBreakdown)
+          })
           .end((err, res) => {
             expect(res).toMatchObject(expectedResponse);
             done();
@@ -1161,7 +1234,8 @@ describe('Requests Controller', () => {
                   ...updateDetails.trips[0],
                   returnDate: moment().add(4, 'days').format('YYYY-MM-DD'),
                 }
-              ]
+              ],
+              stipendBreakdown: JSON.parse(updateDetails.stipendBreakdown)
             })
             .end((err, res) => {
               expect(res).toMatchObject(expectedResponse);
@@ -1196,7 +1270,8 @@ describe('Requests Controller', () => {
                 ...updateDetails.trips[0],
                 returnDate: moment().add(4, 'days').format('YYYY-MM-DD'),
               }
-            ]
+            ],
+            stipendBreakdown: JSON.parse(updateDetails.stipendBreakdown)
           })
           .end((err, res) => {
             expect(res).toMatchObject(expectedResponse);
@@ -1208,7 +1283,10 @@ describe('Requests Controller', () => {
         request(app)
           .put(`/api/v1/requests/${mockOpenRequest.id}`)
           .set('authorization', requesterToken)
-          .send(updateDetails)
+          .send({
+            ...updateDetails,
+            stipendBreakdown: JSON.parse(updateDetails.stipendBreakdown)
+          })
           .end((err, res) => {
             expect(res.body.success).toEqual(true);
             expect(res.body.request.id).toEqual(mockOpenRequest.id);
@@ -1223,7 +1301,10 @@ describe('Requests Controller', () => {
         request(app)
           .put('/api/v1/requests/abcd')
           .set('authorization', requesterToken)
-          .send(updateDetails)
+          .send({
+            ...updateDetails,
+            stipendBreakdown: JSON.parse(updateDetails.stipendBreakdown)
+          })
           .end((err, res) => {
             expect(res.status).toEqual(400);
             expect(res.body.success).toEqual(false);
@@ -1250,7 +1331,8 @@ describe('Requests Controller', () => {
               id: undefined,
               requestId: updateDetails.id,
             })
-          ]
+          ],
+          stipendBreakdown: JSON.parse(updateDetails.stipendBreakdown)
         };
         request(app)
           .put(`/api/v1/requests/${mockOpenRequest.id}`)

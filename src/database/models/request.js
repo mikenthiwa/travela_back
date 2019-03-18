@@ -93,8 +93,13 @@ export default (sequelize, DataTypes) => {
     },
     stipend: {
       allowNull: false,
-      defaultValue: 0,
       type: DataTypes.INTEGER,
+      defaultValue: 0
+    },
+    stipendBreakdown: {
+      allowNull: false,
+      type: DataTypes.TEXT,
+      defaultValue: ''
     },
     budgetStatus: {
       allowNull: false,

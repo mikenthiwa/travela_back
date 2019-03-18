@@ -23,6 +23,19 @@ export const editAndCreateRequestValidators = [
   body('manager', 'manager cannot be empty').trim().not().isEmpty(),
   body('stipend', 'stipend must be an integer and not less than zero')
     .optional().isInt({ gt: -1 }),
+  body('stipendBreakdown')
+    .optional()
+    .isArray()
+    .withMessage('stipendBreakdown must be an array')
+    .custom((value) => {
+      if (!Array.isArray(value)) return false;
+      for (let x = 0; x < value.length; x += 1) {
+        if (value[x].subTotal === undefined) {
+          throw new Error(`subTotal is missing for object at position ${x + 1}`);
+        }
+      }
+      return true;
+    }),
   body('tripType').trim()
     .not().isEmpty()
     .withMessage('tripType cannot be empty')

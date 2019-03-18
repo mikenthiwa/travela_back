@@ -114,6 +114,7 @@ export default class RequestTransactions {
         trips.map(trip => RequestTransactions.updateRequestTrips(trips, trip, request.id)),
       );
       delete requestDetails.status; // status cannot be updated by requester
+      requestDetails.stipendBreakdown = JSON.stringify(requestDetails.stipendBreakdown);
       const updatedRequest = await request.updateAttributes(requestDetails);
       const message = 'edited a travel request';
 

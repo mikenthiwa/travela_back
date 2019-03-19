@@ -94,7 +94,7 @@ export const documentsData = [
     id: 'SyOyr_AtC',
     type: 'visa',
     data: {
-      entryType: 'H-2A',
+      entryType: 'Business',
       country: 'Kenya',
       dateOfIssue: '02-01-2018',
       expiryDate: '06-01-2018',
@@ -108,7 +108,7 @@ export const documentsData = [
     id: 'b9gnYkdzG',
     type: 'visa',
     data: {
-      entryType: 'H-2A',
+      entryType: 'Business',
       country: 'Kenya',
       dateOfIssue: '02-01-2018',
       expiryDate: '06-01-2018',

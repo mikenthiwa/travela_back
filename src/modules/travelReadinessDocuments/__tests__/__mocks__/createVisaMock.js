@@ -24,7 +24,7 @@ const validVisa = {
       country: 'Kenya',
       dateOfIssue: '02-01-2018',
       expiryDate: '06-01-2018',
-      visaType: 'H-2A',
+      visaType: 'Business',
       cloudinaryUrl: 'https://res.cloudinary.com/ined/image/upload/v1538568663/Logo_blue_2x.png'
     }
 };
@@ -36,7 +36,7 @@ const validVisa2 = {
     country: 'Nigeria',
     dateOfIssue: '02-01-2018',
     expiryDate: '06-01-2018',
-    visaType: 'H-2A',
+    visaType: 'Business',
     cloudinaryUrl: 'https://res.cloudinary.com/ined/image/upload/v1538568663/Logo_blue_2x.png'
   }
 };
@@ -44,11 +44,11 @@ const validVisa2 = {
 const invalidDocument = {
   invalid:
     {
-      entryType: 'H-2A',
+      entryType: 'Business',
       country: 'Kenya',
       dateOfIssue: '02-01-2018',
       expiryDate: '06-01-2018',
-      visaType: 'H-2A',
+      visaType: 'Business',
       cloudinaryUrl: 'https://res.cloudinary.com/ined/image/upload/v1538568663/Logo_blue_2x.png'
     },
   countyMissing:
@@ -58,7 +58,7 @@ const invalidDocument = {
        name: 'Permit',
        dateOfIssue: '02-01-2018',
        expiryDate: '06-01-2018',
-       visaType: 'H-2A',
+       visaType: 'Business',
        cloudinaryUrl: 'https://res.cloudinary.com/ined/image/upload/v1538568663/Logo_blue_2x.png'
      }
    }

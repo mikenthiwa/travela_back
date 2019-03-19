@@ -23,8 +23,8 @@ export default class travelReadinessDocumentsValidator {
       .notEmpty()
       .matches(urlCheck);
     req
-      .checkBody('visa.visaType', 'visaType is either H-2A or H-2B')
-      .custom(visaType => visaType === 'H-2A' || visaType === 'H-2B');
+      .checkBody('visa.visaType', 'visaType is either Business or Tourist or Other')
+      .custom(visaType => visaType === 'Business' || visaType === 'Tourist' || visaType === 'Other');
     const errors = req.validationErrors();
     Validator.errorHandler(res, errors, next);
   }

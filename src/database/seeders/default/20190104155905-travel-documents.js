@@ -4,7 +4,7 @@ module.exports = {
       id: 'SyOyr_AtC',
       type: 'visa',
       data: JSON.stringify({
-        entryType: 'H-2A',
+        entryType: 'Business',
         country: 'Kenya',
         dateOfIssue: '02-01-2018',
         expiryDate: '06-01-2018',
@@ -18,7 +18,7 @@ module.exports = {
       id: 'b9gnYkdzG',
       type: 'visa',
       data: JSON.stringify({
-        entryType: 'H-2A',
+        entryType: 'Business',
         country: 'Kenya',
         dateOfIssue: '02-01-2018',
         expiryDate: '06-01-2018',

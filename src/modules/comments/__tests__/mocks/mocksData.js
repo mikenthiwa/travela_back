@@ -61,7 +61,7 @@ const mockData = {
     type: 'visa',
     data: {
       country: 'Kenya',
-      visaType: 'H-2A',
+      visaType: 'Business',
       entryType: 'Multiple',
       expiryDate: '03/01/2018',
       dateOfIssue: '02/01/2018',

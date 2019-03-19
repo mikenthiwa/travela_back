@@ -3,7 +3,7 @@ export const documentsSeeder = [
     id: 'SyOyr_AtC',
     type: 'visa',
     data: {
-      visaType: 'H-2A',
+      visaType: 'Business',
       entryType: 'Multiple',
       country: 'Nigeria',
       dateOfIssue: '02-01-2018',
@@ -18,7 +18,7 @@ export const documentsSeeder = [
     id: 'b9gnYkdzG',
     type: 'visa',
     data: {
-      visaType: 'H-2A',
+      visaType: 'Business',
       entryType: 'Multiple',
       country: 'Kenya',
       dateOfIssue: '02-01-2018',
@@ -33,7 +33,7 @@ export const documentsSeeder = [
     id: 'SyOyr_BtB',
     type: 'visa',
     data: {
-      visaType: 'H-2A',
+      visaType: 'Business',
       entryType: 'Multiple',
       country: 'Nigeria',
       dateOfIssue: '02-01-2018',
@@ -49,7 +49,7 @@ export const documentsSeeder = [
     type: 'visa',
     isVerified: true,
     data: {
-      visaType: 'H-2A',
+      visaType: 'Business',
       entryType: 'Multiple',
       country: 'USA',
       dateOfIssue: '02-01-2018',
@@ -125,7 +125,7 @@ export const documentsSeeder = [
 export const documentUpdateData = {
   visa: {
     entryType: 'Multiple',
-    visaType: 'H-2A',
+    visaType: 'Business',
     country: 'Kenya',
     dateOfIssue: '02-01-2019',
     expiryDate: '03-01-2021',
@@ -136,7 +136,7 @@ export const documentUpdateData = {
 export const existingVisaData = {
   visa: {
     entryType: 'Multiple',
-    visaType: 'H-2A',
+    visaType: 'Business',
     country: 'Nigeria',
     dateOfIssue: '02-01-2018',
     expiryDate: '06-01-2018',

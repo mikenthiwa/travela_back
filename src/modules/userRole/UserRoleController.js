@@ -356,7 +356,21 @@ class UserRoleController {
     const userWithEmail = await models.User.findOne({
       where: {
         email
-      }
+      },
+      include: [
+        {
+          model: models.Role,
+          as: 'roles',
+          attributes: ['roleName'],
+          through: { attributes: [] },
+        },
+        {
+          model: models.Department,
+          as: 'budgetCheckerDepartments',
+          attributes: ['name'],
+          through: { attributes: [] },
+        }
+      ]
     });
     return userWithEmail;
   }

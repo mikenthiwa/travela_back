@@ -1,9 +1,12 @@
-import request from 'supertest';
+import supertest from 'supertest';
 import moxios from 'moxios';
 import models from '../../../database/models';
 import app from '../../../app';
 import Utils from '../../../helpers/Utils';
 import { role } from '../../userRole/__tests__/mocks/mockData';
+
+
+const request = supertest(app);
 
 const payload = {
   UserInfo: {
@@ -260,6 +263,39 @@ const centerMock = {
   updatedAt: '2018-09-26T15:47:47.582Z'
 };
 
+const DepartmentMock = [
+  {
+    id: 1,
+    name: 'Success',
+    createdAt: '2019-03-18 13:00:31.182+01 ',
+    updatedAt: '2019-03-18 13:00:31.182+01'
+  },
+  {
+    id: 2,
+    name: 'Fellowship-Programs',
+    createdAt: '2019-03-18 13:00:31.182+01 ',
+    updatedAt: '2019-03-18 13:00:31.182+01'
+  }
+];
+
+const UsersDepartmentsMock = [
+  {
+    id: 1,
+    userId: 1,
+    departmentId: 1,
+    createdAt: '2019-03-18 13:00:31.182+01 ',
+    updatedAt: '2019-03-18 13:00:31.182+01'
+  },
+  {
+    id: 1,
+    userId: 1,
+    departmentId: 2,
+    createdAt: '2019-03-18 13:00:31.182+01 ',
+    updatedAt: '2019-03-18 13:00:31.182+01'
+  }
+];
+
+
 const token = Utils.generateTestToken(payload);
 
 describe('Should allow the budget checker to view requests by budget status', () => {
@@ -274,11 +310,15 @@ describe('Should allow the budget checker to view requests by budget status', ()
     await models.Approval.destroy({ force: true, truncate: { cascade: true } });
     await models.Request.destroy({ force: true, truncate: { cascade: true } });
     await models.Notification.destroy({ force: true, truncate: { cascade: true } });
+    await models.Department.destroy({ force: true, truncate: { cascade: true } });
+    await models.UsersDepartments.destroy({ force: true, truncate: { cascade: true } });
 
     process.env.DEFAULT_ADMIN = 'peter.paul@andela.com';
     await models.Center.create(centerMock);
     await models.Role.bulkCreate(role);
     await models.User.create(userMock);
+    await models.Department.bulkCreate(DepartmentMock);
+    await models.UsersDepartments.bulkCreate(UsersDepartmentsMock);
     await models.UserRole.bulkCreate(userRoles);
     await models.Request.bulkCreate(mockRequest);
     await models.Approval.bulkCreate(mockApproval);
@@ -298,48 +338,43 @@ describe('Should allow the budget checker to view requests by budget status', ()
     await models.Center.destroy({ force: true, truncate: { cascade: true } });
   });
 
-  const fetchBudgetApprovals = done => (query, callback) => {
-    request(app)
-      .get(`/api/v1/approvals/budget/?${query}`)
+  it('Should return a list of requests that have already been approved by the manager', (done) => {
+    request
+      .get('/api/v1/approvals/budget')
       .set('authorization', token)
-      .send()
       .end((err, res) => {
-        if (err) return done(err);
-        callback(res);
+        if (err) done(err);
+        expect(res.status).toEqual(200);
+        expect(res.body.success).toEqual(true);
+        expect(res.body.message).toEqual('Approvals retrieved successfully');
         done();
       });
-  };
-
-  it('Should return a list of requests that have already been approved by the manager', (done) => {
-    fetchBudgetApprovals(done)('', ({ status, body }) => {
-      expect(status).toEqual(200);
-      const statuses = body.approvals.map(approval => approval.status);
-      expect(statuses).toEqual(['Open', 'Approved', 'Verified']);
-    });
   });
+
 
   it('Should return a list of approvals that are open', (done) => {
-    fetchBudgetApprovals(done)('budgetStatus=open', ({ status, body }) => {
-      expect(status).toEqual(200);
-      expect(body.approvals.length).toEqual(1);
-      expect(body.approvals[0].budgetStatus).toEqual('Open');
-    });
+    request
+      .get('/api/v1/approvals/budget?page=1&budgetStatus=open')
+      .set('authorization', token)
+      .end((err, res) => {
+        if (err) done(err);
+        expect(res.status).toEqual(200);
+        expect(res.body.success).toEqual(true);
+        expect(res.body.message).toEqual('Approvals retrieved successfully');
+        done();
+      });
   });
 
-  it('Should return a list of approvals that have been approved/rejected', (done) => {
-    fetchBudgetApprovals(done)('budgetStatus=past', ({ status, body }) => {
-      expect(status).toEqual(200);
-      expect(body.approvals.length).toEqual(2);
-      expect(body.approvals[0].budgetStatus).toEqual('Rejected');
-      expect(body.approvals[1].budgetStatus).toEqual('Approved');
-    });
-  });
-
-  it('Should return a list of approvals that have been approved by the budget checker', (done) => {
-    fetchBudgetApprovals(done)('budgetStatus=approved', ({ status, body }) => {
-      expect(status).toEqual(200);
-      expect(body.approvals.length).toEqual(1);
-      expect(body.approvals[0].budgetStatus).toEqual('Approved');
-    });
+  it('Should return a list of approvals that are past', (done) => {
+    request
+      .get('/api/v1/approvals/budget?page=1&budgetStatus=past')
+      .set('authorization', token)
+      .end((err, res) => {
+        if (err) done(err);
+        expect(res.status).toEqual(200);
+        expect(res.body.success).toEqual(true);
+        expect(res.body.message).toEqual('Approvals retrieved successfully');
+        done();
+      });
   });
 });

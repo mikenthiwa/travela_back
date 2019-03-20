@@ -2,11 +2,15 @@ import moment from 'moment';
 import _ from 'lodash';
 import UserRoleController from '../userRole/UserRoleController';
 import { validateBudgetChecker } from '../../helpers/approvals';
+import Pagination from '../../helpers/Pagination';
 import TravelReadinessUtils from '../travelReadinessDocuments/TravelReadinessUtils';
 import NotificationEngine from '../notifications/NotificationEngine';
 import models from '../../database/models';
 import Error from '../../helpers/Error';
 import ApprovalsController from './ApprovalsController';
+
+const { Op } = models.Sequelize;
+
 
 export default class BudgetApprovalsController {
   static async budgetCheckerEmailNotification(
@@ -41,17 +45,56 @@ export default class BudgetApprovalsController {
   }
 
 
+  static async calculateApprovals(status, where) {
+    const result = await models.Request.count({
+      where: {
+        ...where,
+        budgetStatus: status
+      }
+    });
+    return result;
+  }
+
+  static returnResponse(res, approvals, open, past, pagination) {
+    res.status(200).json({
+      success: true,
+      message: 'Approvals retrieved successfully',
+      approvals: approvals.rows,
+      meta: { count: { open, past }, pagination }
+    });
+  }
+
   static async getBudgetApprovals(req, res) {
-    const { query: { budgetStatus } } = req;
-
-    req.query.budgetStatus = _.capitalize(budgetStatus);
-    req.query.checkBudget = true;
-
     try {
-      await ApprovalsController.processQuery(req, res, true);
-    } catch (error) {
-      /* istanbul ignore next */
-      return Error.handleError('Server error', 500, res);
+      const user = await UserRoleController.findUserDetails(req);
+      const { query: { budgetStatus } } = req;
+      const dept = user.budgetCheckerDepartments.map(departments => departments.name);
+      const where = {
+        status: 'Approved',
+        department: { [Op.iLike]: { [Op.any]: dept } },
+      };
+      const pastApprovals = { [Op.in]: ['Approved', 'Rejected'] };
+      if (budgetStatus) {
+        if (budgetStatus === 'open') {
+          where.budgetStatus = _.capitalize(budgetStatus);
+        } else {
+          where.budgetStatus = pastApprovals;
+        }
+      }
+      const { page, limit, offset } = await Pagination.initializePagination(req);
+      const approvals = await models.Request.findAndCountAll({
+        where,
+        offset,
+        limit,
+        include: [{ model: models.Trip, as: 'trips' }],
+        order: [['createdAt', 'DESC']]
+      });
+      const pagination = Pagination.getPaginationData(page, limit, approvals.count);
+      const open = await BudgetApprovalsController.calculateApprovals('Open', where);
+      const past = await BudgetApprovalsController.calculateApprovals(pastApprovals, where);
+      return BudgetApprovalsController.returnResponse(res, approvals, open, past, pagination);
+    } catch (error) { /* istanbul ignore next */
+      return res.status(400).json({ error });
     }
   }
 
@@ -87,7 +130,7 @@ export default class BudgetApprovalsController {
           message: 'Success',
           updatedRequest: updatedRequest[1][0]
         });
-      }
+      }/* istanbul ignore next */
       return Error.handleError(error, 400, res);
     } catch (error) {
       /* istanbul ignore next */

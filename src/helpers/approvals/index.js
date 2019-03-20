@@ -29,23 +29,13 @@ export const createStatusCondition = (status) => {
   return condition;
 };
 
-export const createExtendedClause = (verified, location, budgetCheck) => {
+export const createExtendedClause = (verified, location) => {
   let requestWhereExtended = {};
   let tripWhereExtended = {};
-  if (budgetCheck) {
-    tripWhereExtended = {
-      [Op.or]: {
-        origin: {
-          [Op.iLike]: `${location}%`
-        }
-      }
-    };
-  }
 
   if (verified) {
     requestWhereExtended = {
       status: { [Op.in]: ['Approved', 'Verified'] },
-      budgetStatus: 'Approved'
     };
     tripWhereExtended = {
       origin: {
@@ -56,64 +46,18 @@ export const createExtendedClause = (verified, location, budgetCheck) => {
   return { requestWhereExtended, tripWhereExtended };
 };
 
-const createPastBudgetApproval = () => ({
-  [Op.or]: {
-    budgetStatus: {
-      [Op.in]: ['Approved', 'Rejected']
-    }
-  }
-});
-
-const createOpenBudgetApproval = () => ({
-  [Op.and]: {
-    budgetStatus: 'Open',
-    status: 'Approved'
-  }
-});
-
-const createBudgetApproval = (budgetStatus) => {
-  const where = {};
-  where[Op.or] = {
-    status: 'Approved',
-    [Op.and]: {
-      status: 'Verified',
-      budgetStatus: 'Approved'
-    }
-  };
-  if (budgetStatus) {
-    where.budgetStatus = budgetStatus;
-  }
-  return where;
-};
-
-function createBudgetApprovalSubQuery({ budgetStatus, checkBudget }) {
-  let where = {};
-  if (checkBudget) {
-    if (budgetStatus === 'Past') {
-      where = createPastBudgetApproval();
-    } else if (budgetStatus === 'Open') {
-      where = createOpenBudgetApproval();
-    } else {
-      where = createBudgetApproval(budgetStatus);
-    }
-  } else {
-    return null;
-  }
-  return where;
-}
 
 export function createApprovalSubquery({
   req, limit, offset, search, searchRequest
 }) {
   const { verified } = req.query;
-  const budgetStatus = createBudgetApprovalSubQuery(req.query);
   let status = req.query.status ? req.query.status : '';
 
   const userName = req.user.UserInfo.name;
   const { location } = req.user;
   // tripWhereExtended
   const { requestWhereExtended, tripWhereExtended } = createExtendedClause(
-    verified, location, !!budgetStatus
+    verified, location,
   );
   const searchClause = createSearchClause(
     getModelSearchColumns('Request'), search, 'Request'
@@ -126,7 +70,7 @@ export function createApprovalSubquery({
   const requestWhere = {
     [Op.or]: searchClause
   };
-  let where = (searchRequest) ? { ...requestWhere, ...requestWhereExtended }
+  const where = (searchRequest) ? { ...requestWhere, ...requestWhereExtended }
     : requestWhereExtended;
   if (status) {
     status = updateStatus(status);
@@ -136,14 +80,8 @@ export function createApprovalSubquery({
     };
   }
 
-  if (budgetStatus) {
-    if (budgetStatus[Op.or]) {
-      where = { ...where, [Op.and]: { [Op.or]: { ...searchClause }, ...budgetStatus } };
-    } else where = { ...where, ...budgetStatus };
-  }
-
   const subQuery = {
-    where: (verified || budgetStatus) ? {} : { approverId: userName },
+    where: (verified) ? {} : { approverId: userName },
     include: [{
       model: models.Request,
       as: `${models.Request.name}`,

@@ -16,7 +16,7 @@ describe('switchMessage helper', () => {
     );
 
     expect(receivedMessage.split(' ')).toContain('travel');
-    expect(receivedMessage.split(' ')[0]).toEqual('Congratulations,');
+    expect(receivedMessage.split(' ')[2]).toEqual('request');
     done();
   });
 

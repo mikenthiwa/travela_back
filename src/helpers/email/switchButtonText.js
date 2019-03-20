@@ -23,7 +23,7 @@ const switchButtonText = (type) => {
     case 'Send role assignment email notification':
       return 'Login';
     case 'Approved':
-      return 'Fill Checklist';
+      return 'View request status';
     case 'Notify Travel Admins Checklist Completion':
       return 'Verify';
     default:

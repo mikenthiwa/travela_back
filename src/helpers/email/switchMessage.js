@@ -78,10 +78,9 @@ const switchMessage = (msgDetail) => {
         just submitted a travel request. Please login to Travela to take an
         approval decision.`;
     case 'Approved':
-      return `Congratulations, your travel request has just been approved
-      by your manager on Travela.
-        Kindly fill out your travel checklist items by clicking on the button
-        below.`;
+      return `Your travel request has been approved by your manager
+      <b>${msgDetail.senderName}</b>. Kindly login to view the status of the request.
+      Thank you`;
     case 'Rejected':
       return (`Your travel request <b>#${msgDetail.requestId}</b> was rejected
       by

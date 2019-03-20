@@ -113,7 +113,7 @@ export default class TravelStipendController {
     try {
       const { params: { id } } = req;
 
-      const { stipend } = req.body;
+      const { center, stipend } = req.body;
 
       const sanitizedStipend = Math.abs(Number(
         stipend
@@ -134,8 +134,13 @@ export default class TravelStipendController {
           error: 'Travel stipend does not exist'
         });
       }
+      const { id: centerId } = await models.Center.find({
+        where: {
+          location: center
+        }
+      });
 
-      await travelStipend.update({ amount: sanitizedStipend });
+      await travelStipend.update({ centerId, amount: sanitizedStipend });
 
       return res.status(200).json({
         success: true,

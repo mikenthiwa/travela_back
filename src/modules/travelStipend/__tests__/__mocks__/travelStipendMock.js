@@ -56,12 +56,12 @@ const userRole = [{
 ];
 
 const travelStipend = {
-  stipend: 30000,
+  stipend: 300,
   center: 'Nairobi'
 };
 
 const updatedTravelStipend = {
-  stipend: 300
+  stipend: 300,
 };
 
 const listOfStipends = [
@@ -112,5 +112,5 @@ export default {
   listOfStipends,
   payloadNotAdmin,
   travelStipend,
-  updatedTravelStipend
+  updatedTravelStipend,
 };

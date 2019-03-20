@@ -43,14 +43,6 @@ module.exports = {
         updatedAt: '2018-08-16 012:11:52.181+01',
       },
       {
-        id: 60948,
-        amount: 222,
-        createdBy: '-LSsFyueC086niFc9rrz',
-        centerId: 78901,
-        createdAt: '2018-08-16 012:11:52.181+01',
-        updatedAt: '2018-08-16 012:11:52.181+01',
-      },
-      {
         id: 70948,
         amount: 123,
         createdBy: '-LSsFyueC086niFc9rrz',

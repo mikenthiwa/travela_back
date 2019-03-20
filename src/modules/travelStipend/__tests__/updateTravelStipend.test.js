@@ -112,7 +112,10 @@ describe('Update Travel Stipend', () => {
 
     it('should ensure travel stipend exists', (done) => {
       updateTravelStipend(
-        updatedTravelStipend,
+        {
+          center: 'Lagos',
+          stipend: 100
+        },
         999,
         done,
         {
@@ -124,9 +127,10 @@ describe('Update Travel Stipend', () => {
       );
     });
 
-    it('should update if given stipend only', (done) => {
+    it('should successfully update the center and stipend', (done) => {
       updateTravelStipend(
         {
+          center: 'Lagos',
           stipend: 100
         },
         stipendId,
@@ -175,39 +179,18 @@ describe('Update Travel Stipend', () => {
         superAdminToken
       );
     });
-
-    it('should convert string number values to absolute values', (done) => {
+    it('should raise validation errors when stipendId is not an integer', (done) => {
       updateTravelStipend(
         {
-          stipend: '400000'
+          stipended: 10
         },
-        stipendId,
+        'www',
         done,
         {
-          status: 200,
-          travelStipend: {
-            amount: 400000
-          }
+          status: 422,
+          message: 'Validation failed'
         },
-        'travelStipend[\'amount\']',
-        superAdminToken
-      );
-    });
-
-    it('should return absolute value for amount', (done) => {
-      updateTravelStipend(
-        {
-          stipend: -400000
-        },
-        stipendId,
-        done,
-        {
-          status: 200,
-          travelStipend: {
-            amount: 400000
-          }
-        },
-        'travelStipend[\'amount\']',
+        'message',
         superAdminToken
       );
     });

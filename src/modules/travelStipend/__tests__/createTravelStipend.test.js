@@ -34,6 +34,10 @@ describe('TravelStipends', () => {
               name: 'stipend'
             },
             {
+              message: 'stipend must not be more than 1000 dollars',
+              name: 'stipend'
+            },
+            {
               message: 'center is required',
               name: 'center'
             }
@@ -61,6 +65,10 @@ describe('TravelStipends', () => {
                 name: 'stipend'
               },
               {
+                message: 'stipend must not be more than 1000 dollars',
+                name: 'stipend'
+              },
+              {
                 message: 'center is required',
                 name: 'center'
               }
@@ -85,7 +93,7 @@ describe('TravelStipends', () => {
           .set('authorization', token)
           .send({
             center: 'Lagos',
-            stipend: 4556
+            stipend: 455
           })
           .expect(409)
           .end((err, res) => {

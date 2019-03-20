@@ -5,6 +5,8 @@ export default class TravelStipendValidator {
   static async validateNewStipend(req, res, next) {
     req.checkBody('stipend', 'stipend is required and must be a positive number')
       .isInt({ gt: -1 });
+    req.checkBody('stipend', 'stipend must not be more than 1000 dollars')
+      .isInt({ lt: 1001 });
     req.checkBody('center', 'center is required').notEmpty();
     const errors = req.validationErrors();
     if (errors.length) {
@@ -57,17 +59,6 @@ export default class TravelStipendValidator {
     } else {
       return next();
     }
-  }
-
-  static async validateUpdatePayload(req, res, next) {
-    req.checkBody('stipend', 'stipend has not been provided')
-      .notEmpty()
-      .isInt()
-      .withMessage('stipend should be an integer')
-      .exists()
-      .withMessage('stipend has not been provided');
-
-    TravelStipendValidator.checkValidationErrors(req, res, next);
   }
 
   static async validateUpdateParams(req, res, next) {

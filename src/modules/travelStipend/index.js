@@ -49,8 +49,9 @@ TravelStipendRouter.put(
   RoleValidator.checkUserRole(
     ['Super Administrator', 'Travel Administrator', 'Travel Team Member']
   ),
-  TravelStipendValidator.validateUpdatePayload,
   TravelStipendValidator.validateUpdateParams,
+  TravelStipendValidator.validateNewStipend,
+  TravelStipendValidator.checkCenter,
   TravelStipendController.updateTravelStipend
 );
   

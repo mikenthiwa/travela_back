@@ -77,6 +77,7 @@ const mockNewRequest = generateMock.request(
   {
     manager: mockRequester.manager,
     id: undefined,
+    department: 'Fellowship-Programs',
     trips: [
       generateMock.trip({
         destination: mockAndelaDestination.location,
@@ -101,6 +102,7 @@ const mockNewRequestWithComment = generateMock.request(
   {
     manager: mockRequester.manager,
     id: undefined,
+    department: 'Fellowship-Programs',
     trips: [
       generateMock.trip({
         destination: mockAndelaDestination.location,
@@ -192,6 +194,7 @@ const mockOpenRequest = generateMock.request(
     manager: mockRequester.manager,
     status: 'Open',
     userId: mockRequester.userId,
+    department: 'Fellowship-Programs',
     id: 'mock-request-id-1',
     trips: [
       {
@@ -219,6 +222,7 @@ const mockApprovedRequest = generateMock.request(
     manager: mockRequester.manager,
     status: 'Approved',
     userId: mockRequester.userId,
+    department: 'Fellowship-Programs',
     id: 'mock-request-id-2',
     trips: [
       {
@@ -245,6 +249,7 @@ const mockRejectedRequest = generateMock.request(
   {
     manager: mockRequester.manager,
     status: 'Rejected',
+    department: 'Fellowship-Programs',
     userId: mockRequester.userId,
     id: 'mock-request-id-3',
     trips: [
@@ -273,6 +278,7 @@ const mockBookedBedRequest = generateMock.request(
     manager: mockRequester.manager,
     userId: mockTravelAdmin.userId,
     gender: mockTravelAdmin.gender,
+    department: 'Fellowship-Programs',
     id: 'mock-request-id-4',
     trips: [
       {
@@ -296,6 +302,7 @@ const otherMockBookedBedRequest = generateMock.request(
     manager: mockRequester.manager,
     userId: mockTravelAdmin.userId,
     gender: mockTravelAdmin.gender,
+    department: 'Fellowship-Programs',
     id: 'mock-request-id-5',
     trips: [
       {
@@ -325,6 +332,39 @@ const allMyApprovals = [mockOpenRequest, mockApprovedRequest, mockRejectedReques
 );
 
 
+const DepartmentMock = [
+  {
+    id: 1,
+    name: 'Success',
+    createdAt: '2019-03-18 13:00:31.182+01 ',
+    updatedAt: '2019-03-18 13:00:31.182+01'
+  },
+  {
+    id: 2,
+    name: 'Fellowship-Programs',
+    createdAt: '2019-03-18 13:00:31.182+01 ',
+    updatedAt: '2019-03-18 13:00:31.182+01'
+  }
+];
+
+const UsersDepartmentsMock = [
+  {
+    id: 1,
+    userId: 2,
+    departmentId: 1,
+    createdAt: '2019-03-18 13:00:31.182+01 ',
+    updatedAt: '2019-03-18 13:00:31.182+01'
+  },
+  {
+    id: 1,
+    userId: 2,
+    departmentId: 2,
+    createdAt: '2019-03-18 13:00:31.182+01 ',
+    updatedAt: '2019-03-18 13:00:31.182+01'
+  }
+];
+
+
 describe('Requests Controller', () => {
   beforeAll(async (done) => {
     await models.User.destroy({ force: true, truncate: { cascade: true } });
@@ -344,10 +384,13 @@ describe('Requests Controller', () => {
     await models.Center.bulkCreate([mockAndelaOrigin, mockAndelaDestination]);
     await models.Role.bulkCreate(roles);
     await models.User.bulkCreate(allUsers);
+
     await models.UserRole.bulkCreate(allUserRoles);
     await models.GuestHouse.create(mockDestinationGuestHouse);
     await models.Room.bulkCreate(allMockRooms);
     await models.Bed.bulkCreate(allMockBeds);
+    await models.Department.bulkCreate(DepartmentMock);
+    await models.UsersDepartments.bulkCreate(UsersDepartmentsMock);
     done();
   });
 
@@ -364,6 +407,8 @@ describe('Requests Controller', () => {
     await models.GuestHouse.destroy({ force: true, truncate: { cascade: true } });
     await models.User.destroy({ force: true, truncate: { cascade: true } });
     await models.Comment.destroy({ force: true, truncate: { cascade: true } });
+    await models.Department.destroy({ force: true, truncate: { cascade: true } });
+    await models.UsersDepartments.destroy({ force: true, truncate: { cascade: true } });
     done();
   });
 

@@ -5,6 +5,11 @@ import app from '../../../app';
 import Utils from '../../../helpers/Utils';
 import { role } from '../../userRole/__tests__/mocks/mockData';
 
+global.io = {
+  sockets: {
+    emit: (event, dataToBeEmitted) => dataToBeEmitted
+  }
+};
 
 const request = supertest(app);
 
@@ -195,7 +200,16 @@ const userRoles = [{
   centerId: 12345,
   createdAt: '2018-09-26T15:47:47.582Z',
   updatedAt: '2018-09-26T15:47:47.582Z'
-}];
+},
+{
+  id: 3,
+  userId: 1,
+  roleId: 70001,
+  centerId: 12345,
+  createdAt: '2018-09-26T15:47:47.582Z',
+  updatedAt: '2018-09-26T15:47:47.582Z'
+}
+];
 
 const userMock = {
   id: 1,
@@ -217,7 +231,7 @@ const mockApproval = [
   {
     id: 1,
     requestId: '3mzyo5PeF',
-    status: 'Open',
+    status: 'Approved',
     approverId: 'Moses Gitau',
     createdAt: '2018-09-26T15:47:47.582Z',
     updatedAt: '2018-09-26T15:47:47.582Z',
@@ -252,7 +266,7 @@ const mockApproval = [
     createdAt: '2018-09-26T15:47:47.582Z',
     updatedAt: '2018-09-26T15:47:47.582Z',
     deletedAt: null,
-    budgetStatus: 'Approved'
+    budgetStatus: 'Open'
   }
 ];
 
@@ -336,6 +350,8 @@ describe('Should allow the budget checker to view requests by budget status', ()
     await models.Role.destroy({ force: true, truncate: { cascade: true } });
     await models.User.destroy({ force: true, truncate: { cascade: true } });
     await models.Center.destroy({ force: true, truncate: { cascade: true } });
+    await models.Department.destroy({ force: true, truncate: { cascade: true } });
+    await models.UsersDepartments.destroy({ force: true, truncate: { cascade: true } });
   });
 
   it('Should return a list of requests that have already been approved by the manager', (done) => {
@@ -374,6 +390,52 @@ describe('Should allow the budget checker to view requests by budget status', ()
         expect(res.status).toEqual(200);
         expect(res.body.success).toEqual(true);
         expect(res.body.message).toEqual('Approvals retrieved successfully');
+        done();
+      });
+  });
+
+  it('Should return error if request does not exist', (done) => {
+    request
+      .put('/api/v1/approvals/budgetStatus/opkopkt')
+      .set('authorization', token)
+      .send({
+        budgetStatus: 'Approved'
+      })
+      .end((err, res) => {
+        if (err) done(err);
+        expect(res.status).toEqual(500);
+        expect(res.body.success).toEqual(false);
+        done();
+      });
+  });
+
+
+  it('Should update request', (done) => {
+    request
+      .put('/api/v1/approvals/budgetStatus/3mzyo5PeF')
+      .set('authorization', token)
+      .send({
+        budgetStatus: 'Approved'
+      })
+      .end((err, res) => {
+        if (err) done(err);
+        expect(res.status).toEqual(200);
+        expect(res.body.success).toEqual(true);
+        done();
+      });
+  });
+
+  it('Should fail if request as been approved already', (done) => {
+    request
+      .put('/api/v1/approvals/budgetStatus/3mzyo5PeF')
+      .set('authorization', token)
+      .send({
+        budgetStatus: 'Approved'
+      })
+      .end((err, res) => {
+        if (err) done(err);
+        expect(res.status).toEqual(400);
+        expect(res.body.success).toEqual(false);
         done();
       });
   });

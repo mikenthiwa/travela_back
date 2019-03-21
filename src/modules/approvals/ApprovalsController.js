@@ -126,11 +126,9 @@ class ApprovalsController {
           ApprovalsController.sendNotificationToTravelAdmin(user, updatedRequest);
         }
         ApprovalsController.sendNotificationAfterApproval(req, user, updatedRequest, res);
-        const {
-          id, userId, name: requesterName, manager
-        } = updatedRequest;
+
         await BudgetApprovalsController.budgetCheckerEmailNotification(
-          id, userId, requesterName, manager
+          updatedRequest
         );
 
         await ApprovalsController.generateCountAndMessage(res, updatedRequest);
@@ -215,36 +213,41 @@ class ApprovalsController {
 
   // Finance team email notification
   static async sendEmailTofinanceMembers(updatedRequest, user) {
-    const { userId: requesterId, name: requesterName, id } = updatedRequest;
-    const {
-      UserInfo: { name: budgetCheckerName }
-    } = user;
+    try {
+      const { userId: requesterId, name: requesterName, id } = updatedRequest;
+      const {
+        UserInfo: { name: budgetCheckerName }
+      } = user;
 
-    const { location: requesterLocation } = await models.User.findOne({
-      where: {
-        userId: requesterId
+      const { location: requesterLocation } = await models.User.findOne({
+        where: {
+          userId: requesterId
+        }
+      });
+
+      const {
+        users: finaceTeamMembers
+      } = await UserRoleController.calculateUserRole('70001');
+
+      const financeMembers = await TravelReadinessUtils.getRoleMembers(
+        finaceTeamMembers,
+        requesterLocation
+      );
+
+      const data = {
+        topic: `Successful Budget Check for ${requesterName}'s Trip`,
+        type: 'Notify finance team',
+        details: { requesterName, budgetCheckerName },
+        redirectLink: `${process.env.REDIRECT_URL}/requests/${id}`
+      };
+
+      // 4.Test this
+      if (financeMembers.length) {
+        NotificationEngine.sendMailToMany(finaceTeamMembers, data);
       }
-    });
-
-    const {
-      users: finaceTeamMembers
-    } = await UserRoleController.calculateUserRole('70001');
-
-    const financeMembers = await TravelReadinessUtils.getRoleMembers(
-      finaceTeamMembers,
-      requesterLocation
-    );
-
-    const data = {
-      topic: `Successful Budget Check for ${requesterName}'s Trip`,
-      type: 'Notify finance team',
-      details: { requesterName, budgetCheckerName },
-      redirectLink: `${process.env.REDIRECT_URL}/requests/${id}`
-    };
-
-    // 4.Test this
-    if (financeMembers.length) {
-      NotificationEngine.sendMailToMany(finaceTeamMembers, data);
+    } catch (error) {
+      /* istanbul ignore next */
+      return error;
     }
   }
 

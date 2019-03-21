@@ -3,7 +3,6 @@ import _ from 'lodash';
 import UserRoleController from '../userRole/UserRoleController';
 import { validateBudgetChecker } from '../../helpers/approvals';
 import Pagination from '../../helpers/Pagination';
-import TravelReadinessUtils from '../travelReadinessDocuments/TravelReadinessUtils';
 import NotificationEngine from '../notifications/NotificationEngine';
 import models from '../../database/models';
 import Error from '../../helpers/Error';
@@ -13,34 +12,45 @@ const { Op } = models.Sequelize;
 
 
 export default class BudgetApprovalsController {
-  static async budgetCheckerEmailNotification(
-    id,
-    userId,
-    requesterName,
-    manager
-  ) {
-    const requesterId = userId;
-    const { location: userLocation } = await models.User.find({
+  static async findBudgetCheckerDepartment(department) {
+    const findDepartment = await models.Department.findOne({
       where: {
-        userId: requesterId
-      }
+        name: department
+      },
+      include: [
+        {
+          model: models.User,
+          as: 'users',
+          attributes: ['fullName', 'email'],
+          through: { attributes: [] },
+        }
+      ]
     });
-    const { users: budgetChecker } = await UserRoleController.calculateUserRole('60000');
-    const budgetCheckerMembers = await TravelReadinessUtils
-      .getRoleMembers(budgetChecker, userLocation);
-    const data = {
-      sender: requesterName,
-      topic: 'Travel Request Approval',
-      type: 'Notify budget checker',
-      details: { RequesterManager: manager, id },
-      redirectLink: `${process.env.REDIRECT_URL}/requests/budgets/${id}`
-    };
-    if (budgetCheckerMembers.length) {
-      NotificationEngine.sendMailToMany(
-        budgetCheckerMembers,
-        data
-      );
-      return true;
+    return findDepartment.users;
+  }
+
+  static async budgetCheckerEmailNotification({
+    id, name, manager, department
+  }) {
+    try {
+      const budgetCheckerMembers = await
+      BudgetApprovalsController.findBudgetCheckerDepartment(department);
+
+      if (budgetCheckerMembers.length > 0) {
+        const data = {
+          sender: name,
+          topic: 'Travel Request Approval',
+          type: 'Notify budget checker',
+          details: { RequesterManager: manager, id },
+          redirectLink: `${process.env.REDIRECT_URL}/requests/budgets/${id}`
+        };
+        NotificationEngine.sendMailToMany(
+          budgetCheckerMembers,
+          data
+        );
+      }
+    } catch (error) { /* istanbul ignore next */
+      return error;
     }
   }
 
@@ -113,6 +123,7 @@ export default class BudgetApprovalsController {
           budgetApprover: budgeterLocation.name,
           budgetApprovedAt: moment(Date.now()).format('YYYY-MM-DD')
         }, { where: { requestId: req.params.requestId } });
+        
         const updatedRequest = await models.Request.update(
           { budgetStatus: req.body.budgetStatus },
           { where: { id: req.params.requestId }, returning: true }

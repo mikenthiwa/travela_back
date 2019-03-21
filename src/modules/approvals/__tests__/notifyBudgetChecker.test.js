@@ -16,90 +16,130 @@ global.io = {
 
 const payload = {
   UserInfo: {
-    id: 9099,
-    userId: '-kkkfkfkfnninn7',
-    fullName: 'Peter Paul',
-    name: 'Peter Paul',
-    email: 'peter.paul@andela.com',
-    picture: 'fake.png'
-  }
+    id: '-LTI9_PM3tV39gffhUIE',
+    first_name: 'Moses',
+    last_name: 'Gitau',
+    firstName: 'Moses',
+    lastName: 'Gitau',
+    email: 'moses.gitau@andela.com',
+    name: 'Moses Gitau',
+    picture: 'fake.png',
+    location: 'Nairobi, Kenya'
+  },
 };
 
-const mockRequest = {
-  id: 1,
-  userId: '-kkkfkfkfnninn7',
-  name: 'Mutungo Heights',
-  manager: 'Peter Paul',
-  tripType: 'return',
-  gender: 'Male',
-  department: 'TDD',
-  picture: 'picture.png',
-  role: 'Software Developer',
-  deletedAt: null,
-  updatedAt: '2018-09-26T15:47:47.582Z',
-  createdAt: '2018-09-26T15:47:47.582Z'
-};
+
+const mockRequest = [
+  {
+    id: '3mzyo5PeA',
+    name: 'Moses Gitau',
+    tripType: 'return',
+    manager: 'Moses Gitau',
+    gender: 'Male',
+    department: 'Fellowship-Programs',
+    role: 'Technical Team Lead',
+    status: 'Approved',
+    userId: '-LTI9_PM3tV39gffhUIE',
+    picture: 'fake.png',
+    budgetStatus: 'Approved',
+    createdAt: '2019-02-28T19:43:07.929Z',
+    updatedAt: '2019-02-28T19:43:16.733Z',
+    deletedAt: null,
+  }
+];
 
 const userRoles = [
   {
     id: 1,
-    userId: 9099,
+    userId: 1,
     roleId: 53019,
-    centerId: 12345,
     createdAt: '2018-09-26T15:47:47.582Z',
     updatedAt: '2018-09-26T15:47:47.582Z'
   },
   {
     id: 2,
-    userId: 9099,
+    userId: 1,
     roleId: 60000,
-    centerId: 12345,
     createdAt: '2018-09-26T15:47:47.582Z',
     updatedAt: '2018-09-26T15:47:47.582Z'
   },
   {
     id: 3,
-    userId: 9099,
+    userId: 1,
     roleId: 70001,
-    centerId: 12345,
     createdAt: '2018-09-26T15:47:47.582Z',
     updatedAt: '2018-09-26T15:47:47.582Z'
   }
 ];
 
 const userMock = {
-  id: 9099,
-  fullName: 'Peter Paul',
-  userId: '-kkkfkfkfnninn7',
-  manager: 'Peter Paul',
-  location: 'Nairobi, Kenya',
-  name: 'Peter Paul',
-  email: 'peter.paul@andela.com',
-  picture: 'fake.png'
+  id: 1,
+  fullName: 'Moses Gitau',
+  email: 'moses.gitau@andela.com',
+  userId: '-LTI9_PM3tV39gffhUIE',
+  passportName: 'Moses Gitau',
+  department: 'Fellowship-Programs',
+  occupation: 'Technical Team Lead',
+  manager: 'Moses Gitau',
+  gender: 'Male',
+  picture: 'fake.png',
+  location: 'Nairobi',
+  createdAt: '2019-02-28T19:31:07.971Z',
+  updatedAt: '2019-02-28T19:35:44.022Z',
 };
 
 const requestData = {
-  requestId: 1,
+  requestId: '3mzyo5PeA',
   userId: '-kkkfkfkfnninn7',
   newStatus: 'Approved'
 };
 
-const mockApproval = {
-  id: 1,
-  requestId: 1,
-  status: 'Open',
-  approverId: 'Peter Paul',
-  createdAt: '2018-09-26T15:47:47.582Z',
-  updatedAt: '2018-09-26T15:47:47.582Z',
-  deletedAt: null
-};
+const mockApproval = [
+  {
+    id: 1,
+    requestId: '3mzyo5PeA',
+    status: 'Open',
+    approverId: 'Peter Paul',
+    createdAt: '2018-09-26T15:47:47.582Z',
+    updatedAt: '2018-09-26T15:47:47.582Z',
+    deletedAt: null,
+    budgetStatus: 'Open'
+  }
+];
 
-const centerMock = {
-  id: 12345,
-  location: 'Nairobi, Kenya',
-  createdAt: '2018-09-26T15:47:47.582Z',
-  updatedAt: '2018-09-26T15:47:47.582Z'
-};
+
+const DepartmentMock = [
+  {
+    id: 1,
+    name: 'Success',
+    createdAt: '2019-03-18 13:00:31.182+01 ',
+    updatedAt: '2019-03-18 13:00:31.182+01'
+  },
+  {
+    id: 2,
+    name: 'Fellowship-Programs',
+    createdAt: '2019-03-18 13:00:31.182+01 ',
+    updatedAt: '2019-03-18 13:00:31.182+01'
+  }
+];
+
+const UsersDepartmentsMock = [
+  {
+    id: 1,
+    userId: 1,
+    departmentId: 1,
+    createdAt: '2019-03-18 13:00:31.182+01 ',
+    updatedAt: '2019-03-18 13:00:31.182+01'
+  },
+  {
+    id: 1,
+    userId: 1,
+    departmentId: 2,
+    createdAt: '2019-03-18 13:00:31.182+01 ',
+    updatedAt: '2019-03-18 13:00:31.182+01'
+  }
+];
+
 
 const token = Utils.generateTestToken(payload);
 
@@ -109,7 +149,8 @@ describe('Budget checker', () => {
 
     await models.UserRole.destroy({ force: true, truncate: { cascade: true } });
     await models.Role.destroy({ force: true, truncate: { cascade: true } });
-
+    await models.Department.destroy({ force: true, truncate: { cascade: true } });
+    await models.UsersDepartments.destroy({ force: true, truncate: { cascade: true } });
     await models.Center.destroy({ force: true, truncate: { cascade: true } });
     await models.Approval.destroy({ force: true, truncate: { cascade: true } });
     await models.Request.sync({ force: true, truncate: { cascade: true } });
@@ -120,12 +161,13 @@ describe('Budget checker', () => {
     await models.User.sync({ force: true, truncate: { cascade: true } });
 
     process.env.DEFAULT_ADMIN = 'peter.paul@andela.com';
-    await models.Center.create(centerMock);
     await models.Role.bulkCreate(role);
     await models.User.create(userMock);
     await models.UserRole.bulkCreate(userRoles);
-    await models.Request.create(mockRequest);
-    await models.Approval.create(mockApproval);
+    await models.Request.bulkCreate(mockRequest);
+    await models.Approval.bulkCreate(mockApproval);
+    await models.Department.bulkCreate(DepartmentMock);
+    await models.UsersDepartments.bulkCreate(UsersDepartmentsMock);
   });
 
   afterAll(async () => {
@@ -141,31 +183,31 @@ describe('Budget checker', () => {
     await models.Role.destroy({ force: true, truncate: { cascade: true } });
     await models.User.destroy({ force: true, truncate: { cascade: true } });
     await models.Center.destroy({ force: true, truncate: { cascade: true } });
+    await models.Department.destroy({ force: true, truncate: { cascade: true } });
+    await models.UsersDepartments.destroy({ force: true, truncate: { cascade: true } });
   });
 
   it('Should send email notification to budget checker', (done) => {
-    const sendMailToMany = jest.spyOn(NotificationEngine, 'sendMailToMany');
     request(app)
-      .put('/api/v1/approvals/1')
+      .put('/api/v1/approvals/3mzyo5PeA')
       .set('Content-Type', 'application/json')
       .set('authorization', token)
       .send(requestData)
       .end((err, res) => {
         const successMessage = 'Request approved successfully';
-        expect(sendMailToMany).toHaveBeenCalled();
         expect(res.body.message).toEqual(successMessage);
         if (err) return done(err);
         done();
       });
   });
-  it('should send  notifications to budget checker manager', async (done) => {
+  it('should send notifications to budget checker manager', async (done) => {
     jest.spyOn(ApprovalsController, 'sendEmailTofinanceMembers');
     UserRoleController.getRecipient = jest
       .fn()
-      .mockReturnValue({ fullName: 'Peter Paul' }, { userId: null });
+      .mockReturnValue({ fullName: 'Moses Gitaul' }, { userId: null });
     NotificationEngine.notify = jest.fn();
     request(app)
-      .put('/api/v1/approvals/budgetStatus/1')
+      .put('/api/v1/approvals/budgetStatus/3mzyo5PeA')
       .set('Content-Type', 'application/json')
       .set('authorization', token)
       .send({ budgetStatus: 'Approved' })

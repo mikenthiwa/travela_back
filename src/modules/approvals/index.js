@@ -26,7 +26,7 @@ ApprovalsRouter.get(
 ApprovalsRouter.get(
   '/approvals/budget',
   authenticate,
-  RoleValidator.checkUserRole(['Super Administrator', 'Budget Checker']),
+  RoleValidator.checkUserRole(['Budget Checker']),
   getRequestsValidators,
   Validator.validateRequest,
   BudgetApprovalsController.getBudgetApprovals

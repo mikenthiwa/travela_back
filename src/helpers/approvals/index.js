@@ -100,29 +100,13 @@ export function createApprovalSubquery({
 }
 
 export const validateBudgetChecker = async (req) => {
-  const { params: { requestId } } = req;
-  const requestFromDb = await models.Request.findOne({
-    where: {
-      id: requestId
-    }
-  });
-  const { userId: requesterId } = requestFromDb;
-  const user = await models.User.findOne({
-    where: {
-      userId: requesterId
-    }
-  });
-  const { location: userLocation } = user;
   const budgetChecker = await UserRoleController.findUserDetails(req);
-  if (userLocation === budgetChecker.location) {
-    return {
-      budgetId: budgetChecker.id,
-      name: budgetChecker.fullName,
-      manager: budgetChecker.manager,
-      result: true
-    };
-  }
-  return { result: false };
+  return {
+    budgetId: budgetChecker.id,
+    name: budgetChecker.fullName,
+    manager: budgetChecker.manager,
+    result: true
+  };
 };
 
 export const getTravelTeamEmailData = async (

@@ -137,3 +137,12 @@ export const getTravelTeamEmailData = async (
   }
   return null;
 };
+
+export const emailTopic = (request) => {
+  if (request.status === 'Approved' && request.budgetStatus === 'Rejected') {
+    return 'Travela Budget Rejected Request';
+  }
+  if (request.status && request.budgetStatus === 'Open') {
+    return `Travela ${request.status} Request`;
+  }
+};

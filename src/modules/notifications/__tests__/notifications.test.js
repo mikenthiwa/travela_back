@@ -766,6 +766,5 @@ describe('Notifications Controller', () => {
           done();
         })
     })
-
   })
 });

@@ -67,6 +67,10 @@ const checKoutMessage = msgDetail => `<b style='text-transform: capitalize'>${
   msgDetail.checkoutTime
 }`;
 
+const budgetApprovalMessage = () => `Congratulations, your travel request
+  has just been approved by the budget checker on Travela.
+  Kindly fill out your travel checklist items by clicking on the button
+  below.`;
 const switchMessage = (msgDetail) => {
   switch (msgDetail.type) {
     case 'Reminder':
@@ -81,10 +85,15 @@ const switchMessage = (msgDetail) => {
       return `Your travel request has been approved by your manager
       <b>${msgDetail.senderName}</b>. Kindly login to view the status of the request.
       Thank you`;
+    case 'Budget Approval':
+      return budgetApprovalMessage();
     case 'Rejected':
       return (`Your travel request <b>#${msgDetail.requestId}</b> was rejected
       by
         ${msgDetail.senderName}. Login to your travela account for details.`);
+    case 'Budget Rejected':
+      return (`Your travel request <b>#${msgDetail.requestId}</b> was rejected
+        by the budget Checker. Login to your travela account for details.`);
     case 'Verified':
       return (`Your travel request <b>#${msgDetail.requestId}</b> was just
       verified by

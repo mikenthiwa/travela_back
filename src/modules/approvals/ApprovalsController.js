@@ -3,7 +3,7 @@ import models from '../../database/models';
 import { asyncWrapper, retrieveParams } from '../../helpers/requests';
 import { countByStatus, getTotalCount, countVerifiedByStatus } from
   '../../helpers/requests/paginationHelper';
-import { createApprovalSubquery, getTravelTeamEmailData }
+import { createApprovalSubquery, getTravelTeamEmailData, emailTopic }
   from '../../helpers/approvals';
 import Error from '../../helpers/Error';
 import Pagination from '../../helpers/Pagination';
@@ -144,9 +144,9 @@ class ApprovalsController {
     const requestToApprove = await models.Approval.find({
       where: { requestId: request[0].id }
     });
-    if (!requestToApprove) {
-      const error = 'Request not found';
-      return Error.handleError(error, 404, res);
+    const requestError = BudgetApprovalsController.noRequest(requestToApprove);
+    if (requestError) {
+      return Error.handleError(requestError, 404, res);
     }
     const { status } = requestToApprove;
 
@@ -182,18 +182,29 @@ class ApprovalsController {
       message: (status === 'Approved' || budgetStatus === 'Approved')
         ? 'approved your request'
         : 'rejected your request',
-      notificationLink: (budgetStatus === 'Open') ? `/requests/${id}` : `/my-approvals/${id}`
+      notificationLink: `/requests/${id}`
     };
 
-    const inAppNotification = NotificationEngine.notify(notificationData);
+    const budgetEmailData = ApprovalsController.emailData(updatedRequest, recipientEmail, name);
+    const managerEmailData = ApprovalsController.managerData(updatedRequest, recipientEmail, name);
+    const budgetRejectedData = ApprovalsController.budgetRejectData(updatedRequest, recipientEmail, name);
 
-    const emailData = ApprovalsController.emailData(updatedRequest, recipientEmail, name);
+    ApprovalsController.notify(status, budgetStatus, budgetEmailData, managerEmailData, notificationData, budgetRejectedData);
+  }
 
-    const emailNotification = NotificationEngine.sendMail(emailData);
-
-    return (
-      ['Approved', 'Rejected'].includes(status) && inAppNotification && emailNotification
-    );
+  static notify(status, budgetStatus, budgetEmailData, managerEmailData, notificationData, budgetRejectedData) {
+    if (status !== 'Open' && budgetStatus === 'Open') {
+      NotificationEngine.notify(notificationData);
+      NotificationEngine.sendMail(managerEmailData);
+    }
+    if (budgetStatus === 'Approved') {
+      NotificationEngine.notify(notificationData);
+      NotificationEngine.sendMail(budgetEmailData);
+    }
+    if (budgetStatus === 'Rejected') {
+      NotificationEngine.notify(notificationData);
+      NotificationEngine.sendMail(budgetRejectedData);
+    }
   }
 
   static emailData(request, recipient, name) {
@@ -203,10 +214,42 @@ class ApprovalsController {
         email: recipient && recipient.email
       },
       sender: name,
-      topic: `Travela ${request.status} Request`,
-      type: request.status,
+      topic: 'Travela Budget Approved Request',
+      type: 'Budget Approval',
       redirectLink:
       `${process.env.REDIRECT_URL}/redirect/requests/${request.id}/checklist`,
+      requestId: request.id
+    };
+  }
+
+  static managerData(request, recipient, name) {
+    const msg = emailTopic(request);
+    return {
+      recipient: {
+        name: request.name,
+        email: recipient && recipient.email
+      },
+      sender: name,
+      topic: msg,
+      type: request.status,
+      redirectLink:
+        `${process.env.REDIRECT_URL}/requests/${request.id}`,
+      requestId: request.id
+    };
+  }
+
+  static budgetRejectData(request, recipient, name) {
+    const msg = emailTopic(request);
+    return {
+      recipient: {
+        name: request.name,
+        email: recipient && recipient.email
+      },
+      sender: name,
+      topic: msg,
+      type: 'Budget Rejected',
+      redirectLink:
+        `${process.env.REDIRECT_URL}/requests/${request.id}`,
       requestId: request.id
     };
   }

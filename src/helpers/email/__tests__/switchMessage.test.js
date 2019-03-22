@@ -163,4 +163,19 @@ describe('switchMessage helper', () => {
     expect(verifiedMessage.split(' ')).toContain('<b>AnotherTester</b>', 'completed', 'We342');
     done();
   });
+  it('should return budget approval message for the approved budget', (done) => {
+    const budgetApprovalMsg = switchMessage({
+      type: 'Budget Approval'
+    });
+    expect(budgetApprovalMsg.split(' ')[0]).toContain('Congratulations');
+    done();
+  });
+
+  it('should return budget rejected message for the rejected budget', (done) => {
+    const budgetRejectedMsg = switchMessage({
+      type: 'Budget Rejected'
+    });
+    expect(budgetRejectedMsg.split(' ')[0]).toContain('Your');
+    done();
+  });
 });

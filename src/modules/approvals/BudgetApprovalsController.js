@@ -113,14 +113,24 @@ export default class BudgetApprovalsController {
       const requestToApprove = await models.Approval.find({
         where: { requestId: req.params.requestId }
       });
-      const budgeterLocation = await validateBudgetChecker(req);
+
+      const requestError = BudgetApprovalsController.noRequest(requestToApprove);
+      if (requestError) {
+        return Error.handleError(requestError, 404, res);
+      }
+
+      const budgeter = await validateBudgetChecker(req);
+
       const { status, budgetStatus } = requestToApprove;
+
       const error = BudgetApprovalsController.approvals(budgetStatus);
-      if (error) { return Error.handleError(error, 400, res); }
-      if (['Approved'].includes(status) && budgeterLocation.result) {
+      if (error) {
+        return Error.handleError(error, 400, res);
+      }
+      if (['Approved'].includes(status) && budgeter.result) {
         await models.Approval.update({
           budgetStatus: req.body.budgetStatus,
-          budgetApprover: budgeterLocation.name,
+          budgetApprover: budgeter.name,
           budgetApprovedAt: moment(Date.now()).format('YYYY-MM-DD')
         }, { where: { requestId: req.params.requestId } });
         
@@ -128,8 +138,10 @@ export default class BudgetApprovalsController {
           { budgetStatus: req.body.budgetStatus },
           { where: { id: req.params.requestId }, returning: true }
         );
+
         await ApprovalsController.sendNotificationAfterApproval(req, req.user, updatedRequest[1][0], res);
         await BudgetApprovalsController.sendNotificationToManager(req, updatedRequest[1][0]);
+        
         if (req.body.budgetStatus === 'Approved') {
           ApprovalsController.sendEmailTofinanceMembers(
             updatedRequest[1][0],
@@ -141,8 +153,7 @@ export default class BudgetApprovalsController {
           message: 'Success',
           updatedRequest: updatedRequest[1][0]
         });
-      }/* istanbul ignore next */
-      return Error.handleError(error, 400, res);
+      }
     } catch (error) {
       /* istanbul ignore next */
       return Error.handleError(error, 500, res);
@@ -165,7 +176,7 @@ export default class BudgetApprovalsController {
       message: (budgetStatus === 'Approved')
         ? 'approved the budget'
         : 'rejected the request',
-      notificationLink: `/my-approvals/${id}`
+      notificationLink: `/requests/budgets/${id}`
     };
     return NotificationEngine.notify(notificationData);
   }
@@ -173,6 +184,13 @@ export default class BudgetApprovalsController {
   static approvals(status) {
     if (['Approved', 'Rejected'].includes(status)) {
       const error = `Request has been ${status.toLowerCase()} already`;
+      return error;
+    }
+  }
+
+  static noRequest(request) {
+    if (!request) {
+      const error = 'Request not found';
       return error;
     }
   }

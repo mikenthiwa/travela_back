@@ -76,4 +76,18 @@ describe('Department Controller', () => {
           done();
         });
     });
+
+  it('should return validation error when no department is provided',
+    (done) => {
+      request
+        .post('/api/v1/department')
+        .set('authorization', superAdminToken)
+        .send({ name: '' })
+        .expect(422)
+        .end((err, res) => {
+          if (err) return done(err);
+          expect(res.body.message).toEqual('Validation failed');
+          done();
+        });
+    });
 });

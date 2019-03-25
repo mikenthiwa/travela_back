@@ -77,6 +77,21 @@ module.exports = {
         userId: '-LSsFyueC086niFc9rrz',
         deletedAt: null
       },
+      {
+        id: '34511',
+        name: 'Travela Test',
+        status: 'Open',
+        gender: 'Female',
+        manager: 'Travela Test',
+        department: 'Talent & Development',
+        role: 'Software developer',
+        tripType: 'multi',
+        picture: 'https://lh5.googleusercontent.com/-PbuF53uxx4U/AAAAAAAAAAI/AAAAAAAAAAA/AGDgw-i0-XeoeYYk7TpfNBvulhV0oFM6eg/mo/photo.jpg?sz=50',
+        createdAt: '2018-08-16 012:11:52.181+01',
+        updatedAt: '2018-08-16 012:11:52.181+01',
+        userId: '-LSsFyueC086niFc9rrz',
+        deletedAt: null
+      },
     ],
     {},
   ),

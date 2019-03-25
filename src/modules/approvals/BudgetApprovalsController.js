@@ -66,9 +66,12 @@ export default class BudgetApprovalsController {
   }
 
   static returnResponse(res, approvals, open, past, pagination) {
+    const checkApprovals = approvals.rows.length < 1
+      ? 'You have no approvals at the moment'
+      : 'Approvals retrieved successfully';
     res.status(200).json({
       success: true,
-      message: 'Approvals retrieved successfully',
+      message: checkApprovals,
       approvals: approvals.rows,
       meta: { count: { open, past }, pagination }
     });

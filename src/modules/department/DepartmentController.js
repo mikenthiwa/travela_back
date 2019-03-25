@@ -66,12 +66,29 @@ class DepartmentController {
           return { newDepartments };
         };
         const userDept = await Promise.all(departments.map(
-          dept => createUserDepartment(dept)
+          dept => createUserDepartment(dept.toLowerCase())
         ));
         return userDept;
       });
       return addUserDept;
     } catch (error) { /* istanbul ignore next */
+      return error;
+    }
+  }
+
+  static async deletedUserDepartment(id) {
+    try {
+      const deleteDepartment = await models.UsersDepartments.destroy(
+        {
+          where: {
+            userId: {
+              $in: [id]
+            }
+          }
+        }
+      );
+      return deleteDepartment;
+    } catch (error) {
       return error;
     }
   }

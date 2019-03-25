@@ -143,7 +143,7 @@ class UserRoleController {
           occupation: travelaUser.occupation
         }
       });
-      await DepartmentController.createDepartmentFromEndpoint(managerResult.department);
+      await DepartmentController.createDepartmentFromEndpoint(managerResult.department.toLowerCase());
       const newLocation = !userOnProduction.data.values[0].location
         ? userLocation
         : userOnProduction.data.values[0].location.name;
@@ -158,7 +158,7 @@ class UserRoleController {
       };
       await managerResult.addRole(53019);
       await result.update(updateData);
-      await DepartmentController.createDepartmentFromEndpoint(updateData.department);
+      await DepartmentController.createDepartmentFromEndpoint(updateData.department.toLowerCase());
       return UserRoleController.response(res, message, result);
     } catch (error) {
       /* istanbul ignore next */
@@ -202,7 +202,7 @@ class UserRoleController {
       occupation: userOnBamboo.data.jobTitle,
       gender: userOnBamboo.data.gender,
     });
-    await DepartmentController.createDepartmentFromEndpoint(userOnBamboo.data.department);
+    await DepartmentController.createDepartmentFromEndpoint(userOnBamboo.data.department.toLowerCase());
     return { createdUser, found: true };
   }
 
@@ -419,7 +419,12 @@ class UserRoleController {
         req.roleName
         }'`; // eslint-disable-line
       const message = [200, msg, true];
-      if (deletedRole) return UserRoleController.response(res, message);
+      if (deletedRole) {
+        if (roleId === '60000') {
+          await DepartmentController.deletedUserDepartment(userId);
+        }
+        return UserRoleController.response(res, message);
+      }
 
       const error = `User with the role: '${req.roleName}' does not exist`;
       if (!deletedRole) return CustomError.handleError(error, 404, res);

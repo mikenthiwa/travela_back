@@ -5,13 +5,22 @@ module.exports = {
     [
       {
         id: '1',
+        name: 'Travel Ticket',
+        requiresFiles: true,
+        deleteReason: null,
+        destinationName: 'Default',
+        createdAt: '2018-08-05T08:36:11.170Z',
+        updatedAt: '2018-08-05T08:36:11.170Z',
+      },
+      {
+        id: '2',
         name: 'Travel Ticket Details',
         requiresFiles: false,
         deleteReason: null,
         destinationName: 'Default',
         createdAt: '2018-10-05T08:36:11.170Z',
         updatedAt: '2018-10-05T08:36:11.170Z',
-      },
+      }
     ], {}),
 
   down: queryInterface => queryInterface.bulkDelete('ChecklistItems', null, {})

@@ -16,8 +16,8 @@ export default class TravelStipendValidator {
   }
 
   static async checkCenter(req, res, next) {
-    const { center } = req.body;
-
+    const { body: { center, stipend }, route: { methods: { put } } } = req;
+    const action = put;
     const foundCenter = await models.Center.find({
       where: {
         location: center
@@ -40,12 +40,23 @@ export default class TravelStipendValidator {
           }]
         }
       );
+    TravelStipendValidator.conditionalValidation(res, foundStipend, action, stipend, next);
+  }
 
+  static async conditionalValidation(res, foundStipend, action, stipend, next) {
     if (foundStipend) {
-      return res.status(409).json({
-        success: false,
-        message: 'A travel stipend already exists for this center'
-      });
+      if (!action) {
+        return res.status(409).json({
+          success: false,
+          message: 'A travel stipend already exists for this center'
+        });
+      }
+      if (action && (foundStipend.dataValues.amount === Number(stipend))) {
+        return res.status(409).json({
+          success: false,
+          message: 'A travel stipend already exists for this center'
+        });
+      }
     }
     return next();
   }

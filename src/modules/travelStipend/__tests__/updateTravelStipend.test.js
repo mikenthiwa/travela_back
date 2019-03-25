@@ -143,6 +143,24 @@ describe('Update Travel Stipend', () => {
         superAdminToken
       );
     });
+    it('should raise validation errors when same stipend is being added twice', async (done) => {
+      await TestSetup.destoryTables();
+      await TestSetup.createTables();
+      updateTravelStipend(
+        {
+          center: 'Lagos',
+          stipend: 75
+        },
+        100,
+        done,
+        {
+          status: 409,
+          message: 'A travel stipend already exists for this center'
+        },
+        'message',
+        superAdminToken
+      );
+    });
 
     it('should not update if given center only', (done) => {
       updateTravelStipend(

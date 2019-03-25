@@ -32,6 +32,20 @@ module.exports = {
         updatedAt: '2018-08-15 012:11:53.181+01',
         picture: 'https://lh5.googleusercontent.com/-PbuF53uxx4U/AAAAAAAAAAI/AAAAAAAAAAA/AGDgw-i0-XeoeYYk7TpfNBvulhV0oFM6eg/mo/photo.jpg?sz=50'
       },
+      {
+        fullName: 'John Snow',
+        email: 'john.snow@andela.com',
+        userId: '-LMfhfu756fhvgf764',
+        passportName: 'John Snow',
+        department: 'Talent & Development',
+        occupation: 'Software developer',
+        manager: 'Travela Test',
+        gender: 'Male',
+        location: 'Nairobi',
+        createdAt: '2018-08-15 012:11:53.181+01',
+        updatedAt: '2018-08-15 012:11:53.181+01',
+        picture: 'https://lh5.googleusercontent.com/-PbuF53uxx4U/AAAAAAAAAAI/AAAAAAAAAAA/AGDgw-i0-XeoeYYk7TpfNBvulhV0oFM6eg/mo/photo.jpg?sz=50'
+      },
     ],
     {},
   ),

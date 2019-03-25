@@ -327,7 +327,7 @@ class UserRoleController {
         {
           model: models.User,
           as: 'users',
-          attributes: ['email', 'fullName', 'userId', 'id'],
+          attributes: ['email', 'fullName', 'userId', 'id', 'location'],
           through: {
             attributes: []
           },

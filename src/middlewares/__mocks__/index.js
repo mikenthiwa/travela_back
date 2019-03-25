@@ -34,7 +34,6 @@ const middleware = {
     validateCreateGuestHouse: jest.fn(invokeNextMiddleware),
     checkUrl: jest.fn(invokeNextMiddleware),
     getUserId: jest.fn(mockGetUserId),
-    centerExists: jest.fn(invokeNextMiddleware),
     validateChecklistQuery: jest.fn(invokeNextMiddleware),
     getUserFromDb: jest.fn(invokeNextMiddleware),
     checkSignedInUser: jest.fn(invokeNextMiddleware),
@@ -43,14 +42,12 @@ const middleware = {
     validateTeamMemberLocation: jest.fn(invokeNextMiddleware)
   },
   RoleValidator: {
-    validateUpdateRole: jest.fn(invokeNextMiddleware),
+    validateUpdateRole: jest.fn(() => invokeNextMiddleware),
     validateRoleAssignment: jest.fn(invokeNextMiddleware),
     roleExists: jest.fn(invokeNextMiddleware),
     checkUserRole: jest.fn(() => invokeNextMiddleware),
     validateAddRole: jest.fn(invokeNextMiddleware),
     validateUserRole: jest.fn(invokeNextMiddleware),
-    validateUpdateCenterBody: jest.fn(invokeNextMiddleware),
-    validateUpdateCenter: jest.fn(invokeNextMiddleware),
     checkUserRoleById: jest.fn(invokeNextMiddleware),
     validateChecklistQuery: jest.fn(invokeNextMiddleware),
     validateRequestIdQuery: jest.fn(invokeNextMiddleware),
@@ -158,7 +155,8 @@ const middleware = {
   },
   DepartmentValidation: {
     validateDepartment: jest.fn(invokeNextMiddleware),
-    validateRoleDepartment: jest.fn(invokeNextMiddleware)
+    validateBudgetCheckerDepartments: jest.fn(() => invokeNextMiddleware),
+    validateRoleDepartment: jest.fn(invokeNextMiddleware),
   }
 };
 

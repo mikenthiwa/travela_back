@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 class DepartmentValidation {
   static errorHandler(res, errors, next) {
     if (errors) {
@@ -20,25 +22,30 @@ class DepartmentValidation {
     DepartmentValidation.errorHandler(res, errors, next);
   }
 
-  static async validateRoleDepartment(req, res, next) {
-    const { roleName, departments } = req.body;
-
+  static async validateBudgetCheckerDepartments({
+    roleName = 'Budget Checker', departments, req, res, next
+  }) {
     if (roleName === 'Budget Checker') {
-      if (!departments) {
-        return res.status(400).json({
-          success: false,
-          message: 'You have to add department in an array when adding a user to a budget checker role'
-        });
-      }
-      
-      if (departments.length < 1 || !(departments instanceof Array)) {
+      if ((departments || []).length < 1 || !(departments instanceof Array)) {
         return res.status(400).json({
           success: false,
           message: 'Department must be an array and cannot be empty'
         });
       }
+
+      // remove duplicate departments
+      const departmentsToLower = departments.map(dept => dept.toLowerCase());
+      const uniqueDepartments = new Set(departmentsToLower);
+      req.body.departments = [...uniqueDepartments].map(dept => _.capitalize(dept));
     }
     next();
+  }
+
+  static async validateRoleDepartment(req, res, next) {
+    const { roleName, departments } = req.body;
+    DepartmentValidation.validateBudgetCheckerDepartments({
+      roleName, departments, req, res, next
+    });
   }
 }
 

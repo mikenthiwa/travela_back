@@ -1,4 +1,5 @@
 import paginationHelper from '../../helpers/Pagination';
+import models from '../../database/models';
 
 class UserRoleUtils {
   static getPaginatedRoles(req, count, roles) {
@@ -68,6 +69,14 @@ class UserRoleUtils {
       return message;
     }
     return false;
+  }
+
+  static async getUser(email) {
+    const user = await models.User.findOne({
+      where: { email },
+      attributes: ['email', 'fullName', 'userId', 'id']
+    });
+    return user;
   }
 }
 

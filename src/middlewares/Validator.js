@@ -175,23 +175,6 @@ export default class Validator {
     next();
   }
 
-  static async centerExists(req, res, next) {
-    const { center } = req.body;
-    if (center) {
-      const findCenter = await models.Center.findOne({
-        where: { location: { [Op.iLike]: center } }, attributes: ['id']
-      });
-      if (!findCenter) {
-        const error = 'Center does not exist';
-        return Error.handleError(error, 404, res);
-      }
-      req.centerId = findCenter.id;
-      next();
-    } else {
-      next();
-    }
-  }
-
   static checkSignedInUser(req, res, next) {
     if (req.user.UserInfo.id !== req.params.id) {
       return res.status(403).json({

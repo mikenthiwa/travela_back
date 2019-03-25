@@ -4,13 +4,16 @@ import CustomError from '../helpers/Error';
 import Validator from './Validator';
 
 export default class RoleValidator {
-  static validateUpdateRole(req, res, next) {
-    req.checkBody('email').isEmail()
-      .withMessage('Please provide a valid email');
-    req.checkBody('roleName', 'roleName is required').notEmpty();
-    req.checkBody('center', 'center cannot be empty').optional().notEmpty();
-    const errors = req.validationErrors();
-    Validator.errorHandler(res, errors, next);
+  static validateUpdateRole(roleNameRequired = true) {
+    return async (req, res, next) => {
+      req.checkBody('email').isEmail()
+        .withMessage('Please provide a valid email');
+      if (roleNameRequired) {
+        req.checkBody('roleName', 'roleName is required').notEmpty();
+      }
+      const errors = req.validationErrors();
+      Validator.errorHandler(res, errors, next);
+    };
   }
 
   static validateAddRole(req, res, next) {
@@ -79,21 +82,6 @@ export default class RoleValidator {
       !== 'travel team member') {
       const error = 'Only a Super Admin can assign that role';
       return CustomError.handleError(error, 403, res);
-    }
-    next();
-  }
-
-  static validateUpdateCenterBody(req, res, next) {
-    req.checkBody('center', 'Center name is required').notEmpty();
-    const errors = req.validationErrors();
-    Validator.errorHandler(res, errors, next);
-  }
-
-  static validateUpdateCenter(req, res, next) {
-    if (Number.isNaN(parseInt(req.params.id, 10))) {
-      return res.status(400).json({
-        message: 'Only Number allowed for id'
-      });
     }
     next();
   }

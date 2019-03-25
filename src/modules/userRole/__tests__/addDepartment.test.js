@@ -131,11 +131,11 @@ describe('Budget Checker role test', () => {
             email: 'test.user@andela.com',
             roleName: 'Budget Checker',
           })
-          .expect(200)
+          .expect(400)
           .end((err, res) => {
             expect(res.body.success).toEqual(false);
             expect(res.body.message)
-              .toEqual('You have to add department in an array when adding a user to a budget checker role');
+              .toEqual('Department must be an array and cannot be empty');
             done();
           });
       });
@@ -150,7 +150,7 @@ describe('Budget Checker role test', () => {
             roleName: 'Budget Checker',
             departments: 'People'
           })
-          .expect(200)
+          .expect(400)
           .end((err, res) => {
             expect(res.body.success).toEqual(false);
             expect(res.body.message)

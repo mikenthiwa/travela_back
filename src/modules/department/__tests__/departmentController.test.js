@@ -119,6 +119,21 @@ describe('Department Controller', () => {
         });
     });
 
+  it('should throw 422 error if department name is empty',
+    (done) => {
+      request
+        .post('/api/v1/department')
+        .set('authorization', superAdminToken)
+        .send({ name: '' })
+        .expect(422)
+        .end((err, res) => {
+          if (err) return done(err);
+          expect(res.body.success).toEqual(false);
+          expect(res.body.message).toEqual('Validation failed');
+          done();
+        });
+    });
+
   it('should get list of department successfully',
     (done) => {
       request

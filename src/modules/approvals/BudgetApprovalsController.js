@@ -15,7 +15,7 @@ export default class BudgetApprovalsController {
   static async findBudgetCheckerDepartment(department) {
     const findDepartment = await models.Department.findOne({
       where: {
-        name: department
+        name: { [Op.iLike]: department }
       },
       include: [
         {
@@ -136,7 +136,7 @@ export default class BudgetApprovalsController {
           budgetApprover: budgeter.name,
           budgetApprovedAt: moment(Date.now()).format('YYYY-MM-DD')
         }, { where: { requestId: req.params.requestId } });
-        
+
         const updatedRequest = await models.Request.update(
           { budgetStatus: req.body.budgetStatus },
           { where: { id: req.params.requestId }, returning: true }
@@ -144,7 +144,7 @@ export default class BudgetApprovalsController {
 
         await ApprovalsController.sendNotificationAfterApproval(req, req.user, updatedRequest[1][0], res);
         await BudgetApprovalsController.sendNotificationToManager(req, updatedRequest[1][0]);
-        
+
         if (req.body.budgetStatus === 'Approved') {
           ApprovalsController.sendEmailTofinanceMembers(
             updatedRequest[1][0],

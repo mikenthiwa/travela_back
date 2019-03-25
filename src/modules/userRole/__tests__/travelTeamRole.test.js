@@ -189,23 +189,6 @@ describe('Travel team role test', () => {
           done();
         });
     });
-    it('should return 404 error if the center does not exist', (done) => {
-      request(app)
-        .put('/api/v1/user/role/update')
-        .set('authorization', token)
-        .send({
-          email: 'test.user@andela.com',
-          roleName: 'travel team member',
-          center: 'London, UK'
-        })
-        .expect(404)
-        .end((err, res) => {
-          expect(res.body.success).toEqual(false);
-          expect(res.body.error)
-            .toEqual('Center does not exist');
-          done();
-        });
-    });
     it('should create travel team members',
       (done) => {
         request(app)

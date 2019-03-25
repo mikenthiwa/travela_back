@@ -1,6 +1,6 @@
+import _ from 'lodash';
 import models from '../../database/models';
 import Error from '../../helpers/Error';
-
 
 class DepartmentController {
   static handleResponse(res, code, message) {
@@ -44,7 +44,7 @@ class DepartmentController {
   static async createDepartment(department) {
     try {
       const newDocument = await models.Department.findOrCreate({
-        where: { name: department }
+        where: { name: _.capitalize(department) }
       });
       return newDocument;
     } catch (error) { /* istanbul ignore next */
@@ -52,21 +52,23 @@ class DepartmentController {
     }
   }
 
-  static async assignDepartments(departments, user) {
+  static async assignDepartments(allDepartments, user) {
     try {
       const addUserDept = await models.sequelize.transaction(async () => {
         const createUserDepartment = async (dept) => {
-          const [newDepartments] = await models.Department.findOrCreate({
+          const [department] = await models.Department.findOrCreate({
             where: { name: dept }
           });
-          await models.UsersDepartments.create({
-            userId: user.id,
-            departmentId: newDepartments.id
+          await models.UsersDepartments.findOrCreate({
+            where: {
+              userId: user.id,
+              departmentId: department.id
+            }
           });
-          return { newDepartments };
+          return department;
         };
-        const userDept = await Promise.all(departments.map(
-          dept => createUserDepartment(dept.toLowerCase())
+        const userDept = await Promise.all(allDepartments.map(
+          dept => createUserDepartment(dept)
         ));
         return userDept;
       });

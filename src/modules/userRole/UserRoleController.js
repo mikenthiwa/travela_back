@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 import axios from 'axios';
+import { Op } from 'sequelize';
 import models from '../../database/models';
 import CustomError from '../../helpers/Error';
 import UserHelper from '../../helpers/user';
@@ -62,7 +63,6 @@ class UserRoleController {
               }
             }
           ],
-          
         },
         {
           model: models.Department,
@@ -143,7 +143,7 @@ class UserRoleController {
           occupation: travelaUser.occupation
         }
       });
-      await DepartmentController.createDepartmentFromEndpoint(managerResult.department.toLowerCase());
+      await DepartmentController.createDepartmentFromEndpoint(managerResult.department);
       const newLocation = !userOnProduction.data.values[0].location
         ? userLocation
         : userOnProduction.data.values[0].location.name;
@@ -158,7 +158,7 @@ class UserRoleController {
       };
       await managerResult.addRole(53019);
       await result.update(updateData);
-      await DepartmentController.createDepartmentFromEndpoint(updateData.department.toLowerCase());
+      await DepartmentController.createDepartmentFromEndpoint(updateData.department);
       return UserRoleController.response(res, message, result);
     } catch (error) {
       /* istanbul ignore next */
@@ -202,7 +202,7 @@ class UserRoleController {
       occupation: userOnBamboo.data.jobTitle,
       gender: userOnBamboo.data.gender,
     });
-    await DepartmentController.createDepartmentFromEndpoint(userOnBamboo.data.department.toLowerCase());
+    await DepartmentController.createDepartmentFromEndpoint(userOnBamboo.data.department);
     return { createdUser, found: true };
   }
 
@@ -218,10 +218,7 @@ class UserRoleController {
           UserInfo: { name }
         }
       } = req;
-      let user = await models.User.findOne({
-        where: { email },
-        attributes: ['email', 'fullName', 'userId', 'id']
-      });
+      let user = await UserRoleUtils.getUser(email);
       let dept;
       if (!user) {
         const { found, createdUser } = await UserRoleController.createUserFromApi(req);
@@ -343,6 +340,12 @@ class UserRoleController {
                 attributes: [],
                 where: { roleId }
               }
+            },
+            {
+              model: models.Department,
+              as: 'budgetCheckerDepartments',
+              attributes: ['id', 'name'],
+              through: { attributes: [] },
             }
           ]
         }
@@ -444,6 +447,44 @@ class UserRoleController {
       details: { role: roleName, assignerName: name }
     };
     NotificationEngine.sendMail(data);
+  }
+
+  static async updateBudgetCheckerRole(req, res) {
+    try {
+      const { body: { email, departments } } = req;
+      await models.sequelize.transaction(async () => {
+        const user = await UserRoleUtils.getUser(email);
+        if (!user) {
+          return CustomError.handleError('User does not exist', 404, res);
+        }
+        const isBudgetChecker = await models.UserRole.findOne({
+          where: {
+            userId: user.id,
+            roleId: 60000
+          }
+        });
+        if (!isBudgetChecker) {
+          return CustomError.handleError('User is not a budget checker', 409, res);
+        }
+        const budgetCheckerDepartments = await DepartmentController
+          .assignDepartments(departments, user);
+        // Delete other departments asides from the received departments
+        await models.UsersDepartments.destroy({
+          where: {
+            userId: user.id,
+            departmentId: { [Op.notIn]: budgetCheckerDepartments.map(d => d.id) }
+          }
+        });
+        return res.status(200).json({
+          success: true,
+          message: 'Budget checker role updated successfully',
+          user,
+          budgetCheckerDepartments,
+        });
+      });
+    } catch (error) { // istanbul ignore next
+      return CustomError.handleError(error.toString(), 500, res);
+    }
   }
 }
 

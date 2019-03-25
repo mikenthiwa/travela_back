@@ -7,20 +7,6 @@ const Router = express.Router();
 
 Router.get('/centers', authenticate, CentersController.getCenters);
 
-Router.patch(
-  '/center/user/:id',
-  authenticate,
-  RoleValidator.validateUpdateCenter,
-  RoleValidator.validateUpdateCenterBody,
-  RoleValidator.checkUserRole([
-    'Super Administrator',
-    'Travel Administrator',
-    'Travel Team Member'
-  ]),
-  Validator.centerExists,
-  CentersController.changeCenter
-);
-
 Router.get('/centers',
   authenticate,
   CentersController.getCenters);

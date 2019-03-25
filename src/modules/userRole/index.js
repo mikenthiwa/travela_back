@@ -67,10 +67,9 @@ Router.put(
     'Travel Administrator',
     'Travel Team Member'
   ]),
-  RoleValidator.validateUpdateRole,
+  RoleValidator.validateUpdateRole(),
   Validator.checkEmail,
   RoleValidator.roleExists,
-  Validator.centerExists,
   RoleValidator.validateRoleAssignment,
   DepartmentValidation.validateRoleDepartment,
   UserRoleController.updateUserRole
@@ -89,5 +88,15 @@ Router.delete(
   RoleValidator.roleExists,
   UserRoleController.deleteUserRole
 );
+
+Router.patch('/user/roles/budgetChecker',
+  authenticate,
+  RoleValidator.checkUserRole([
+    'Super Administrator',
+  ]),
+  RoleValidator.validateUpdateRole(false),
+  Validator.checkEmail,
+  DepartmentValidation.validateRoleDepartment,
+  UserRoleController.updateBudgetCheckerRole);
 
 export default Router;

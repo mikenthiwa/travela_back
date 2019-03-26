@@ -1,16 +1,15 @@
 
-
 module.exports = {
   up: queryInterface => queryInterface.bulkInsert('ChecklistItems',
     [
       {
-        id: '1',
-        name: 'Travel Ticket Details',
-        requiresFiles: false,
+        id: '2',
+        name: 'Travel Ticket',
+        requiresFiles: true,
         deleteReason: null,
         destinationName: 'Default',
-        createdAt: '2018-10-05T08:36:11.170Z',
-        updatedAt: '2018-10-05T08:36:11.170Z',
+        createdAt: '2017-10-05T08:36:11.170Z',
+        updatedAt: '2017-10-05T08:36:11.170Z',
       }
     ], {}),
 

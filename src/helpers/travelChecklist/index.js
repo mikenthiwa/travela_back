@@ -51,11 +51,12 @@ class TravelChecklistHelper {
     const checklistWithDefaultItem = checkList.map(
       checklist => ({
         ...checklist,
-        checklist: [...checklist.checklist, ...travelTicket.checklist]
+        checklist: [...checklist.checklist, ...travelTicket.checklist.reverse()]
       })
     );
     return checklistWithDefaultItem;
   }
+
 
   static addDestinationsWithNoChecklist(groupedChecklists, tripsDestinations) {
     const uniqueDestinations = [...new Set(tripsDestinations)];

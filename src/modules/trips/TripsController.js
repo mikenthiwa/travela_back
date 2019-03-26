@@ -228,7 +228,7 @@ class TripsController {
   }
 
   static async validateTripRequest(req, res) {
-    const { body: { trips: requestTrips } } = req;
+    const { body: { trips: requestTrips, editing, id } } = req;
     const { id: userId } = req.user.UserInfo;
     const searchTrips = requestTrips.map((trip) => {
       const { origin, destination, departureDate } = trip;
@@ -238,14 +238,14 @@ class TripsController {
     try {
       const trips = await models.Trip.findAll(searchOptions);
       const myTrips = trips.filter(trip => trip.request.userId === userId);
-      if (myTrips.length) {
+      if (myTrips.length && !editing) {
         return res.status(409).json({
           success: false,
           message: 'You already have this trip',
           errors: [{ message: 'You already have this trip' }]
         });
       }
-      await RequestUtils.validateTripDates(req.user.UserInfo.id, requestTrips);
+      await RequestUtils.validateTripDates(req.user.UserInfo.id, requestTrips, id);
       return res.status(200).json({
         success: true,
         message: 'success',

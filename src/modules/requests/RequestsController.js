@@ -368,7 +368,7 @@ class RequestsController {
       };
       const emailRequest = { name, manager: request.name, id: request.id };
       const emailData = RequestUtils.getMailData(
-        emailRequest, recipient, 'Travel Request Verified', 'Verified', '/redirect/requests/'
+        emailRequest, recipient, 'Travel Request Verified', 'Verified', `/redirect/requests/${emailRequest.id}`
       );
       NotificationEngine.notify(notificationData);
       NotificationEngine.sendMail(emailData);

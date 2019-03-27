@@ -1729,7 +1729,7 @@ describe('Requests Controller', () => {
         );
         jest.spyOn(RequestUtils, 'sendEmailToFinanceTeam');
         NotificationEngine.sendMailToMany = jest.fn();
-        const redirect = 'redirect/requests/';
+        const redirect = 'redirect/requests/mock-request-id-2';
         const notifySpy = jest.spyOn(NotificationEngine, 'notify');
         const sendMailSpy = jest.spyOn(NotificationEngine, 'sendMail');
         request(app)

@@ -56,7 +56,7 @@ class CommentsController {
       const requesterDetails = await UserRoleController.getRecipient(null, userId);
       const managerDetail = await UserRoleController.getRecipient(manager);
       const linkType = commentType === 'Document'
-        ? `/trip-planner/travel-readiness/${userId}?id=${id}&type=${documentType}`
+        ? `/travel-readiness/${userId}?id=${id}&type=${documentType}`
         : `/requests/${id}`;
       const newNotificationDetail = {
         senderId: managerDetail.userId,
@@ -92,7 +92,7 @@ class CommentsController {
     }
     if (commentType === 'Document') {
       const { type: documentType } = request;
-      redirectLink = `${process.env.REDIRECT_URL}/trip-planner/travel-readiness/${userId}?id=${id}&type=${documentType}`;
+      redirectLink = `${process.env.REDIRECT_URL}/travel-readiness/${userId}?id=${id}&type=${documentType}`;
     }
     /* istanbul ignore next */
     CommentsController.sendEmail(

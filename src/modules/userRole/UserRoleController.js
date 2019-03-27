@@ -77,6 +77,9 @@ class UserRoleController {
   }
 
   static async updateUserProfile(req, res) {
+    const {
+      department, passportName, occupation, gender, manager, location
+    } = req.body;
     const user = await models.User.findOne({
       where: {
         userId: req.params.id
@@ -87,13 +90,14 @@ class UserRoleController {
       return UserRoleController.response(res, message);
     }
     const result = await user.update({
-      passportName: req.body.passportName || user.passportName,
-      department: req.body.department || user.department,
-      occupation: req.body.occupation || user.occupation,
-      manager: req.body.manager || user.manager,
-      gender: req.body.gender || user.gender,
-      location: req.body.location || user.location
+      passportName: passportName || user.passportName,
+      department: department || user.department,
+      occupation: occupation || user.occupation,
+      manager: manager || user.manager,
+      gender: gender || user.gender,
+      location: location || user.location
     });
+    if (department) await DepartmentController.createDepartmentFromEndpoint(department);
     const message = [200, 'Profile updated successfully', true];
     UserRoleController.response(res, message, result);
   }
@@ -121,9 +125,8 @@ class UserRoleController {
       const message = [201, 'User created successfully', true];
       UserHelper.authorizeRequests(req.userToken);
       const userOnProduction = await UserHelper.getUserOnProduction(result);
-      const userOnBamboo = await UserHelper.getUserOnBamboo(
-        userOnProduction.data.values[0].bamboo_hr_id
-      );
+      const bambooHRID = userOnProduction.data.values[0].bamboo_hr_id;
+      const userOnBamboo = await UserHelper.getUserOnBamboo(bambooHRID);
       const managerOnBamboo = await UserHelper.getUserOnBamboo(userOnBamboo.data.supervisorEId);
       const managerOnProduction = await
       UserHelper.getManagerOnProduction(userOnBamboo.data.supervisorEId);
@@ -157,7 +160,7 @@ class UserRoleController {
         gender: userOnBamboo.data.gender
       };
       await managerResult.addRole(53019);
-      await result.update(updateData);
+      if (bambooHRID !== 0) await result.update(updateData);
       await DepartmentController.createDepartmentFromEndpoint(updateData.department);
       return UserRoleController.response(res, message, result);
     } catch (error) {

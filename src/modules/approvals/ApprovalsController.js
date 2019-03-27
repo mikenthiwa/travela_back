@@ -280,13 +280,13 @@ class ApprovalsController {
       const data = {
         topic: `Successful Budget Check for ${requesterName}'s Trip`,
         type: 'Notify finance team',
-        details: { requesterName, budgetCheckerName },
-        redirectLink: `${process.env.REDIRECT_URL}/requests/${id}`
+        details: { requesterName, budgetCheckerName, id },
+        redirectLink: `${process.env.REDIRECT_URL}/requests/budgets/${id}`
       };
 
       // 4.Test this
       if (financeMembers.length) {
-        NotificationEngine.sendMailToMany(finaceTeamMembers, data);
+        NotificationEngine.sendMailToMany(financeMembers, data);
       }
     } catch (error) {
       /* istanbul ignore next */

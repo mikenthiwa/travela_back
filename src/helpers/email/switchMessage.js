@@ -149,11 +149,10 @@ const switchMessage = (msgDetail) => {
 </b>. Please login to Travela to review the details and advise on availability
 of budget for this trip.`;
     case 'Notify finance team':
-      return `A travel request for <b>${
-        msgDetail.details.requesterName
-      }</b> has now been approved by ${
-        msgDetail.details.budgetCheckerName
-      }. Please make arrangements to make funds available for this trip.`;
+      return `This is to notify you that a travel request <b>${msgDetail.details.id}
+      </b> for <b> ${msgDetail.details.requesterName}</b> has now been approved by the budget holder 
+      <b>${msgDetail.details.budgetCheckerName} </b> of the department.
+      You will be notified again as soon as the request is verified by the Travel team.Thank you.`;
     case 'Notify Travel Admins of Manager Approval':
       return `<b>${msgDetail.details.requesterName}</b>'s manager has approved \
       their request.<br/> <br/>

@@ -113,7 +113,8 @@ const middleware = {
     checkStatusIsApproved: jest.fn(invokeNextMiddleware),
     validateRequestHasTrips: jest.fn(invokeNextMiddleware),
     validateDepartureDate: jest.fn(invokeNextMiddleware),
-    validateCheckListComplete: jest.fn(invokeNextMiddleware)
+    validateCheckListComplete: jest.fn(invokeNextMiddleware),
+    getTravelaUser: jest.fn(invokeNextMiddleware)
   },
   TravelReadinessDocumentValidator: {
     validateInput: jest.fn(invokeNextMiddleware),

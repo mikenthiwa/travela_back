@@ -125,8 +125,9 @@ class UserRoleController {
       const message = [201, 'User created successfully', true];
       UserHelper.authorizeRequests(req.userToken);
       const userOnProduction = await UserHelper.getUserOnProduction(result);
-      const bambooHRID = userOnProduction.data.values[0].bamboo_hr_id;
-      const userOnBamboo = await UserHelper.getUserOnBamboo(bambooHRID);
+      const userOnBamboo = await UserHelper.getUserOnBamboo(
+        userOnProduction.data.values[0].bamboo_hr_id
+      );
       const managerOnBamboo = await UserHelper.getUserOnBamboo(userOnBamboo.data.supervisorEId);
       const managerOnProduction = await
       UserHelper.getManagerOnProduction(userOnBamboo.data.supervisorEId);
@@ -160,7 +161,7 @@ class UserRoleController {
         gender: userOnBamboo.data.gender
       };
       await managerResult.addRole(53019);
-      if (bambooHRID !== 0) await result.update(updateData);
+      await result.update(updateData);
       await DepartmentController.createDepartmentFromEndpoint(updateData.department);
       return UserRoleController.response(res, message, result);
     } catch (error) {

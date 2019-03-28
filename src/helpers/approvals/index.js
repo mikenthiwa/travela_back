@@ -53,7 +53,7 @@ export function createApprovalSubquery({
   const { verified } = req.query;
   let status = req.query.status ? req.query.status : '';
 
-  const userName = req.user.UserInfo.name;
+  const userName = req.travelaUser.fullName;
   const { location } = req.user;
   // tripWhereExtended
   const { requestWhereExtended, tripWhereExtended } = createExtendedClause(

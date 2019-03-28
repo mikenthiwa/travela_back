@@ -132,6 +132,12 @@ const fakeManager = generateMock.user(
   }
 );
 
+const nonExistentUserToken = Utils.generateTestToken({
+  UserInfo: {
+    email: 'dontexist@andela.com', id: 'hgyfytgcbvv', name: 'Incognito'
+  }
+});
+
 const requesterToken = Utils.generateTestToken(
   { UserInfo: { ...mockRequester, name: mockRequester.fullName, id: mockRequester.userId } }
 );
@@ -1475,6 +1481,24 @@ describe('Requests Controller', () => {
           error: 'Permission denied, you are not requesters manager',
         });
         done();
+      });
+
+      it('should return 404 error if the user does not exist in the app', (done) => {
+        const expectedResponse = {
+          body: {
+            success: false,
+            error: 'User does not exist in the application',
+          },
+          status: 404,
+        };
+        request(app)
+          .put(`/api/v1/approvals/${mockOpenRequest.id}`)
+          .set('authorization', nonExistentUserToken)
+          .send({ newStatus: 'Approved' })
+          .end((err, res) => {
+            expect(res).toMatchObject(expectedResponse);
+            done();
+          });
       });
     });
 

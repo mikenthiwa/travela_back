@@ -7,7 +7,7 @@ import BudgetApprovalsController from './BudgetApprovalsController';
 const ApprovalsRouter = express.Router();
 
 const {
-  authenticate, Validator, validateDirectReport, RoleValidator
+  authenticate, Validator, validateDirectReport, RoleValidator, RequestValidator
 } = middleware;
 
 ApprovalsRouter.get(
@@ -18,6 +18,7 @@ ApprovalsRouter.get(
       'Travel Team Member', 'Budget Checker']
   ),
   getRequestsValidators,
+  RequestValidator.getTravelaUser,
   Validator.validateRequest,
   ApprovalsController.getUserApprovals,
 );
@@ -36,6 +37,7 @@ ApprovalsRouter.put(
   '/approvals/:requestId',
   authenticate,
   Validator.validateStatus,
+  RequestValidator.getTravelaUser,
   validateDirectReport,
   ApprovalsController.updateRequestStatus,
 );

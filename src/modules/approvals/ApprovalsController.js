@@ -31,7 +31,7 @@ class ApprovalsController {
 
   static setParameters(req) {
     params = retrieveParams(req);
-    params.userName = req.user.UserInfo.name;
+    params.userName = req.travelaUser.fullName;
     params.parameters = {
       req,
       limit: params.limit,

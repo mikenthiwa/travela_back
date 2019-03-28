@@ -118,4 +118,20 @@ export default class RequestValidator {
       return Error.handleError(error, 500, res);
     }
   }
+
+  static async getTravelaUser(req, res, next) {
+    const travelaUser = await models.User.findOne({
+      where: {
+        email: req.user.UserInfo.email
+      }
+    });
+    if (!travelaUser) {
+      return res.status(404).json({
+        success: false,
+        error: 'User does not exist in the application'
+      });
+    }
+    req.travelaUser = travelaUser;
+    next();
+  }
 }

@@ -44,7 +44,7 @@ export default class TravelReadinessController {
           userId: req.user.UserInfo.id
         };
       }
-      
+
       const addedDocument = await models.TravelReadinessDocuments.create(newDocument);
       res.status(201).json({
         success: true,

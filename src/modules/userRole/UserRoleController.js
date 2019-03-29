@@ -109,7 +109,7 @@ class UserRoleController {
         const message = [400, 'User Id required', false];
         return UserRoleController.response(res, message);
       }
-      const [result] = await models.User.findOrCreate({
+      const [result, userCreated] = await models.User.findOrCreate({
         where: {
           email: req.user.UserInfo.email,
           userId: req.user.UserInfo.id
@@ -125,9 +125,8 @@ class UserRoleController {
       const message = [201, 'User created successfully', true];
       UserHelper.authorizeRequests(req.userToken);
       const userOnProduction = await UserHelper.getUserOnProduction(result);
-      const userOnBamboo = await UserHelper.getUserOnBamboo(
-        userOnProduction.data.values[0].bamboo_hr_id
-      );
+      const bambooHRID = userOnProduction.data.values[0].bamboo_hr_id;
+      const userOnBamboo = await UserHelper.getUserOnBamboo(bambooHRID);
       const managerOnBamboo = await UserHelper.getUserOnBamboo(userOnBamboo.data.supervisorEId);
       const managerOnProduction = await
       UserHelper.getManagerOnProduction(userOnBamboo.data.supervisorEId);
@@ -161,7 +160,8 @@ class UserRoleController {
         gender: userOnBamboo.data.gender
       };
       await managerResult.addRole(53019);
-      await result.update(updateData);
+      // Update data for only new users or users with valid bambooHR id
+      if (bambooHRID !== 0 || userCreated) await result.update(updateData);
       await DepartmentController.createDepartmentFromEndpoint(updateData.department);
       return UserRoleController.response(res, message, result);
     } catch (error) {

@@ -1,7 +1,7 @@
 module.exports = {
   // eslint-disable-next-line
-    up: (queryInterface, Sequelize) => queryInterface.bulkInsert(
-        /* eslint-disable-line */
+  up: (queryInterface, Sequelize) => queryInterface.bulkInsert(
+    /* eslint-disable-line */
     'Trips',
     [
       {
@@ -9,8 +9,8 @@ module.exports = {
         origin: 'Nairobi, Kenya',
         destination: 'Lagos, Nigeria',
         bedId: null,
-        returnDate: `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate() + 5}`,
-        departureDate: `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate() + 2}`,
+        returnDate: `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate() + 2}`,
+        departureDate: `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate() + 1}`,
         requestId: '3451',
         createdAt: '2018-08-16 012:11:52.181+01',
         updatedAt: '2018-08-16 012:11:52.181+01',
@@ -65,6 +65,6 @@ module.exports = {
 
   down: (
     queryInterface,
-      Sequelize, //eslint-disable-line
+    Sequelize, //eslint-disable-line
   ) => queryInterface.bulkDelete('Trips', null, {}),
 };

@@ -30,7 +30,11 @@ const getRequests = (requestId, models) => models.Request.find({
             }]
           }]
         }]
-    }]
+    }],
+  order: [
+    [
+      { model: models.Trip, as: 'trips' }, 'returnDate', 'ASC']
+  ]
 });
 
 export default getRequests;

@@ -188,7 +188,8 @@ export default class TravelChecklistController {
       (checklist) => {
         const newChecklist = { ...checklist };
         if (RegExp(location).test(checklist.destinationName)) {
-          newChecklist.checklist = [checklist.checklist[0]];
+          newChecklist.checklist = checklist.checklist
+            .filter(checklistItem => checklistItem.destinationName === 'Default');
         }
         return newChecklist;
       }
@@ -208,11 +209,36 @@ export default class TravelChecklistController {
     return percentage >= 100 ? 100 : percentage;
   }
 
+  static notifyRequester(requestId, requestData) {
+    const {
+      userId,
+      name,
+      picture
+    } = requestData;
+    const message = `Hi ${name}, 
+    Congratulations, you have now responded to all the 
+    checklist requirements for your trip <a href="/requests/${requestId}">${requestId}</a>.
+    The travel team will review your submissions and 
+    advise accordingly.`;
+    const notificationData = {
+      senderId: userId,
+      recipientId: userId,
+      notificationType: 'general',
+      senderName: name,
+      notificationStatus: 'unread',
+      notificationLink: `/requests/${requestId}`,
+      senderImage: picture,
+      message,
+    };
+    NotificationEngine.notify(notificationData);
+  }
+  
   static async checkListPercentage(req, res, requestId) {
-    const { status } = await models.Request.findByPk(requestId);
-    if (status === 'Verified') return '100% complete';
+    const requestData = await models.Request.findByPk(requestId);
+    const { status } = requestData;
     const percentage = await TravelChecklistController
       .checkListPercentageNumber(req, res, requestId);
+    if (status === 'Verified') return '100% complete';
     const completedPercentage = `${isNaN(percentage) ? 0 : percentage}% complete`; // eslint-disable-line
     return completedPercentage;
   }
@@ -354,6 +380,7 @@ export default class TravelChecklistController {
         .checkListPercentageNumber(req, res, requestId);
       if (percentageCompleted >= 100 && previousPercentage < 100) {
         const request = await models.Request.findByPk(requestId);
+        TravelChecklistController.notifyRequester(requestId, request);
         TravelChecklistController.sendEmailToTravelAdmin(request, req.user);
       }
       res.status(201).json({

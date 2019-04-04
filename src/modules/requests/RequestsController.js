@@ -363,7 +363,9 @@ class RequestsController {
         recipientId: userId,
         notificationType: 'general',
         requestId: id,
-        message: 'verified your travel request',
+        message: `Hi ${request.name}, Congratulations, 
+        your request <a href="/requests/${id}">${id}</a> has been verified by the travel team. 
+        You are now ready for this trip. Do have a safe trip.`,
         notificationLink: `/requests/${id}`
       };
       const emailRequest = { name, manager: request.name, id: request.id };

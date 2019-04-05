@@ -224,3 +224,25 @@ describe('Budget checker', () => {
       });
   });
 });
+
+describe('setNotificationMessage', () => {
+  it('sets message for requester after manager approval', () => {
+    const managerApprovalMessage = ApprovalsController.setNotificationMessage('Approved', 'Open', 'Requester Name', 'IIDDEE');
+    expect(managerApprovalMessage).toEqual(expect.stringContaining('IIDDEE'));
+  });
+
+  it('sets message for requester after budget checker approval', () => {
+    const budgetApprovalMessage = ApprovalsController.setNotificationMessage('Approved', 'Approved', 'Requester Name', 'IIDDEE');
+    expect(budgetApprovalMessage).toEqual(expect.stringContaining('approved'));
+  });
+
+  it('sets message for requester after budget checker rejection', () => {
+    const budgetRejectionMessage = ApprovalsController.setNotificationMessage('Approved', 'Rejected', 'Requester Name', 'IIDDEE');
+    expect(budgetRejectionMessage).toEqual(expect.stringContaining('rejected your request'));
+  });
+
+  it('sets message for requester after manager rejection', () => {
+    const managerRejectionMessage = ApprovalsController.setNotificationMessage('Rejected', 'Open', 'Requester Name', 'IIDDEE');
+    expect(managerRejectionMessage).toEqual(expect.stringContaining('rejected your request'));
+  });
+});

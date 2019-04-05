@@ -165,11 +165,24 @@ class ApprovalsController {
       updatedRequest: { request: updatedRequest }
     });
   }
+
+  static setNotificationMessage(status, budgetStatus, requesterName, id) {
+    if (status === 'Approved' && budgetStatus === 'Open') {
+      return `Hi ${requesterName} 
+        Now that your travel request <a href="/requests/${id}">${id}</a> has been approved by your manager, 
+        please be informed that it has been forwarded to budget check.`;
+    }
+    if (status === 'Approved' && budgetStatus === 'Approved') return 'approved your request';
+    if (status === 'Rejected') return 'rejected your request';
+    if (budgetStatus === 'Rejected') return 'rejected your request';
+  }
+  
   // eslint-disable-next-line
   static async sendNotificationAfterApproval(req, user, updatedRequest, res) {
     const {
-      status, id, userId, budgetStatus
+      status, name: requesterName, id, userId, budgetStatus,
     } = updatedRequest;
+
     const { name, picture } = user.UserInfo;
     const recipientEmail = await UserRoleController.getRecipient(null, userId);
     const notificationData = {
@@ -179,10 +192,8 @@ class ApprovalsController {
       recipientId: userId,
       notificationType: 'general',
       requestId: id,
-      message: (status === 'Approved' || budgetStatus === 'Approved')
-        ? 'approved your request'
-        : 'rejected your request',
-      notificationLink: `/requests/${id}`
+      message: ApprovalsController.setNotificationMessage(status, budgetStatus, requesterName, id),
+      notificationLink: `/requests/${id}`,
     };
 
     const budgetEmailData = ApprovalsController.emailData(updatedRequest, recipientEmail, name);

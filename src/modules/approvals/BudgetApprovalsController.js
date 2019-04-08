@@ -21,7 +21,7 @@ export default class BudgetApprovalsController {
         {
           model: models.User,
           as: 'users',
-          attributes: ['fullName', 'email'],
+          attributes: ['fullName', 'email', 'userId'],
           through: { attributes: [] },
         }
       ]
@@ -29,8 +29,8 @@ export default class BudgetApprovalsController {
     return findDepartment.users;
   }
 
-  static async budgetCheckerEmailNotification({
-    id, name, manager, department
+  static async notifyBudgetChecker({
+    id, name, manager, department, picture
   }) {
     try {
       const budgetCheckerMembers = await
@@ -44,6 +44,25 @@ export default class BudgetApprovalsController {
           details: { RequesterManager: manager, id },
           redirectLink: `${process.env.REDIRECT_URL}/requests/budgets/${id}`
         };
+        const managerDetails = await UserRoleController.getRecipient(manager, null);
+
+        budgetCheckerMembers.forEach((budgetChecker) => {
+          const notificationData = {
+            senderId: managerDetails.userId,
+            senderName: name,
+            recipientId: budgetChecker.dataValues.userId,
+            senderImage: picture,
+            notificationType: 'general',
+            requestId: id,
+            message: `Hi ${budgetChecker.dataValues.fullName}, Please click on  <a href="/requests/${id}">${id}</a> to confirm availability of budget for this trip. You will be required to take an approval decision by clicking on Approve or Reject `,
+            notificationLink: `/requests/${id}`
+          };
+
+          NotificationEngine.notify(
+            notificationData
+          );
+        });
+
         NotificationEngine.sendMailToMany(
           budgetCheckerMembers,
           data

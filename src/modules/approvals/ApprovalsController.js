@@ -165,40 +165,43 @@ class ApprovalsController {
       updatedRequest: { request: updatedRequest }
     });
   }
-
-  static setNotificationMessage(status, budgetStatus, requesterName, id) {
+  
+  static setNotificationMessage({
+    status, budgetStatus, name, id
+  }) {
     if (status === 'Approved' && budgetStatus === 'Open') {
-      return `Hi ${requesterName} 
+      return `Hi ${name} 
         Now that your travel request <a href="/requests/${id}">${id}</a> has been approved by your manager, 
         please be informed that it has been forwarded to budget check.`;
     }
-    if (status === 'Approved' && budgetStatus === 'Approved') return 'approved your request';
-    if (status === 'Rejected') return 'rejected your request';
-    if (budgetStatus === 'Rejected') return 'rejected your request';
+    if (status === 'Approved' && budgetStatus === 'Approved') {
+      return `Hi ${name} , Your travel request <a href="/requests/${id}">${id}</a> has passed 
+      the budget check. Kindly proceed to respond to the requirements of the travel checklist`;
+    }
+    if (status === 'Rejected' || budgetStatus === 'Rejected') return 'rejected your request';
   }
-  
+
   // eslint-disable-next-line
   static async sendNotificationAfterApproval(req, user, updatedRequest, res) {
     const {
-      status, name: requesterName, id, userId, budgetStatus,
+      status, id, userId, budgetStatus,
     } = updatedRequest;
-
-    const { name, picture } = user.UserInfo;
+    const { name: userName, picture } = user.UserInfo;
     const recipientEmail = await UserRoleController.getRecipient(null, userId);
     const notificationData = {
       senderId: user.UserInfo.id,
-      senderName: name,
+      senderName: userName,
       senderImage: picture,
       recipientId: userId,
       notificationType: 'general',
       requestId: id,
-      message: ApprovalsController.setNotificationMessage(status, budgetStatus, requesterName, id),
-      notificationLink: `/requests/${id}`,
+      message: ApprovalsController.setNotificationMessage(updatedRequest),
+      notificationLink: `/requests/${id}`
     };
 
-    const budgetEmailData = ApprovalsController.emailData(updatedRequest, recipientEmail, name);
-    const managerEmailData = ApprovalsController.managerData(updatedRequest, recipientEmail, name);
-    const budgetRejectedData = ApprovalsController.budgetRejectData(updatedRequest, recipientEmail, name);
+    const budgetEmailData = ApprovalsController.emailData(updatedRequest, recipientEmail, userName);
+    const managerEmailData = ApprovalsController.managerData(updatedRequest, recipientEmail, userName);
+    const budgetRejectedData = ApprovalsController.budgetRejectData(updatedRequest, recipientEmail, userName);
 
     ApprovalsController.notify(status, budgetStatus, budgetEmailData, managerEmailData, notificationData, budgetRejectedData);
   }

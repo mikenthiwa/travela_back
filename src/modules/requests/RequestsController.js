@@ -374,7 +374,7 @@ class RequestsController {
       );
       NotificationEngine.notify(notificationData);
       NotificationEngine.sendMail(emailData);
-      RequestUtils.sendEmailToFinanceTeam(request);
+      await RequestUtils.sendEmailToFinanceTeam(request);
       return res.status(200)
         .json({ success: true, message: 'Verification Successful', updatedRequest: { request } });
     } catch (error) {

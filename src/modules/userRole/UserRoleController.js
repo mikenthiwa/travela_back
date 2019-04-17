@@ -237,18 +237,23 @@ class UserRoleController {
       });
       const error = 'User already has this role';
       if (hasRole) return CustomError.handleError(error, 409, res);
-      const [[result]] = await user.addRole(roleId, {
-        through: { centerId }
-      });
-      user.dataValues.centers = [{ id: result.centerId, location: center }];
-      const message = [200, 'Role updated successfully', true];
+      
+      await UserRoleController.addMuftiCenter(centerId, user, roleId);
       if (roleId === 60000) {
         dept = await DepartmentController.assignDepartments(departments, user);
       }
+      const message = [200, 'Role updated successfully', true];
       await UserRoleController.sendNotificationEmail(user, roleName, name);
-      const results = [user, dept];
-
-      UserRoleController.response(res, message, results);
+      const values = {
+        name: user.fullName,
+        email: user.email,
+        id: user.id,
+        userId: user.userId,
+        roleName,
+        center,
+        dept,
+      };
+      UserRoleController.response(res, message, values);
     } catch (error) {
       /* istanbul ignore next */
       res.status(500).json({
@@ -256,6 +261,13 @@ class UserRoleController {
         error
       });
     }
+  }
+
+  static async addMuftiCenter(centerId, user, roleId) {
+    return centerId && centerId.length > 0
+      ? Promise.all(centerId.map(addCenter => models.UserRole.create({
+        userId: user.id, roleId, centerId: addCenter.id
+      }))) : user.addRole(roleId);
   }
 
   static async addRole(req, res) {

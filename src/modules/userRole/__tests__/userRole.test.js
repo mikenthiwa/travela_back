@@ -11,6 +11,7 @@ import {
   profile,
   userMock,
   userRoles,
+  center
 } from './mocks/mockData';
 import Utils from '../../../helpers/Utils';
 
@@ -107,20 +108,25 @@ const unSeededUserToken = Utils.generateTestToken(payload4);
 describe('User Role Test', () => {
   beforeAll(async () => {
     moxios.install();
+    await models.UsersDepartments.destroy({ force: true, truncate: { cascade: true } });
+    await models.UserRole.destroy({ force: true, truncate: { cascade: true } });
     await models.User.destroy({ force: true, truncate: { cascade: true } });
     await models.Role.destroy({ force: true, truncate: { cascade: true } });
-    await models.UserRole.destroy({ force: true, truncate: { cascade: true } });
+    await models.Center.destroy({ force: true, truncate: { cascade: true } });
     process.env.DEFAULT_ADMIN = 'captain.america@andela.com';
     await models.Role.bulkCreate(role);
     await models.User.bulkCreate(userMock);
+    await models.Center.bulkCreate(center);
     await models.UserRole.bulkCreate(userRoles);
   });
 
   afterAll(async () => {
     moxios.uninstall();
+    await models.UserRole.destroy({ force: true, truncate: { cascade: true } });
+    await models.UsersDepartments.destroy({ force: true, truncate: { cascade: true } });
     await models.User.destroy({ force: true, truncate: { cascade: true } });
     await models.Role.destroy({ force: true, truncate: { cascade: true } });
-    await models.UserRole.destroy({ force: true, truncate: { cascade: true } });
+    await models.Center.destroy({ force: true, truncate: { cascade: true } });
   });
 
   it('should return 401 Unauthorized users', (done) => {
@@ -606,8 +612,8 @@ describe('User Role Test', () => {
       .set('Authorization', token)
       .send({ email: 'black.widow@andela.com', roleName: 'manager' })
       .end((err, res) => {
-        expect(res.body.result[0].email).toEqual('black.widow@andela.com');
-        expect(res.body.result[0].fullName).toEqual('Black Widow');
+        expect(res.body.result.email).toEqual('black.widow@andela.com');
+        expect(res.body.result.name).toEqual('Black Widow');
         if (err) return done(err);
         done();
       });
@@ -757,6 +763,95 @@ describe('User Role Test', () => {
           if (err) return done(err);
           done();
         });
+    });
+  });
+
+  describe('Update User Center', () => {
+    describe('PATCH api/v1/center/user', () => {
+      it('update the user center', (done) => {
+        request(app)
+          .patch('/api/v1/center/user')
+          .set('authorization', token)
+          .send({
+            email: 'captan.ameria@andela.com',
+            roleName: 'Travel Administrator',
+            center: ['Nairobi, Kenya']
+          })
+          .end((err, res) => {
+            if (err) done(err);
+            expect(res.status).toEqual(200);
+            expect(res.body.message).toEqual('Centres updated successfully');
+            done();
+          });
+      });
+
+      it('return error if email does not', (done) => {
+        request(app)
+          .patch('/api/v1/center/user')
+          .set('authorization', token)
+          .send({
+            email: 'cap@andela.com',
+            roleName: 'Travel Administrator',
+            center: ['Nairobi, Kenya']
+          })
+          .end((err, res) => {
+            if (err) done(err);
+            expect(res.status).toEqual(404);
+            expect(res.body.error).toEqual('Email does not exist');
+            done();
+          });
+      });
+
+      it('return error if center does not', (done) => {
+        request(app)
+          .patch('/api/v1/center/user')
+          .set('authorization', token)
+          .send({
+            email: 'captan.ameria@andela.com',
+            roleName: 'Travel Administrator',
+            center: ['Togo']
+          })
+          .end((err, res) => {
+            if (err) done(err);
+            expect(res.status).toEqual(404);
+            expect(res.body.error).toEqual('Center does not exist -> Togo');
+            done();
+          });
+      });
+
+      it('return error if center is not an Array', (done) => {
+        request(app)
+          .patch('/api/v1/center/user')
+          .set('authorization', token)
+          .send({
+            email: 'captan.ameria@andela.com',
+            roleName: 'Travel Administrator',
+            center: 'Togo'
+          })
+          .end((err, res) => {
+            if (err) done(err);
+            expect(res.status).toEqual(400);
+            expect(res.body.error).toEqual('Center must be an array and cannot be empty');
+            done();
+          });
+      });
+
+      it('return error if user dose not have the role', (done) => {
+        request(app)
+          .patch('/api/v1/center/user')
+          .set('authorization', token)
+          .send({
+            email: 'captan.ameria@andela.com',
+            roleName: 'Finance team member',
+            center: 'Togo'
+          })
+          .end((err, res) => {
+            if (err) done(err);
+            expect(res.status).toEqual(400);
+            expect(res.body.error).toEqual('Center must be an array and cannot be empty');
+            done();
+          });
+      });
     });
   });
 });

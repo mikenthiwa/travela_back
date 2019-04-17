@@ -179,7 +179,7 @@ describe('Travel team role test', () => {
         .send({
           email: 'someEmail@andela.com',
           roleName: 'travel team member',
-          center: 'Lagos, Nigeria'
+          center: ['Lagos, Nigeria']
         })
         .expect(404)
         .end((err, res) => {
@@ -197,14 +197,14 @@ describe('Travel team role test', () => {
           .send({
             email: 'test.user@andela.com',
             roleName: 'travel team member',
-            center: 'Lagos, Nigeria'
+            center: ['Lagos, Nigeria']
           })
           .expect(200)
           .end((err, res) => {
             expect(res.body.success).toEqual(true);
             expect(res.body.message)
               .toEqual('Role updated successfully');
-            expect(res.body.result[0].centers[0].location)
+            expect(res.body.result.center[0])
               .toEqual('Lagos, Nigeria');
             done();
           });
@@ -218,7 +218,7 @@ describe('Travel team role test', () => {
         .send({
           email: 'test.user@andela.com',
           roleName: 'travel team member',
-          center: 'Lagos, Nigeria'
+          center: ['Lagos, Nigeria']
         })
         .expect(409)
         .end((err, res) => {

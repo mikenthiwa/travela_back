@@ -3,25 +3,25 @@ import middlewares from '../../middlewares';
 import UserRoleController from './UserRoleController';
 import UpdateUserRoleController from './UpdateRoleController';
 
-
 const {
   authenticate, Validator, RoleValidator, DepartmentValidation
 } = middlewares;
 const Router = express.Router();
 
-Router.get('/user',
+Router.get(
+  '/user',
   authenticate,
-  RoleValidator.checkUserRole(
-    ['Super Administrator', 'Travel Administrator', 'Travel Team Member']
-  ),
-  UserRoleController.getAllUser);
+  RoleValidator.checkUserRole([
+    'Super Administrator',
+    'Travel Administrator',
+    'Travel Team Member'
+  ]),
+  UserRoleController.getAllUser
+);
 
 Router.get('/user/roles', authenticate, UserRoleController.getRoles);
 Router.put('/user/admin', authenticate, UserRoleController.autoAdmin);
-Router.get('/user/:id',
-  authenticate,
-  Validator.getUserId,
-  UserRoleController.getOneUser);
+Router.get('/user/:id', authenticate, Validator.getUserId, UserRoleController.getOneUser);
 
 Router.put(
   '/user/:id/profile',
@@ -32,20 +32,13 @@ Router.put(
   UserRoleController.updateUserProfile
 );
 
-Router.post(
-  '/user',
-  authenticate,
-  Validator.checkEmail,
-  UserRoleController.addUser
-);
+Router.post('/user', authenticate, Validator.checkEmail, UserRoleController.addUser);
 
 Router.post(
   '/user/role',
   authenticate,
   RoleValidator.validateAddRole,
-  RoleValidator.checkUserRole(
-    ['Super Administrator']
-  ),
+  RoleValidator.checkUserRole(['Super Administrator']),
   UserRoleController.addRole
 );
 
@@ -53,9 +46,7 @@ Router.patch(
   '/user/role/:id',
   authenticate,
   RoleValidator.validateAddRole,
-  RoleValidator.checkUserRole(
-    ['Super Administrator']
-  ),
+  RoleValidator.checkUserRole(['Super Administrator']),
   UpdateUserRoleController.updateRole
 );
 
@@ -70,6 +61,7 @@ Router.put(
   RoleValidator.validateUpdateRole(),
   Validator.checkEmail,
   RoleValidator.roleExists,
+  Validator.centerExists,
   RoleValidator.validateRoleAssignment,
   DepartmentValidation.validateRoleDepartment,
   UserRoleController.updateUserRole
@@ -89,14 +81,14 @@ Router.delete(
   UserRoleController.deleteUserRole
 );
 
-Router.patch('/user/roles/budgetChecker',
+Router.patch(
+  '/user/roles/budgetChecker',
   authenticate,
-  RoleValidator.checkUserRole([
-    'Super Administrator',
-  ]),
+  RoleValidator.checkUserRole(['Super Administrator']),
   RoleValidator.validateUpdateRole(false),
   Validator.checkEmail,
   DepartmentValidation.validateRoleDepartment,
-  UserRoleController.updateBudgetCheckerRole);
+  UserRoleController.updateBudgetCheckerRole
+);
 
 export default Router;

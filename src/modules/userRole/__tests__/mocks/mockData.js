@@ -151,6 +151,17 @@ export const newRole = {
   }
 };
 
+export const center = [
+  {
+    id: 12345,
+    location: 'Lagos, Nigeria'
+  },
+  {
+    id: 23456,
+    location: 'Nairobi, Kenya'
+  }
+];
+
 export const userMock = [
   {
     id: 20200,
@@ -180,5 +191,13 @@ export const userRoles = [
   {
     userId: 20201,
     roleId: 401938
-  }
+  },
+  {
+    userId: 20200,
+    roleId: 29187
+  },
+  {
+    userId: 20200,
+    roleId: 10948
+  },
 ];

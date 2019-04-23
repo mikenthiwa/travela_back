@@ -18,17 +18,11 @@ export default class TravelStipendValidator {
   static async checkCenter(req, res, next) {
     const { body: { center, stipend }, route: { methods: { put } } } = req;
     const action = put;
-    const foundCenter = await models.Center.find({
+    await models.Center.findOrCreate({
       where: {
         location: center
       }
     });
-    if (!foundCenter) {
-      return res.status(404).json({
-        success: false,
-        message: 'This Center does not exist'
-      });
-    }
     const foundStipend = await models.TravelStipends
       .find(
         {

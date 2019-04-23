@@ -23,12 +23,11 @@ const token = Utils.generateTestToken(payload);
 describe('Update Budget Checker role test', () => {
   beforeAll(async () => {
     moxios.install();
+    await models.UserRole.destroy({ truncate: true, cascade: true });
+    await models.UsersDepartments.destroy({ truncate: true, cascade: true });
     await models.Role.destroy({ truncate: true, cascade: true });
     await models.Role.bulkCreate(role);
     await models.User.destroy({ truncate: true, cascade: true });
-    await models.UserRole
-      .destroy({ truncate: true, cascade: true });
-    await models.UsersDepartments.destroy({ truncate: true, cascade: true });
     await models.Department.destroy({ truncate: true, cascade: true });
     await models.Center.destroy({ truncate: true, cascade: true });
     await models.Center.bulkCreate(centers);
@@ -66,10 +65,10 @@ describe('Update Budget Checker role test', () => {
 
   afterAll(async () => {
     moxios.uninstall();
-    await models.Role.destroy({ truncate: true, cascade: true });
     await models.UserRole.destroy({ truncate: true, cascade: true });
-    await models.User.destroy({ truncate: true, cascade: true });
     await models.UsersDepartments.destroy({ truncate: true, cascade: true });
+    await models.Role.destroy({ truncate: true, cascade: true });
+    await models.User.destroy({ truncate: true, cascade: true });
     await models.Department.destroy({ truncate: true, cascade: true });
     await models.Center.destroy({ truncate: true, cascade: true });
   });

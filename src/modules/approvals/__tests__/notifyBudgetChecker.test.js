@@ -28,7 +28,6 @@ const payload = {
   },
 };
 
-
 const mockRequest = [
   {
     id: '3mzyo5PeA',
@@ -107,7 +106,6 @@ const mockApproval = [
   }
 ];
 
-
 const DepartmentMock = [
   {
     id: 1,
@@ -139,7 +137,6 @@ const UsersDepartmentsMock = [
     updatedAt: '2019-03-18 13:00:31.182+01'
   }
 ];
-
 
 const token = Utils.generateTestToken(payload);
 
@@ -222,5 +219,72 @@ describe('Budget checker', () => {
           ApprovalsController.sendEmailTofinanceMembers
         ).toHaveBeenCalled();
       });
+  });
+});
+
+describe('setNotificationMessage', () => {
+  it('sets message for requester after manager approval', () => {
+    const managerApprovalMessage = ApprovalsController.setNotificationMessage({
+      status: 'Approved',
+      budgetStatus: 'Open',
+      name: 'Andrew Hinga',
+      id: '3mzyo5PeQ'
+    });
+    expect(managerApprovalMessage).toEqual(
+      expect.stringContaining(
+        'has been approved by your manager'
+      )
+    );
+    expect(managerApprovalMessage).toEqual(
+      expect.stringContaining(
+        'mzyo5PeQ'
+      )
+    );
+    expect(managerApprovalMessage).toEqual(
+      expect.stringContaining(
+        'Andrew Hinga'
+      )
+    );
+  });
+  it('sets message for requester after budget checker approval', () => {
+    const budgetApprovalMessage = ApprovalsController.setNotificationMessage({
+      status: 'Approved',
+      budgetStatus: 'Approved',
+      name: 'Andrew Hinga',
+      id: '3mzyo5PeQ'
+    });
+    expect(budgetApprovalMessage).toEqual(
+      expect.stringContaining(
+        '3mzyo5PeQ'
+      )
+    );
+    expect(budgetApprovalMessage).toEqual(
+      expect.stringContaining(
+        'Andrew Hinga'
+      )
+    );
+    expect(budgetApprovalMessage).toEqual(
+      expect.stringContaining(
+        'budget check'
+      )
+    );
+  });
+  it('sets message for requester after budget checker rejection', () => {
+    const budgetRejectionMessage = ApprovalsController.setNotificationMessage({
+      status: 'Approved',
+      budgetStatus: 'Rejected',
+      name: 'Andrew Hinga',
+      id: '3mzyo5PeQ'
+    });
+    expect(budgetRejectionMessage).toEqual(expect.stringContaining('rejected your request'));
+  });
+  it('sets message for requester after manager rejection', () => {
+    const managerRejectionMessage = ApprovalsController.setNotificationMessage({
+      status: 'Rejected',
+      budgetStatus: 'Open',
+      name: 'Andrew Hinga',
+      id: '3mzyo5PeQ'
+    });
+    expect(managerRejectionMessage).toEqual(expect.stringContaining('rejected your request'));
   });
 });

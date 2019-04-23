@@ -71,6 +71,21 @@ const mockTravelTeamMember = generateMock.user({
   id: 4
 });
 
+const mockFinanceTeamMember = generateMock.user({
+  fullName: 'Finance Team Member',
+  passportName: 'Finance Team Member',
+  department: 'Guest Relations & Travel',
+  occupation: 'Finance Team Member',
+  email: 'finance.teamMember@gmail.com',
+  userId: 'finance-team-member',
+  location: mockAndelaOrigin.location,
+  centerId: mockAndelaOrigin.id,
+  manager: null,
+  gender: 'Female',
+  roleId: 70001,
+  id: 5
+});
+
 const mockRequester = generateMock.user({ manager: mockManager.fullName });
 
 const mockNewRequest = generateMock.request(
@@ -156,7 +171,7 @@ const nonRequestManagerToken = Utils.generateTestToken({ UserInfo: fakeManager }
 
 const invalidToken = 'eyJhbGciOiJSUzI1Ni6IkpXVCJ9.eyJVc2CI6Ii1MSEptS3J4';
 
-const allUsers = [mockRequester, mockManager, mockTravelAdmin, mockTravelTeamMember];
+const allUsers = [mockRequester, mockManager, mockTravelAdmin, mockTravelTeamMember, mockFinanceTeamMember];
 const allUserRoles = allUsers.map(
   user => (
     {
@@ -1781,10 +1796,13 @@ describe('Requests Controller', () => {
             ];
             expect(args.notificationType).toEqual('general');
             if (err) return done(err);
-            done();
             expect(
               RequestUtils.sendEmailToFinanceTeam
             ).toHaveBeenCalled();
+
+            expect(
+              NotificationEngine.sendMailToMany.mock.calls[0][0][0].fullName
+            ).toEqual('Finance Team Member');
             done();
           });
       });

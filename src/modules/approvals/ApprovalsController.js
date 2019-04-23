@@ -1,10 +1,15 @@
-
 import models from '../../database/models';
 import { asyncWrapper, retrieveParams } from '../../helpers/requests';
-import { countByStatus, getTotalCount, countVerifiedByStatus } from
-  '../../helpers/requests/paginationHelper';
-import { createApprovalSubquery, getTravelTeamEmailData, emailTopic }
-  from '../../helpers/approvals';
+import {
+  countByStatus,
+  getTotalCount,
+  countVerifiedByStatus
+} from '../../helpers/requests/paginationHelper';
+import {
+  createApprovalSubquery,
+  getTravelTeamEmailData,
+  emailTopic
+} from '../../helpers/approvals';
 import Error from '../../helpers/Error';
 import Pagination from '../../helpers/Pagination';
 import Utils from '../../helpers/Utils';
@@ -45,11 +50,23 @@ class ApprovalsController {
     const { location } = req.user;
     let count;
     if (verified && !checkBudget) {
-      count = await asyncWrapper(res, countVerifiedByStatus, models.Approval,
-        location, params.search);
+      count = await asyncWrapper(
+        res,
+        countVerifiedByStatus,
+        models.Approval,
+        location,
+        params.search
+      );
     } else {
-      count = await asyncWrapper(res, countByStatus, models.Approval,
-        params.userName, params.search, checkBudget, location);
+      count = await asyncWrapper(
+        res,
+        countByStatus,
+        models.Approval,
+        params.userName,
+        params.search,
+        checkBudget,
+        location
+      );
     }
     return count;
   }
@@ -63,22 +80,27 @@ class ApprovalsController {
     );
 
     const { fillWithRequestData } = ApprovalsController;
-    const message = (params.search && !result.count)
-      ? noResult : Utils.getResponseMessage(pagination, params.status, 'Approval');
+    const message = params.search && !result.count
+      ? noResult
+      : Utils.getResponseMessage(pagination, params.status, 'Approval');
     const approvals = result.rows.map(fillWithRequestData);
-    const newRequest = await Promise.all(approvals.map(async (request) => {
-      const travelCompletion = await TravelChecklistController
-        .checkListPercentage(req, res, request.id);
-      request.dataValues.travelCompletion = travelCompletion;
-      return request;
-    }));
-    return res.status(200)
-      .json({
-        success: true,
-        message,
-        approvals: newRequest,
-        meta: { count, pagination }
-      });
+    const newRequest = await Promise.all(
+      approvals.map(async (request) => {
+        const travelCompletion = await TravelChecklistController.checkListPercentage(
+          req,
+          res,
+          request.id
+        );
+        request.dataValues.travelCompletion = travelCompletion;
+        return request;
+      })
+    );
+    return res.status(200).json({
+      success: true,
+      message,
+      approvals: newRequest,
+      meta: { count, pagination }
+    });
   }
 
   static async getApprovalsFromDb(subquery) {
@@ -94,7 +116,11 @@ class ApprovalsController {
         searchRequest: true
       });
       let result = { count: 0 };
-      result = await asyncWrapper(res, ApprovalsController.getApprovalsFromDb, subquery);
+      result = await asyncWrapper(
+        res,
+        ApprovalsController.getApprovalsFromDb,
+        subquery
+      );
       return ApprovalsController.sendResult(req, res, result);
     } catch (error) {
       /* istanbul ignore next */
@@ -105,7 +131,8 @@ class ApprovalsController {
   static async getUserApprovals(req, res) {
     try {
       await ApprovalsController.processQuery(req, res);
-    } catch (error) { /* istanbul ignore next */
+    } catch (error) {
+      /* istanbul ignore next */
       return Error.handleError('Server error', 500, res);
     }
   }
@@ -115,22 +142,30 @@ class ApprovalsController {
     const { newStatus } = req.body;
     const { request, user } = req;
     try {
-      const updateApproval = await ApprovalsController.updateApprovals(req, res, [
-        request, newStatus, user
-      ]);
+      const updateApproval = await ApprovalsController.updateApprovals(
+        req,
+        res,
+        [request, newStatus, user]
+      );
       if (updateApproval.approverId) {
         const updatedRequest = await request.update({
           status: newStatus
         });
         if (newStatus === 'Approved') {
-          ApprovalsController.sendNotificationToTravelAdmin(user, updatedRequest);
+          ApprovalsController.sendNotificationToTravelAdmin(
+            user,
+            updatedRequest
+          );
         }
-        ApprovalsController.sendNotificationAfterApproval(req, user, updatedRequest, res);
-
-        await BudgetApprovalsController.budgetCheckerEmailNotification(
+        ApprovalsController.sendNotificationAfterApproval(
+          req,
+          user,
+          updatedRequest,
+          res
+        );
+        await BudgetApprovalsController.notifyBudgetChecker(
           updatedRequest
         );
-
         await ApprovalsController.generateCountAndMessage(res, updatedRequest);
       }
     } catch (error) {
@@ -165,34 +200,62 @@ class ApprovalsController {
       updatedRequest: { request: updatedRequest }
     });
   }
+
+  static setNotificationMessage({
+    status, budgetStatus, name, id
+  }) {
+    if (status === 'Approved' && budgetStatus === 'Open') {
+      return `Hi ${name}
+        Now that your travel request <a href="/requests/${id}">${id}</a> has been approved by your manager,
+        please be informed that it has been forwarded to budget check.`;
+    }
+    if (status === 'Approved' && budgetStatus === 'Approved') {
+      return `Hi ${name} , Your travel request <a href="/requests/${id}">${id}</a> has passed
+      the budget check. Kindly proceed to respond to the requirements of the travel checklist`;
+    }
+    if (status === 'Rejected' || budgetStatus === 'Rejected') return 'rejected your request';
+  }
+
   // eslint-disable-next-line
   static async sendNotificationAfterApproval(req, user, updatedRequest, res) {
     const {
-      status, id, userId, budgetStatus
+      status, id, userId, budgetStatus,
     } = updatedRequest;
-    const { name, picture } = user.UserInfo;
+    const { name: userName, picture } = user.UserInfo;
     const recipientEmail = await UserRoleController.getRecipient(null, userId);
     const notificationData = {
       senderId: user.UserInfo.id,
-      senderName: name,
+      senderName: userName,
       senderImage: picture,
       recipientId: userId,
       notificationType: 'general',
       requestId: id,
-      message: (status === 'Approved' || budgetStatus === 'Approved')
-        ? 'approved your request'
-        : 'rejected your request',
+      message: ApprovalsController.setNotificationMessage(updatedRequest),
       notificationLink: `/requests/${id}`
     };
 
-    const budgetEmailData = ApprovalsController.emailData(updatedRequest, recipientEmail, name);
-    const managerEmailData = ApprovalsController.managerData(updatedRequest, recipientEmail, name);
-    const budgetRejectedData = ApprovalsController.budgetRejectData(updatedRequest, recipientEmail, name);
+    const budgetEmailData = ApprovalsController.emailData(updatedRequest, recipientEmail, userName);
+    const managerEmailData = ApprovalsController.managerData(updatedRequest, recipientEmail, userName);
+    const budgetRejectedData = ApprovalsController.budgetRejectData(updatedRequest, recipientEmail, userName);
 
-    ApprovalsController.notify(status, budgetStatus, budgetEmailData, managerEmailData, notificationData, budgetRejectedData);
+    ApprovalsController.notify(
+      status,
+      budgetStatus,
+      budgetEmailData,
+      managerEmailData,
+      notificationData,
+      budgetRejectedData
+    );
   }
 
-  static notify(status, budgetStatus, budgetEmailData, managerEmailData, notificationData, budgetRejectedData) {
+  static notify(
+    status,
+    budgetStatus,
+    budgetEmailData,
+    managerEmailData,
+    notificationData,
+    budgetRejectedData
+  ) {
     if (status !== 'Open' && budgetStatus === 'Open') {
       NotificationEngine.notify(notificationData);
       NotificationEngine.sendMail(managerEmailData);
@@ -216,8 +279,9 @@ class ApprovalsController {
       sender: name,
       topic: 'Travela Budget Approved Request',
       type: 'Budget Approval',
-      redirectLink:
-      `${process.env.REDIRECT_URL}/redirect/requests/${request.id}/checklist`,
+      redirectLink: `${process.env.REDIRECT_URL}/redirect/requests/${
+        request.id
+      }/checklist`,
       requestId: request.id
     };
   }
@@ -232,8 +296,7 @@ class ApprovalsController {
       sender: name,
       topic: msg,
       type: request.status,
-      redirectLink:
-        `${process.env.REDIRECT_URL}/requests/${request.id}`,
+      redirectLink: `${process.env.REDIRECT_URL}/requests/${request.id}`,
       requestId: request.id
     };
   }
@@ -248,8 +311,7 @@ class ApprovalsController {
       sender: name,
       topic: msg,
       type: 'Budget Rejected',
-      redirectLink:
-        `${process.env.REDIRECT_URL}/requests/${request.id}`,
+      redirectLink: `${process.env.REDIRECT_URL}/requests/${request.id}`,
       requestId: request.id
     };
   }
@@ -295,7 +357,9 @@ class ApprovalsController {
   }
 
   static async sendNotificationToTravelAdmin(user, updatedRequest) {
-    const { UserInfo: { name } } = user;
+    const {
+      UserInfo: { name }
+    } = user;
     const data = await getTravelTeamEmailData(updatedRequest, name);
 
     if (data) {

@@ -43,21 +43,27 @@ export default class Validator {
     return next();
   }
 
-  static validateUserRoleCheck(
-    req,
-    res,
-    next,
-    body,
-    body2,
-    body3,
-    body4,
-    body5
-  ) {
-    req.checkBody(body, `${body} is required`).notEmpty().trim();
-    req.checkBody(body2, `${body2} is required`).notEmpty().trim();
-    req.checkBody(body3, `${body3} is required`).notEmpty().trim();
-    req.checkBody(body4, `${body4} is required`).notEmpty().trim();
-    req.checkBody(body5, `${body5} is required`).notEmpty().trim();
+  static validateUserRoleCheck(req, res, next, body, body2, body3, body4, body5) {
+    req
+      .checkBody(body, `${body} is required`)
+      .notEmpty()
+      .trim();
+    req
+      .checkBody(body2, `${body2} is required`)
+      .notEmpty()
+      .trim();
+    req
+      .checkBody(body3, `${body3} is required`)
+      .notEmpty()
+      .trim();
+    req
+      .checkBody(body4, `${body4} is required`)
+      .notEmpty()
+      .trim();
+    req
+      .checkBody(body5, `${body5} is required`)
+      .notEmpty()
+      .trim();
 
     const errors = req.validationErrors();
     Validator.errorHandler(res, errors, next);
@@ -70,8 +76,7 @@ export default class Validator {
   static checkEmail(req, res, next) {
     const tokenEmail = req.user.UserInfo.email;
     const bodyEmail = req.body.email;
-    if ((bodyEmail && !Validator.isValidEmail(bodyEmail))
-      || !Validator.isValidEmail(tokenEmail)) {
+    if ((bodyEmail && !Validator.isValidEmail(bodyEmail)) || !Validator.isValidEmail(tokenEmail)) {
       return res.status(400).json({
         success: false,
         message: 'Only Andela Email address allowed'
@@ -101,26 +106,14 @@ export default class Validator {
       req.body[`${key}`] = req.body[`${key}`].toLowerCase();
     });
 
-    req
-      .checkBody('currentStatus', 'currentStatus field is required')
-      .notEmpty();
-    req
-      .checkBody('newStatus', 'newStatus field is required')
-      .notEmpty();
-    req
-      .checkBody('notificationType', 'notificationType field is required')
-      .notEmpty();
+    req.checkBody('currentStatus', 'currentStatus field is required').notEmpty();
+    req.checkBody('newStatus', 'newStatus field is required').notEmpty();
+    req.checkBody('notificationType', 'notificationType field is required').notEmpty();
 
+    req.checkBody('currentStatus', 'currentStatus must be "unread"').isIn(['unread']);
+    req.checkBody('newStatus', 'newStatus must be "read"').isIn(['read']);
     req
-      .checkBody('currentStatus', 'currentStatus must be "unread"')
-      .isIn(['unread']);
-    req
-      .checkBody('newStatus', 'newStatus must be "read"')
-      .isIn(['read']);
-    req
-      .checkBody(
-        'notificationType', 'notificationType can only be pending or general'
-      )
+      .checkBody('notificationType', 'notificationType can only be pending or general')
       .isIn(['pending', 'general']);
     const errors = req.validationErrors();
     Validator.errorHandler(res, errors, next);
@@ -154,13 +147,15 @@ export default class Validator {
       }
       if (action[methodName] === 'create' && !checkUrl) {
         return res.status(400).json({
-          success: false, message: 'Only Url allowed for Image'
+          success: false,
+          message: 'Only Url allowed for Image'
         });
       }
       next();
     } catch (error) {
       res.status(404).json({
-        success: false, message: 'User not found in database'
+        success: false,
+        message: 'User not found in database'
       });
     }
   }
@@ -175,6 +170,33 @@ export default class Validator {
     next();
   }
 
+  static async centerExists(req, res, next) {
+    const { center } = req.body;
+    if (center) {
+      if ((center || []).length < 1 || !(center instanceof Array)) {
+        const error = 'Center must be an array and cannot be empty';
+        return Error.handleError(error, 400, res);
+      }
+      const findCenter = await Promise.all(
+        center.map(centerId => models.Center.findAll({
+            where: { location: { [Op.iLike]: centerId } },
+            attributes: ['id', 'location']
+          }))
+      );
+      const centerId = [].concat(...findCenter);
+      const location = centerId.map(value => value.location);
+      const notFound = center.filter(notfound => !location.includes(notfound));
+      if (centerId.length < center.length) {
+        const error = `Center does not exist -> ${notFound}`;
+        return Error.handleError(error, 404, res);
+      }
+      req.centerId = centerId;
+      next();
+    } else {
+      next();
+    }
+  }
+
   static checkSignedInUser(req, res, next) {
     if (req.user.UserInfo.id !== req.params.id) {
       return res.status(403).json({
@@ -187,9 +209,11 @@ export default class Validator {
 
   static checkSignedInUserOrAdmin(req, res, next) {
     if (req.user.UserInfo.id !== req.params.id) {
-      return RoleValidator.checkUserRole(
-        ['Super Administrator', 'Travel Administrator', 'Travel Team Member']
-      )(req, res, next);
+      return RoleValidator.checkUserRole([
+        'Super Administrator',
+        'Travel Administrator',
+        'Travel Team Member'
+      ])(req, res, next);
     }
 
     next();
@@ -200,8 +224,9 @@ export default class Validator {
     if (!location) return Error.handleError('Please provide a new location', 400, res);
     const message = 'Please provide a valid location';
     if (typeof location !== 'string') return Error.handleError(message, 400, res);
-    const foundLocation = await models.Center
-      .findOne({ where: { location: { [Op.iLike]: location } } });
+    const foundLocation = await models.Center.findOne({
+      where: { location: { [Op.iLike]: location } }
+    });
     if (foundLocation) {
       return res.status(409).json({
         success: false,
@@ -216,10 +241,12 @@ export default class Validator {
       const { requestId } = req.params;
       let { location } = req.user;
       location = location.toLowerCase();
-      const trip = await models
-        .Trip.findOne({ where: { requestId }, order: [['departureDate', 'ASC']] });
+      const trip = await models.Trip.findOne({
+        where: { requestId },
+        order: [['departureDate', 'ASC']]
+      });
       if (trip && (trip.origin !== location && !trip.origin.toLowerCase().startsWith(location))) {
-        const error = 'You don\'t have access to perform this action';
+        const error = "You don't have access to perform this action";
         return Error.handleError(error, 403, res);
       }
       return next();

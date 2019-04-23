@@ -110,7 +110,7 @@ export default class RequestUtils {
     );
 
     if (financeTeam.length) {
-      NotificationEngine.sendMailToMany(financeTeamMembers, data);
+      NotificationEngine.sendMailToMany(financeTeam, data);
     }
   }
 }

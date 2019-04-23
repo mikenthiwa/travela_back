@@ -90,24 +90,33 @@ export default class TravelReadinessController {
   }
 
   static async getAllUsersReadiness(req, res) {
-    const { searchQuery } = req.query;
+    const { searchQuery, withDocuments } = req.query;
     const query = searchQuery ? await getSearchQuery(searchQuery) : {};
-
     query.location = req.user.location;
     try {
       const count = await models.User.count({
         where: query,
+        include: [
+          {
+            model: models.TravelReadinessDocuments,
+            as: 'travelDocuments',
+            required: withDocuments === 'true',
+          }
+        ]
       });
-
       const { pageCount, currentPage, initialPage } = Pagination
         .getPaginationParams(req, count);
       const users = await models.User.findAll({
         where: query,
         ...initialPage,
+        order: [
+          ['fullName', 'ASC']
+        ],
         include: [
           {
             model: models.TravelReadinessDocuments,
             as: 'travelDocuments',
+            required: withDocuments === 'true',
           },
         ]
       });

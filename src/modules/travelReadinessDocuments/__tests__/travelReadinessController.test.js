@@ -70,6 +70,19 @@ describe('TravelReadiness Controller', () => {
         });
     });
 
+    it('should filter the list of users', (done) => {
+      request(app)
+        .get('/api/v1/travelreadiness/users?withDocuments=true')
+        .set('Content-Type', 'application/json')
+        .set('authorization', travelAdminToken)
+        .end((err, res) => {
+          expect(res.status).toBe(200);
+          expect(res.body.users).toBeDefined();
+          expect(res.body.users.length).toBe(2);
+          done();
+        });
+    });
+
     it('should get a paginated list of users', (done) => {
       request(app)
         .get('/api/v1/travelreadiness/users')

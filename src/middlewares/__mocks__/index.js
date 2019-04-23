@@ -34,6 +34,7 @@ const middleware = {
     validateCreateGuestHouse: jest.fn(invokeNextMiddleware),
     checkUrl: jest.fn(invokeNextMiddleware),
     getUserId: jest.fn(mockGetUserId),
+    centerExists: jest.fn(mockGetUserId),
     validateChecklistQuery: jest.fn(invokeNextMiddleware),
     getUserFromDb: jest.fn(invokeNextMiddleware),
     checkSignedInUser: jest.fn(invokeNextMiddleware),

@@ -206,11 +206,11 @@ class ApprovalsController {
   }) {
     if (status === 'Approved' && budgetStatus === 'Open') {
       return `Hi ${name}
-        Now that your travel request <a href="/requests/${id}">${id}</a> has been approved by your manager,
+        Now that your travel request ${id} has been approved by your manager,
         please be informed that it has been forwarded to budget check.`;
     }
     if (status === 'Approved' && budgetStatus === 'Approved') {
-      return `Hi ${name} , Your travel request <a href="/requests/${id}">${id}</a> has passed
+      return `Hi ${name} , Your travel request ${id} has passed
       the budget check. Kindly proceed to respond to the requirements of the travel checklist`;
     }
     if (status === 'Rejected' || budgetStatus === 'Rejected') return 'rejected your request';

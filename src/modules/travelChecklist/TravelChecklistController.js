@@ -217,7 +217,7 @@ export default class TravelChecklistController {
     } = requestData;
     const message = `Hi ${name}, 
     Congratulations, you have now responded to all the 
-    checklist requirements for your trip <a href="/requests/${requestId}">${requestId}</a>.
+    checklist requirements for your trip ${requestId}.
     The travel team will review your submissions and 
     advise accordingly.`;
     const notificationData = {

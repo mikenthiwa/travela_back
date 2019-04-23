@@ -54,7 +54,7 @@ export default class BudgetApprovalsController {
             senderImage: picture,
             notificationType: 'general',
             requestId: id,
-            message: `Hi ${budgetChecker.dataValues.fullName}, Please click on  <a href="/requests/budgets/${id}">${id}</a> to confirm availability of budget for this trip. You will be required to take an approval decision by clicking on Approve or Reject `,
+            message: `Hi ${budgetChecker.dataValues.fullName}, Please click on  ${id} to confirm availability of budget for this trip. You will be required to take an approval decision by clicking on Approve or Reject `,
             notificationLink: `/requests/budgets/${id}`
           };
 

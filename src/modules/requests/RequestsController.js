@@ -364,7 +364,7 @@ class RequestsController {
         notificationType: 'general',
         requestId: id,
         message: `Hi ${request.name}, Congratulations, 
-        your request <a href="/requests/${id}">${id}</a> has been verified by the travel team. 
+        your request ${id} has been verified by the travel team. 
         You are now ready for this trip. Do have a safe trip.`,
         notificationLink: `/requests/${id}`
       };

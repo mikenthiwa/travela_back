@@ -33,7 +33,7 @@ describe('reminderEmails', () => {
     await setup();
     await models.Role.bulkCreate(role);
     const { userId } = await models.User.create(travelAdmin);
-    await models.UserRole.create(travelAdminRole);
+    await models.UserRole.bulkCreate(travelAdminRole);
     await models.User.create(requester);
     await models.UserRole.create(requesterRole);
     await models.User.bulkCreate(usersData);

@@ -68,6 +68,13 @@ const userRoles = [
     roleId: 70001,
     createdAt: '2018-09-26T15:47:47.582Z',
     updatedAt: '2018-09-26T15:47:47.582Z'
+  },
+  {
+    id: 4,
+    userId: 1,
+    roleId: 29187,
+    createdAt: '2018-09-26T15:47:47.582Z',
+    updatedAt: '2018-09-26T15:47:47.582Z'
   }
 ];
 

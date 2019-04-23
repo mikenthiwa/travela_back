@@ -73,13 +73,23 @@ export const usersData = [
   }
 ];
 
-export const travelAdminRole = {
-  id: 8378,
-  userId: 8378,
-  roleId: 29187,
-  createdAt: '2019-01-04 012:11:52.181+01',
-  updatedAt: '2019-01-16 012:11:52.181+01',
-};
+export const travelAdminRole = [
+  {
+    id: 8378,
+    userId: 8378,
+    roleId: 29187,
+    createdAt: '2019-01-04 012:11:52.181+01',
+    updatedAt: '2019-01-16 012:11:52.181+01',
+  },
+
+  {
+    id: 8378,
+    userId: 8378,
+    roleId: 339458,
+    createdAt: '2019-01-04 012:11:52.181+01',
+    updatedAt: '2019-01-16 012:11:52.181+01',
+  }
+];
 
 export const requesterRole = {
   id: 9378,

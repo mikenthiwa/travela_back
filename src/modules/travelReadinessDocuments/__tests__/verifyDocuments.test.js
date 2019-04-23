@@ -33,7 +33,7 @@ describe('verify visa documents', () => {
     await models.User.create(user);
     await models.Role.bulkCreate(role);
     await models.User.create(travelAdmin);
-    await models.UserRole.create(travelAdminRole);
+    await models.UserRole.bulkCreate(travelAdminRole);
   });
 
   afterAll(async () => {

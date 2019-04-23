@@ -75,7 +75,7 @@ export const tripsMock = [
     id: 'trip-12',
     requestId: '35678',
     origin: 'Nairobi',
-    destination: 'New York, United States',
+    destination: 'Nairobi',
     bedId: 1,
     departureDate: dates.departureDate,
     returnDate: dates.returnDate,
@@ -208,7 +208,7 @@ export const travelChecklists = [
 
 export const checklist = {
   id: '46664',
-  destinationName: 'New York, United States',
+  destinationName: 'Default',
   name: 'Travel Stipend',
   requiresFiles: false,
   deleteReason: null,

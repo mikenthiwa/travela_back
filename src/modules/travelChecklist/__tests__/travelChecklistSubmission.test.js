@@ -16,6 +16,12 @@ class Error {
 	}
 }
 
+global.io = {
+	sockets: {
+	  emit: (event, dataToBeEmitted) => dataToBeEmitted,
+	},
+};
+
 const requesterPayload = {
 	UserInfo: {
 		id: '-AVwHJmKrxA90lPNQ1FOLNn',
@@ -200,7 +206,7 @@ describe('Travel Checklist Submission', () => {
 					tripId: 'trip-12',
 					file: "N4000"
 				})
-				.end((err, res) => {
+				.end(async (err, res) => {
 					if (err) return done(err);
 					expect(res.status).toEqual(201);
 					expect(res.body.success).toEqual(true);

@@ -28,7 +28,7 @@ const user = {
   roleId: 10948,
   createdAt: '2018-08-16 012:11:52.181+01',
   updatedAt: '2018-08-16 012:11:52.181+01',
-  location: 'Lagos'
+  location: 'Kigali, Rwanda'
 };
 
 const token = Utils.generateTestToken(payload);

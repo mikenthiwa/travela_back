@@ -4,7 +4,7 @@ import Utils from '../../../helpers/Utils';
 import models from '../../../database/models';
 import { role } from '../../userRole/__tests__/mocks/mockData';
 import {
-  usersData, requesterPayload, requester, requesterRole
+  usersData, requesterPayload, requester, requesterRole, travelAdmin, travelAdminRole
 } from './__mocks__';
 import {
   documentsSeeder,
@@ -28,6 +28,8 @@ describe('TravelReadiness Controller', () => {
     await setUp();
     await models.Role.bulkCreate(role);
     await models.User.bulkCreate(usersData);
+    await models.User.create(travelAdmin);
+    await models.UserRole.bulkCreate(travelAdminRole);
     await models.User.create(requester);
     await models.UserRole.create(requesterRole);
     await models.TravelReadinessDocuments.bulkCreate(documentsSeeder);
@@ -80,8 +82,8 @@ describe('TravelReadiness Controller', () => {
         });
     });
 
-    it(`should throw an error message when a user tries to update unique 
-      values already existing in another record (for visas)`, (done) => {
+    it(`should throw an error message when a user tries to update 
+    unique values already existing in another record (for visas)`, (done) => {
       request(app)
         .put('/api/v1/travelreadiness/documents/SyOyr_BtB')
         .set('Content-Type', 'application/json')
@@ -90,14 +92,15 @@ describe('TravelReadiness Controller', () => {
         .end((err, res) => {
           expect(res.statusCode).toEqual(409);
           expect(res.body.success).toEqual(false);
-          expect(res.body.errors[0].message).toEqual('You already have a visa for this country with the same expiry date');
+          expect(res.body.errors[0].message)
+            .toEqual('You already have a visa for this country with the same expiry date');
           if (err) return done(err);
           done();
         });
     });
 
     it(`should throw an error message when a user tries to update unique 
-      values already existing in another record (for passports)`, (done) => {
+    values already existing in another record (for passports)`, (done) => {
       request(app)
         .put('/api/v1/travelreadiness/documents/pk42DLn78u')
         .set('Content-Type', 'application/json')
@@ -106,14 +109,15 @@ describe('TravelReadiness Controller', () => {
         .end((err, res) => {
           expect(res.statusCode).toEqual(409);
           expect(res.body.success).toEqual(false);
-          expect(res.body.errors[0].message).toEqual('You already have a passport with the same number');
+          expect(res.body.errors[0].message)
+            .toEqual('You already have a passport with the same number');
           if (err) return done(err);
           done();
         });
     });
 
-    it(`should throw an error message when a user tries to update unique 
-      values already existing in another record (for other documents)`, (done) => {
+    it(`should throw an error message when a user tries to update unique values 
+    already existing in another record (for other documents)`, (done) => {
       request(app)
         .put('/api/v1/travelreadiness/documents/pk42Dr90ops')
         .set('Content-Type', 'application/json')
@@ -122,7 +126,8 @@ describe('TravelReadiness Controller', () => {
         .end((err, res) => {
           expect(res.statusCode).toEqual(409);
           expect(res.body.success).toEqual(false);
-          expect(res.body.errors[0].message).toEqual('You already have a document with the same name');
+          expect(res.body.errors[0].message)
+            .toEqual('You already have a document with the same name');
           if (err) return done(err);
           done();
         });

@@ -13,7 +13,7 @@ export default class TestSetup {
     await models.Role.bulkCreate(role);
     await models.User.create(travelAdmin);
     await models.User.create(requester);
-    await models.UserRole.create(travelAdminRole);
+    await models.UserRole.bulkCreate(travelAdminRole);
     await models.UserRole.create(requesterRole);
   }
 

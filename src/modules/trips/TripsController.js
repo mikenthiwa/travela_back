@@ -103,6 +103,7 @@ class TripsController {
         type = 'Guesthouse Check-out';
       }
       const { data, travelAdmins } = await TripUtils.getMailDataWithReceipints(trip, type, topic);
+      /* istanbul ignore next */
       NotificationEngine.sendMailToMany(travelAdmins, data);
     } catch (error) { /* istanbul ignore next */ }
   }

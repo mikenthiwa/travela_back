@@ -42,7 +42,7 @@ describe('Reminders Controller', () => {
     await setup();
     await models.Role.bulkCreate(role);
     await models.User.create(travelAdmin);
-    await models.UserRole.create(travelAdminRole);
+    await models.UserRole.bulkCreate(travelAdminRole);
     await models.User.bulkCreate(usersData);
     await models.Condition.create(passportReminder);
     await models.Condition.create(visPassport);

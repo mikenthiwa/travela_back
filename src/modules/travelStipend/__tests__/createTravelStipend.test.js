@@ -21,7 +21,7 @@ describe('TravelStipends', () => {
   });
 
   const token = Utils.generateTestToken(payload);
-  
+
   describe('Create Travel Stipends: POST /api/v1/travelStipend', () => {
     it('should throw 422 error if the user does not provide a stipend and a location',
       (done) => {
@@ -119,25 +119,6 @@ describe('TravelStipends', () => {
             if (err) return done(err);
             expect(res.body.success).toEqual(true);
             expect(res.body.message).toEqual('Successfully created a new travel stipend for Nairobi');
-            done();
-          });
-      });
-    it('should not create a new stipend for a location that does not exist',
-      (done) => {
-        request
-          .post(url)
-          .set('authorization', token)
-          .send(
-            {
-              center: 'Naples',
-              stipend: 75
-            }
-          )
-          .expect(404)
-          .end((err, res) => {
-            if (err) return done(err);
-            expect(res.body.success).toEqual(false);
-            expect(res.body.message).toEqual('This Center does not exist');
             done();
           });
       });

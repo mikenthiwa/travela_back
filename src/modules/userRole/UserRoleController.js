@@ -299,6 +299,7 @@ class UserRoleController {
 
   static async getOneRole(req, res) {
     const { id: roleId } = req.params;
+    const { search } = req.query;
     const errormessage = UserRoleUtils.sanitizePaginationParams(req, roleId);
 
     if (errormessage) {
@@ -306,9 +307,13 @@ class UserRoleController {
     }
 
     try {
-      const roles = await UserRoleController.calculateUserRole(roleId);
+      const roles = await UserRoleController.calculateUserRole(roleId, search);
 
       if (!roles) {
+        if (search) {
+          const message = [404, 'User does not exist for this role', false];
+          return UserRoleController.response(res, message);
+        }
         const message = [404, 'Role does not exist', false];
         return UserRoleController.response(res, message);
       }
@@ -336,7 +341,7 @@ class UserRoleController {
     }
   }
 
-  static async calculateUserRole(roleId) {
+  static async calculateUserRole(roleId, search = '') {
     const result = await models.Role.findById(roleId, {
       order: [[{ model: models.User, as: 'users' }, models.UserRole, 'createdAt', 'DESC']],
       include: [
@@ -344,9 +349,12 @@ class UserRoleController {
           model: models.User,
           as: 'users',
           attributes: ['email', 'fullName', 'userId', 'id', 'location'],
-          through: {
-            attributes: []
+          where: {
+            fullName: {
+              [Op.iLike]: `%${search}%`
+            }
           },
+          through: { attributes: [] },
           include: [
             {
               model: models.Center,

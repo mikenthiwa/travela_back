@@ -37,7 +37,7 @@ describe('Disable reminder conditions', () => {
     await setup();
     await models.Role.bulkCreate(role);
     await models.User.create(travelAdmin);
-    await models.UserRole.create(travelAdminRole);
+    await models.UserRole.bulkCreate(travelAdminRole);
     await models.User.create(requester);
     await models.UserRole.create(requesterRole);
     await models.User.bulkCreate(usersData);
@@ -144,8 +144,8 @@ describe('Disable reminder conditions', () => {
         });
     });
 
-    it(`should throw an error if the reason for 
-      disabling is not up to 5 characters or more`, (done) => {
+    it(`should throw an error if the reason 
+    for disabling is not up to 5 characters or more`, (done) => {
       request(app)
         .put(`${URI}/400`)
         .set('Content-Type', 'application/json')

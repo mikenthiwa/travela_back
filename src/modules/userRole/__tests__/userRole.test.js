@@ -345,7 +345,7 @@ describe('User Role Test', () => {
       });
   });
 
- 
+
   it('should return only one user from the database', (done) => {
     request(app)
       .get('/api/v1/user/JNDVNFSFDK')
@@ -359,8 +359,7 @@ describe('User Role Test', () => {
       });
   });
 
-  it(`should throw 404 error when getting a user that does
-  not exist in the database`, (done) => {
+  it('should throw 404 error when getting a user that does not exist in the database', (done) => {
     request(app)
       .get('/api/v1/user/JNDVNFSFDKuytom')
       .set('Content-Type', 'application/json')
@@ -374,7 +373,8 @@ describe('User Role Test', () => {
       });
   });
 
-  it('should return error if login user does not exist in database when changing user role', (done) => {
+  it(`should return error if login user does not 
+  exist in database when changing user role`, (done) => {
     request(app)
       .put('/api/v1/user/role/update')
       .set('Content-Type', 'application/json')
@@ -406,7 +406,8 @@ describe('User Role Test', () => {
         done();
       });
   });
-  it('should throw error if user does not exist in the database when user is set to super admin', (done) => {
+  it(`should throw error if user does not exist in the database 
+  when user is set to super admin`, (done) => {
     request(app)
       .put('/api/v1/user/admin')
       .set('Content-Type', 'application/json')
@@ -434,7 +435,8 @@ describe('User Role Test', () => {
       });
   });
 
-  it('should throw if email does not match process env when changing user to super admin', (done) => {
+  it(`should throw if email does not match process env 
+  when changing user to super admin`, (done) => {
     request(app)
       .put('/api/v1/user/admin')
       .set('Content-Type', 'application/json')
@@ -664,7 +666,8 @@ describe('User Role Test', () => {
       });
   });
 
-  it('should throw error if role already exist when adding  new role when user is super admin ', (done) => {
+  it(`should throw error if role already exist when adding  
+  new role when user is super admin `, (done) => {
     request(app)
       .post('/api/v1/user/role')
       .set('Content-Type', 'application/json')
@@ -760,6 +763,32 @@ describe('User Role Test', () => {
         .expect(200)
         .end((err, res) => {
           expect(res.body.success).toEqual(true);
+          if (err) return done(err);
+          done();
+        });
+    });
+
+    it('should return search result for a role from the database', (done) => {
+      request(app)
+        .get('/api/v1/user/roles/10948?search=cap')
+        .set('Content-Type', 'application/json')
+        .set('authorization', token)
+        .expect(200)
+        .end((err, res) => {
+          expect(res.body.success).toEqual(true);
+          if (err) return done(err);
+          done();
+        });
+    });
+
+    it('should return does not exist search result for invalid keyword', (done) => {
+      request(app)
+        .get('/api/v1/user/roles/10948?search=keng')
+        .set('Content-Type', 'application/json')
+        .set('authorization', token)
+        .expect(404)
+        .end((err, res) => {
+          expect(res.body.success).toEqual(false);
           if (err) return done(err);
           done();
         });

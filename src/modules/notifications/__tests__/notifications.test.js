@@ -10,9 +10,10 @@ import {
 } from './__mocks__/notificationsData';
 import { role } from '../../userRole/__tests__/mocks/mockData';
 import { dates } from '../../requests/__tests__/mocks/mockData';
+import NotificationController from '../NotificationsController';
 
 const request = supertest;
-const invalidToken =  'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySW5mbyI6eyJpZCI6Ii1MSEptS3J4'; // eslint-disable-line
+const invalidToken = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySW5mbyI6eyJpZCI6Ii1MSEptS3J4'; // eslint-disable-line
 
 global.io = {
   sockets: {
@@ -90,23 +91,23 @@ describe('Notifications Controller', () => {
     describe('Authenticated user with no notifications', () => {
       it(`should return 200 status and the appropriate
       message for a user without notifications`, (done) => {
-        const expectedResponse = {
-          status: 404,
-          body: {
-            success: false,
-            error: 'You have no notifications at the moment',
-          }
-        };
-        request(app)
-          .get('/api/v1/notifications')
-          .set('authorization', token1)
-          .end((err, res) => {
-            expect(res.body).toMatchObject(expectedResponse.body);
-            expect(res.body.error)
-              .toEqual('You have no notifications at the moment');
-            done();
-          });
-      });
+          const expectedResponse = {
+            status: 404,
+            body: {
+              success: false,
+              error: 'You have no notifications at the moment',
+            }
+          };
+          request(app)
+            .get('/api/v1/notifications')
+            .set('authorization', token1)
+            .end((err, res) => {
+              expect(res.body).toMatchObject(expectedResponse.body);
+              expect(res.body.error)
+                .toEqual('You have no notifications at the moment');
+              done();
+            });
+        });
     });
 
     describe('Authenticated user With notifications', () => {
@@ -348,34 +349,34 @@ describe('Notifications Controller', () => {
 
       it(`should return 422 if notificationType is
         neither pending nor general`, (done) => {
-        const expectedResponse = {
-          status: 422,
-          body: {
-            success: false,
-            errors: [
-              {
-                message: 'notificationType can only be pending or general',
-                name: 'notificationType'
-              }
-            ]
-          },
-        };
+          const expectedResponse = {
+            status: 422,
+            body: {
+              success: false,
+              errors: [
+                {
+                  message: 'notificationType can only be pending or general',
+                  name: 'notificationType'
+                }
+              ]
+            },
+          };
 
-        request(app)
-          .put('/api/v1/notifications')
-          .set('authorization', userOgoToken)
-          .send({
-            currentStatus: 'unread',
-            newStatus: 'read',
-            notificationType: 'wrong'
-          })
-          .end((err, res) => {
-            if (err) return done(err);
-            expect(res.status).toEqual(expectedResponse.status);
-            expect(res.body).toMatchObject(expectedResponse.body);
-            done();
-          });
-      });
+          request(app)
+            .put('/api/v1/notifications')
+            .set('authorization', userOgoToken)
+            .send({
+              currentStatus: 'unread',
+              newStatus: 'read',
+              notificationType: 'wrong'
+            })
+            .end((err, res) => {
+              if (err) return done(err);
+              expect(res.status).toEqual(expectedResponse.status);
+              expect(res.body).toMatchObject(expectedResponse.body);
+              done();
+            });
+        });
 
       it('should return 422 if payload doesn\'t have `newStatus` property',
         (done) => {
@@ -414,38 +415,38 @@ describe('Notifications Controller', () => {
 
       it(`should return 422 if payload
           doesn't have "notificationType" property`,
-      (done) => {
-        const expectedResponse = {
-          status: 422,
-          body: {
-            success: false,
-            errors: [
-              {
-                message: 'notificationType field is required',
-                name: 'notificationType'
-              },
-              {
-                message: 'notificationType can only be pending or general',
-                name: 'notificationType'
-              },
-            ]
-          },
-        };
+        (done) => {
+          const expectedResponse = {
+            status: 422,
+            body: {
+              success: false,
+              errors: [
+                {
+                  message: 'notificationType field is required',
+                  name: 'notificationType'
+                },
+                {
+                  message: 'notificationType can only be pending or general',
+                  name: 'notificationType'
+                },
+              ]
+            },
+          };
 
-        request(app)
-          .put('/api/v1/notifications')
-          .set('authorization', userOgoToken)
-          .send({
-            currentStatus: 'unread',
-            newStatus: 'read'
-          })
-          .end((err, res) => {
-            if (err) return done(err);
-            expect(res.status).toEqual(expectedResponse.status);
-            expect(res.body).toMatchObject(expectedResponse.body);
-            done();
-          });
-      });
+          request(app)
+            .put('/api/v1/notifications')
+            .set('authorization', userOgoToken)
+            .send({
+              currentStatus: 'unread',
+              newStatus: 'read'
+            })
+            .end((err, res) => {
+              if (err) return done(err);
+              expect(res.status).toEqual(expectedResponse.status);
+              expect(res.body).toMatchObject(expectedResponse.body);
+              done();
+            });
+        });
     });
 
     describe('Authenticated user with unread notifications', () => {
@@ -568,7 +569,7 @@ describe('Notifications Controller', () => {
         "gender": "Male",
         "manager": "Ademola Ariya",
         "department": "TDD",
-        "status" : "Open",
+        "status": "Open",
         "role": "Senior Consultant",
         "departureDate": "2018-08-16",
         "arrivalDate": "2018-08-30",
@@ -690,58 +691,58 @@ describe('Notifications Controller', () => {
 
     const token2 = Utils.generateTestToken(payload2);
     beforeAll(async () => {
-    moxios.install();
-    await models.UserRole.destroy({ force: true, truncate: { cascade: true } });
-    await models.Role.destroy({ force: true, truncate: { cascade: true } });
-    await  models.Role.bulkCreate(role);
-    moxios.stubRequest(`${process.env.ANDELA_PROD_API}/users?email=fakeemail@andela.com`, {
-      status: 200,
-      response: {
-        values: [{
-          bamboo_hr_id: '01',
-        }]
-      }
-    });
-    moxios.stubRequest(process.env.BAMBOOHR_API.replace('{bambooHRId}', '01'), {
-      status: 200,
-      response: {
-        workEmail: 'lisa.doe@andela.com',
-        supervisorEId: '92'
-      }
-    });
-    moxios.stubRequest(process.env.BAMBOOHR_API.replace('{bambooHRId}', '92'), {
-      status: 200,
-      response: {
-        id: '92',
-        displayName: 'ssewilliam',
-        firstName: 'William',
-        lastName: 'Sserubiri',
-        jobTitle: 'Engineering Team Lead',
-        department: 'Partner-Programs',
-        location: 'Kenya',
-        workEmail: 'william.sserubiri@andela.com',
-        supervisorEId: '9',
-        supervisor: 'Samuel Kubai'
-      }
-    });
-    moxios.stubRequest(`${process.env.ANDELA_PROD_API}/users?email=william.sserubiri@andela.com`, {
-      status: 200,
-      response: {
-        values: [{
-          email: 'william.sserubiri@andela.com',
-          name: 'ssewilliam',
+      moxios.install();
+      await models.UserRole.destroy({ force: true, truncate: { cascade: true } });
+      await models.Role.destroy({ force: true, truncate: { cascade: true } });
+      await models.Role.bulkCreate(role);
+      moxios.stubRequest(`${process.env.ANDELA_PROD_API}/users?email=fakeemail@andela.com`, {
+        status: 200,
+        response: {
+          values: [{
+            bamboo_hr_id: '01',
+          }]
+        }
+      });
+      moxios.stubRequest(process.env.BAMBOOHR_API.replace('{bambooHRId}', '01'), {
+        status: 200,
+        response: {
+          workEmail: 'lisa.doe@andela.com',
+          supervisorEId: '92'
+        }
+      });
+      moxios.stubRequest(process.env.BAMBOOHR_API.replace('{bambooHRId}', '92'), {
+        status: 200,
+        response: {
           id: '92',
-          location: {
-            name: 'Kampala'
-          },
-          picture: 'http//:gif.jpg'
-        }]
-      }
-    });
-    await request(app)
-      .post('/api/v1/user')
-      .set('authorization', token2)
-      .send({ location: 'Lagos' });
+          displayName: 'ssewilliam',
+          firstName: 'William',
+          lastName: 'Sserubiri',
+          jobTitle: 'Engineering Team Lead',
+          department: 'Partner-Programs',
+          location: 'Kenya',
+          workEmail: 'william.sserubiri@andela.com',
+          supervisorEId: '9',
+          supervisor: 'Samuel Kubai'
+        }
+      });
+      moxios.stubRequest(`${process.env.ANDELA_PROD_API}/users?email=william.sserubiri@andela.com`, {
+        status: 200,
+        response: {
+          values: [{
+            email: 'william.sserubiri@andela.com',
+            name: 'ssewilliam',
+            id: '92',
+            location: {
+              name: 'Kampala'
+            },
+            picture: 'http//:gif.jpg'
+          }]
+        }
+      });
+      await request(app)
+        .post('/api/v1/user')
+        .set('authorization', token2)
+        .send({ location: 'Lagos' });
     });
 
     afterAll(async () => {
@@ -754,17 +755,33 @@ describe('Notifications Controller', () => {
     })
 
     xit('should post a replied comment from email', async (done) => {
-        request(app)
+      request(app)
         .post('/api/v1/email')
         .set('authorization', token2)
         .send(repliedComment)
         .end((err, res) => {
-          const{ success, message, comment: {requestId} } = res.body;
+          const { success, message, comment: { requestId } } = res.body;
           expect(success).toEqual(true);
           expect(message).toEqual('Comment created');
           expect(requestId).toEqual('-Bhjghdbfw');
           done();
         })
+    })
+  })
+
+  describe('Static method test', () => {
+    it('should mock getCommentData', () => {
+      const sender = {
+        fullName: 'Olusola Ajayi',
+        picture: 'myImage.jpg',
+        email: 'olusola.ajayi@me.com'
+      };
+      const requestId = 123456;
+      const comment = 'What does this do?'
+      const result = NotificationController.getCommentData(sender, requestId, comment);
+      expect(result.requestId).toEqual(123456);
+      expect(result.userName).toEqual(sender.fullName);
+      expect(result.userEmail).toEqual(sender.email);
     })
   })
 });

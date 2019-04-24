@@ -42,6 +42,11 @@ export default (sequelize, DataTypes) => {
       location: {
         allowNull: false,
         type: DataTypes.STRING
+      },
+      bambooHrId: {
+        allowNull: false,
+        type: DataTypes.INTEGER,
+        defaultValue: 0
       }
     },
     {}

@@ -3,6 +3,7 @@ import middleware from '../../middlewares';
 import { getRequestsValidators } from '../../helpers/validators';
 import ApprovalsController from './ApprovalsController';
 import BudgetApprovalsController from './BudgetApprovalsController';
+import TravelAdminApprovalController from './TravelAdminApprovalController';
 
 const ApprovalsRouter = express.Router();
 
@@ -21,6 +22,19 @@ ApprovalsRouter.get(
   RequestValidator.getTravelaUser,
   Validator.validateRequest,
   ApprovalsController.getUserApprovals,
+);
+
+ApprovalsRouter.get(
+  '/approvals/travel-admin',
+  authenticate,
+  RoleValidator.checkUserRole(
+    ['Super Administrator', 'Travel Administrator',
+      'Travel Team Member']
+  ),
+  getRequestsValidators,
+  RequestValidator.getTravelaUser,
+  Validator.validateRequest,
+  TravelAdminApprovalController.getTravelAdminRequest,
 );
 
 

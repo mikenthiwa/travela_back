@@ -380,6 +380,7 @@ class UserRoleController {
 
   static async findUserDetails(req) {
     const { email } = req.user.UserInfo;
+    const getId = await models.User.findOne({ where: { email } });
     const userWithEmail = await models.User.findOne({
       where: {
         email
@@ -390,6 +391,17 @@ class UserRoleController {
           as: 'roles',
           attributes: ['roleName'],
           through: { attributes: [] },
+          include: [
+            {
+              model: models.Center,
+              as: 'centers',
+              attributes: ['id', 'location'],
+              through: {
+                attributes: [],
+                where: { userId: getId.id }
+              }
+            }
+          ],
         },
         {
           model: models.Department,

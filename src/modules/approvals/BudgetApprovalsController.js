@@ -7,9 +7,10 @@ import NotificationEngine from '../notifications/NotificationEngine';
 import models from '../../database/models';
 import Error from '../../helpers/Error';
 import ApprovalsController from './ApprovalsController';
+import { createSearchClause, getModelSearchColumns } from '../../helpers/requests';
 
 const { Op } = models.Sequelize;
-
+const noResult = 'No records found';
 
 export default class BudgetApprovalsController {
   static async findBudgetCheckerDepartment(department) {
@@ -22,7 +23,7 @@ export default class BudgetApprovalsController {
           model: models.User,
           as: 'users',
           attributes: ['fullName', 'email', 'userId'],
-          through: { attributes: [] },
+          through: { attributes: [] }
         }
       ]
     });
@@ -33,8 +34,9 @@ export default class BudgetApprovalsController {
     id, name, manager, department, picture
   }) {
     try {
-      const budgetCheckerMembers = await
-      BudgetApprovalsController.findBudgetCheckerDepartment(department);
+      const budgetCheckerMembers = await BudgetApprovalsController.findBudgetCheckerDepartment(
+        department
+      );
 
       if (budgetCheckerMembers.length > 0) {
         const data = {
@@ -58,36 +60,47 @@ export default class BudgetApprovalsController {
             notificationLink: `/requests/budgets/${id}`
           };
 
-          NotificationEngine.notify(
-            notificationData
-          );
+          NotificationEngine.notify(notificationData);
         });
 
-        NotificationEngine.sendMailToMany(
-          budgetCheckerMembers,
-          data
-        );
+        NotificationEngine.sendMailToMany(budgetCheckerMembers, data);
       }
-    } catch (error) { /* istanbul ignore next */
+    } catch (error) {
+      /* istanbul ignore next */
       return error;
     }
   }
 
-
-  static async calculateApprovals(status, where) {
-    const result = await models.Request.count({
+  static async calculateApprovals(status, where, requestWhere, tripWhere) {
+    let result = await models.Request.count({
       where: {
         ...where,
-        budgetStatus: status
+        budgetStatus: status,
+        ...requestWhere
       }
     });
+
+    if (!result) {
+      result = await models.Request.count({
+        where: {
+          ...where,
+          budgetStatus: status
+        },
+        include: [{ model: models.Trip, as: 'trips', where: { ...tripWhere } }]
+      });
+    }
+
     return result;
   }
 
-  static returnResponse(res, approvals, open, past, pagination) {
-    const checkApprovals = approvals.rows.length < 1
-      ? 'You have no approvals at the moment'
-      : 'Approvals retrieved successfully';
+  static responseMesssage(rows) {
+    const message = rows < 1 ? 'You have no approvals at the moment' : 'Approvals retrieved successfully';
+    return message;
+  }
+
+  static returnResponse(res, approvals, open, past, pagination, search) {
+    const rows = approvals.rows.length;
+    const checkApprovals = search && rows < 1 ? noResult : BudgetApprovalsController.responseMesssage(rows);
     res.status(200).json({
       success: true,
       message: checkApprovals,
@@ -96,14 +109,46 @@ export default class BudgetApprovalsController {
     });
   }
 
+  static async getApprovals(where, offset, limit, requestWhere, tripWhere) {
+    let approvals = await models.Request.findAndCountAll({
+      where: {
+        ...where,
+        ...requestWhere
+      },
+      offset,
+      limit,
+      include: [{ model: models.Trip, as: 'trips' }],
+      order: [['createdAt', 'DESC']]
+    });
+
+    if (!approvals.count) {
+      approvals = await models.Request.findAndCountAll({
+        where,
+        offset,
+        limit,
+        include: [{ model: models.Trip, as: 'trips', where: { ...tripWhere } }],
+        order: [['createdAt', 'DESC']]
+      });
+    }
+
+    return approvals;
+  }
+
   static async getBudgetApprovals(req, res) {
     try {
       const user = await UserRoleController.findUserDetails(req);
-      const { query: { budgetStatus } } = req;
+      const {
+        query: { budgetStatus, search = '' }
+      } = req;
       const dept = user.budgetCheckerDepartments.map(departments => departments.name);
+      const searchClause = createSearchClause(getModelSearchColumns('Request'), search, 'Request');
+      const tripSearchClause = createSearchClause(getModelSearchColumns('Trip'), search);
+      const tripWhere = { [Op.or]: tripSearchClause };
+
+      const requestWhere = { [Op.or]: searchClause };
       const where = {
         status: 'Approved',
-        department: { [Op.iLike]: { [Op.any]: dept } },
+        department: { [Op.iLike]: { [Op.any]: dept } }
       };
       const pastApprovals = { [Op.in]: ['Approved', 'Rejected'] };
       if (budgetStatus) {
@@ -114,18 +159,13 @@ export default class BudgetApprovalsController {
         }
       }
       const { page, limit, offset } = await Pagination.initializePagination(req);
-      const approvals = await models.Request.findAndCountAll({
-        where,
-        offset,
-        limit,
-        include: [{ model: models.Trip, as: 'trips' }],
-        order: [['createdAt', 'DESC']]
-      });
+      const approvals = await BudgetApprovalsController.getApprovals(where, offset, limit, requestWhere, tripWhere);
       const pagination = Pagination.getPaginationData(page, limit, approvals.count);
-      const open = await BudgetApprovalsController.calculateApprovals('Open', where);
-      const past = await BudgetApprovalsController.calculateApprovals(pastApprovals, where);
-      return BudgetApprovalsController.returnResponse(res, approvals, open, past, pagination);
-    } catch (error) { /* istanbul ignore next */
+      const open = await BudgetApprovalsController.calculateApprovals('Open', where, requestWhere, tripWhere);
+      const past = await BudgetApprovalsController.calculateApprovals(pastApprovals, where, requestWhere, tripWhere);
+      return BudgetApprovalsController.returnResponse(res, approvals, open, past, pagination, search);
+    } catch (error) {
+      /* istanbul ignore next */
       return res.status(400).json({ error });
     }
   }
@@ -150,11 +190,14 @@ export default class BudgetApprovalsController {
         return Error.handleError(error, 400, res);
       }
       if (['Approved'].includes(status) && budgeter.result) {
-        await models.Approval.update({
-          budgetStatus: req.body.budgetStatus,
-          budgetApprover: budgeter.name,
-          budgetApprovedAt: moment(Date.now()).format('YYYY-MM-DD')
-        }, { where: { requestId: req.params.requestId } });
+        await models.Approval.update(
+          {
+            budgetStatus: req.body.budgetStatus,
+            budgetApprover: budgeter.name,
+            budgetApprovedAt: moment(Date.now()).format('YYYY-MM-DD')
+          },
+          { where: { requestId: req.params.requestId } }
+        );
 
         const updatedRequest = await models.Request.update(
           { budgetStatus: req.body.budgetStatus },
@@ -165,10 +208,7 @@ export default class BudgetApprovalsController {
         await BudgetApprovalsController.sendNotificationToManager(req, updatedRequest[1][0]);
 
         if (req.body.budgetStatus === 'Approved') {
-          ApprovalsController.sendEmailTofinanceMembers(
-            updatedRequest[1][0],
-            req.user
-          );
+          ApprovalsController.sendEmailTofinanceMembers(updatedRequest[1][0], req.user);
         }
         return res.status(200).json({
           success: true,
@@ -195,9 +235,7 @@ export default class BudgetApprovalsController {
       recipientId: managerId,
       notificationType: 'general',
       requestId: id,
-      message: (budgetStatus === 'Approved')
-        ? 'approved the budget'
-        : 'rejected the request',
+      message: budgetStatus === 'Approved' ? 'approved the budget' : 'rejected the request',
       notificationLink: `/requests/budgets/${id}`
     };
     return NotificationEngine.notify(notificationData);

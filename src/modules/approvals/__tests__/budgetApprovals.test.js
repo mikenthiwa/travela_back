@@ -520,4 +520,68 @@ describe('Should allow the budget checker to view requests by budget status', ()
         done();
       });
   });
+  it('Should return a list of approvals that have been searched', (done) => {
+    request
+      .get('/api/v1/approvals/budget?search=moses')
+      .set('authorization', token)
+      .end((err, res) => {
+        if (err) done(err);
+        expect(res.status).toEqual(200);
+        expect(res.body.success).toEqual(true);
+        expect(res.body.message).toEqual('Approvals retrieved successfully');
+        done();
+      });
+  });
+
+  it('Should return an approval searched by id', (done) => {
+    request
+      .get('/api/v1/approvals/budget?&search=3mzyo5PeF')
+      .set('authorization', token)
+      .end((err, res) => {
+        if (err) done(err);
+        expect(res.status).toEqual(200);
+        expect(res.body.success).toEqual(true);
+        expect(res.body.message).toEqual('Approvals retrieved successfully');
+        done();
+      });
+  });
+  
+  it('Should return a list of approvals searched in past approvals', (done) => {
+    request
+      .get('/api/v1/approvals/budget?&budgetStatus=past&search=moses')
+      .set('authorization', token)
+      .end((err, res) => {
+        if (err) done(err);
+        expect(res.status).toEqual(200);
+        expect(res.body.success).toEqual(true);
+        expect(res.body.message).toEqual('Approvals retrieved successfully');
+        done();
+      });
+  });
+
+  it('Should return nothing if request does not exist', (done) => {
+    request
+      .get('/api/v1/approvals/budget?&search=sammy')
+      .set('authorization', token)
+      .end((err, res) => {
+        if (err) done(err);
+        expect(res.status).toEqual(200);
+        expect(res.body.success).toEqual(true);
+        expect(res.body.message).toEqual('No records found');
+        done();
+      });
+  });
+
+  it('Should return a list of approvals searched by origin or destination', (done) => {
+    request
+      .get('/api/v1/approvals/budget?&search=kigali')
+      .set('authorization', token)
+      .end((err, res) => {
+        if (err) done(err);
+        expect(res.status).toEqual(200);
+        expect(res.body.success).toEqual(true);
+        expect(res.body.message).toEqual('Approvals retrieved successfully');
+        done();
+      });
+  });
 });

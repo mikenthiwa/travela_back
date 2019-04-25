@@ -14,6 +14,7 @@ import ReminderValidator from './reminderValidator';
 import TravelReasonsValidator from './travelReasonsValidator';
 import TravelStipendValidator from './travelStipendValidator';
 import DepartmentValidation from './DepartmentValidation';
+import BambooWebhookValidator from './BambooWebhookValidator';
 
 
 const middleware = {
@@ -32,7 +33,8 @@ const middleware = {
   ReminderEmailTemplateValidator,
   TravelReasonsValidator,
   TravelStipendValidator,
-  DepartmentValidation
+  DepartmentValidation,
+  BambooWebhookValidator
 };
 
 export default middleware;

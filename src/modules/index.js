@@ -17,6 +17,7 @@ import remindersRouter from './reminders';
 import travelReasons from './travelReasons';
 import travelStipendRouter from './travelStipend';
 import departmentRouter from './department';
+import bamboohrRouter from './bamboohr';
 
 const apiPrefix = '/api/v1';
 
@@ -40,7 +41,8 @@ const routes = [
   remindersRouter,
   travelReasons,
   travelStipendRouter,
-  departmentRouter
+  departmentRouter,
+  bamboohrRouter
 ];
 export default (app) => {
   routes.forEach(route => app.use(apiPrefix, route));

@@ -118,6 +118,7 @@ export default class BudgetApprovalsController {
       offset,
       limit,
       include: [{ model: models.Trip, as: 'trips' }],
+      distinct: true,
       order: [['createdAt', 'DESC']]
     });
 
@@ -127,6 +128,7 @@ export default class BudgetApprovalsController {
         offset,
         limit,
         include: [{ model: models.Trip, as: 'trips', where: { ...tripWhere } }],
+        distinct: true,
         order: [['createdAt', 'DESC']]
       });
     }

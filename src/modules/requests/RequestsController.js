@@ -22,6 +22,9 @@ import Error from '../../helpers/Error';
 import TravelChecklistController from '../travelChecklist/TravelChecklistController';
 import RequestTransactions from './RequestTransactions';
 import RequestUtils from './RequestUtils';
+import Centers from '../../helpers/centers';
+import Users from '../../helpers/user';
+
 
 dotenv.config();
 const { Op } = models.Sequelize;
@@ -344,6 +347,37 @@ class RequestsController {
     }
   }
 
+  static notificationMessages(senderId, name, request, picture, userId, id) {
+    const travelAdminEmailData = {
+      topic: 'Travel Request Verified',
+      sender: name,
+      type: 'Travel Request Verified',
+      details: {
+        RequesterName: request.name,
+        id: request.id
+      },
+      redirectLink: `${process.env.REDIRECT_URL}/requests/budgets/${id}`
+    };
+
+    const notificationData = {
+      senderId,
+      senderName: name,
+      senderImage: picture,
+      recipientId: userId,
+      notificationType: 'general',
+      requestId: id,
+      message: `Hi ${request.name}, Congratulations,
+      your request ${id} has been verified by the travel team.
+      You are now ready for this trip. Do have a safe trip.`,
+      notificationLink: `/requests/${id}`
+    };
+
+    return {
+      travelAdminEmailData,
+      notificationData
+    };
+  }
+
   static async verifyRequest(req, res) {
     try {
       const { requestId } = req.params;
@@ -355,26 +389,30 @@ class RequestsController {
       await request.save();
       await approval.save();
       const { id, userId } = request;
+
       const recipient = await UserRoleController.getRecipient(null, userId);
-      const notificationData = {
-        senderId,
-        senderName: name,
-        senderImage: picture,
-        recipientId: userId,
-        notificationType: 'general',
-        requestId: id,
-        message: `Hi ${request.name}, Congratulations, 
-        your request ${id} has been verified by the travel team. 
-        You are now ready for this trip. Do have a safe trip.`,
-        notificationLink: `/requests/${id}`
-      };
+      const centerIds = await Centers.getDestinationCenters(requestId);
+
+      if (centerIds.length) {
+        const travelAdmins = await Users.getDestinationTravelAdmin(centerIds);
+        const message = `This is to inform you that ${request.name}'s request ${request.id} to visit 
+          your centre has just been verified by the local travel team.
+          Please be aware of this request and plan for the traveller.`;
+        NotificationEngine.notifyMany({
+          users: travelAdmins, senderId, name, picture, id, message
+        });
+        NotificationEngine.sendMailToMany(travelAdmins, RequestsController.notificationMessages(senderId, name, request, picture, userId, id).travelAdminEmailData);
+      }
+
       const emailRequest = { name, manager: request.name, id: request.id };
       const emailData = RequestUtils.getMailData(
         emailRequest, recipient, 'Travel Request Verified', 'Verified', `/redirect/requests/${emailRequest.id}`
       );
-      NotificationEngine.notify(notificationData);
+      
+      NotificationEngine.notify(RequestsController.notificationMessages(senderId, name, request, picture, userId, id).notificationData);
       NotificationEngine.sendMail(emailData);
       await RequestUtils.sendEmailToFinanceTeam(request);
+
       return res.status(200)
         .json({ success: true, message: 'Verification Successful', updatedRequest: { request } });
     } catch (error) {

@@ -141,4 +141,24 @@ export default class NotificationEngine {
       });
     });
   }
+
+  static async notifyMany({
+    users = [], senderId, name, picture, id, message
+  }) {
+    users.forEach((user) => {
+      const { userId } = user.dataValues;
+      const data = {
+        senderId,
+        senderName: name,
+        senderImage: picture,
+        recipientId: userId,
+        notificationType: 'general',
+        requestId: id,
+        notificationStatus: 'unread',
+        message,
+        notificationLink: `/requests/${id}`
+      };
+      NotificationEngine.notify(data);
+    });
+  }
 }

@@ -43,7 +43,7 @@ class TravelReadinessUtils {
     }
   }
 
-  static async getRoleMembers(roleMembers, userLocation) {
+  static async getRoleMembers(roleMembers = [], userLocation) {
     const availableRoleMemberIds = roleMembers.map(member => member.id);
     const availableRoleMembers = await models.User.findAll({
       where: {

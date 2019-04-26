@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 import axios from 'axios';
+import models from '../../database/models';
 
 dotenv.config();
 
@@ -55,6 +56,17 @@ class UserHelper {
       USA: 'New York'
     };
     return countries[country] ? countries[country] : country;
+  }
+
+  static async getDestinationTravelAdmin(centerIds) {
+    const users = centerIds.map(async (centerId) => {
+      const travelAdmin = await models.UserRole.findAll({ where: { roleId: 29187, centerId }, include: [{ model: models.User, as: 'user' }] });
+      if (travelAdmin.length) {
+        return travelAdmin.map(user => user.dataValues.user);
+      }
+    });
+    const [travelAdmins] = await Promise.all(users);
+    return travelAdmins;
   }
 }
 export default UserHelper;

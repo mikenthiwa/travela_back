@@ -19,7 +19,6 @@ let documentId2;
 const clearDatabase = async () => {
   await models.Role.destroy({ force: true, truncate: { cascade: true } });
   await models.User.destroy({ force: true, truncate: { cascade: true } });
-  await models.Comment.destroy({ force: true, truncate: { cascade: true } });
   await models.TravelReadinessDocuments.destroy({ force: true, truncate: { cascade: true } });
   await models.UserRole.destroy({ force: true, truncate: { cascade: true } });
   await models.Center.destroy({ force: true, truncate: { cascade: true } });

@@ -268,7 +268,7 @@ describe('Travel Checklists Controller', () => {
         };
 
         request(app)
-          .get('/api/v1/checklists?destinationName=Nairobi')
+          .get('/api/v1/checklists?destinationName=Nairobi, Kenya')
           .set('authorization', testToken)
           .end((err, res) => {
             if (err) done(err);

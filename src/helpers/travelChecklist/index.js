@@ -5,7 +5,6 @@ import models from '../../database/models';
 import TripsController from '../../modules/trips/TripsController';
 import CustomError from '../Error';
 import { getTravelDocument } from '../../modules/travelReadinessDocuments/getTravelDocument.data';
-import UserHelper from '../user';
 
 class TravelChecklistHelper {
   static groupCheckList(checklists, groupBy) {
@@ -31,14 +30,9 @@ class TravelChecklistHelper {
     const checklistWithTripId = checklists.map((checklist) => {
       const { destinationName } = checklist;
       const destinationTrip = uniqueTrips
-        .find(
-          trip => trip.destination.split(',')[1].trim() === destinationName.split(',')[1].trim()
-        );
+        .find(trip => trip.destination === destinationName);
 
-      return {
-        ...checklist, tripId: destinationTrip.id,
-        tripLocation: destinationTrip.destination
-      };
+      return { ...checklist, tripId: destinationTrip.id };
     });
 
     return checklistWithTripId;
@@ -67,12 +61,11 @@ class TravelChecklistHelper {
   static addDestinationsWithNoChecklist(groupedChecklists, tripsDestinations) {
     const uniqueDestinations = [...new Set(tripsDestinations)];
     const destinationsWithChecklists = groupedChecklists
-      .map(checklist => checklist.destinationName.split(',')[1] || checklist.destinationName);
+      .map(checklist => checklist.destinationName);
 
     const destinationsWithNoChecklist = [];
-
     uniqueDestinations.forEach((destination) => {
-      if (!destinationsWithChecklists.includes(destination.split(',')[1])) {
+      if (!destinationsWithChecklists.includes(destination)) {
         destinationsWithNoChecklist
           .push({ destinationName: destination, checklist: [] });
       }
@@ -111,38 +104,19 @@ class TravelChecklistHelper {
       const { requestId, destinationName } = req.query;
       let where = {};
       const tripsDestination = [];
-      const checklistsDestination = [];
       const tripsDestinationsWithId = [];
       const reqId = requestId || requestID;
-      const andelaCenters = await TravelChecklistHelper.getAndelaCentersByCountry();
       if (reqId) {
         const trips = await TripsController.getTripsByRequestId(reqId, res);
-
         trips.forEach((trip) => {
           const { id, destination } = trip;
-          const [, countryName] = destination.split(',');
-
           tripsDestinationsWithId.push({ id, destination });
-
-          let destinationNames = andelaCenters[countryName.trim()];
-
-          if (destinationNames && destinationNames.includes('Austin, United States')) {
-            destinationNames = 'New York, United States';
-          }
-
-          checklistsDestination.push(destinationNames);
           tripsDestination.push(destination);
         });
-
-        where = { destinationName: [...checklistsDestination, 'Default'] };
+        where = { destinationName: [...tripsDestination, 'Default'] };
       } else if (destinationName) {
-        const destinationCountry = await UserHelper.getUserCountry(destinationName);
-        const destinationNames = (destinationCountry.split(',')).map(center => (andelaCenters[center]));
-
-        if (destinationNames && destinationNames.includes('Austin, United States')) {
-          destinationNames.push('New York, United States');
-        }
-
+        const andelaCenters = await TravelChecklistHelper.getAndelaCenters();
+        const destinationNames = (destinationName.split(',')).map(center => (andelaCenters[center]));
         where = { destinationName: { [Op.or]: [...destinationNames, 'Default'] } };
       }
       const query = {
@@ -159,7 +133,6 @@ class TravelChecklistHelper {
         ? TravelChecklistHelper.modifyChecklistStructure(
           filteredGroupedChecklists, tripsDestination, tripsDestinationsWithId
         ) : [];
-
       return checklists;
     } catch (error) { /* istanbul ignore next */
       CustomError.handleError(error, 500, res);
@@ -173,16 +146,6 @@ class TravelChecklistHelper {
       allCenters[center.dataValues.location.split(',', 1)] = center.dataValues.location;
     });
     return allCenters;
-  }
-
-  static async getAndelaCentersByCountry() {
-    const andelaLocations = await models.Center.findAll();
-    const allCountryName = {};
-    andelaLocations.forEach((center) => {
-      const [, countryName] = center.dataValues.location.split(',');
-      allCountryName[countryName.trim()] = center.dataValues.location;
-    });
-    return allCountryName;
   }
 
   static combineSubmittedChecklists(travelCheckLists, submissions) {

@@ -75,7 +75,7 @@ export const tripsMock = [
     id: 'trip-12',
     requestId: '35678',
     origin: 'Nairobi',
-    destination: 'Nairobi',
+    destination: 'Nairobi, Kenya',
     bedId: 1,
     departureDate: dates.departureDate,
     returnDate: dates.returnDate,

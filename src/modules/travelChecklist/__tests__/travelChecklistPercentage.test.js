@@ -11,6 +11,7 @@ import {
   guestHouse,
   rooms,
   beds,
+  centers,
 } from './__mocks__/mockData';
 
 const payload = {
@@ -49,6 +50,7 @@ describe('Checklist Percentage', () => {
       await models.ChecklistItem.sync({ force: true });
       await models.Request.destroy({ force: true, truncate: { cascade: true } });
       await models.Trip.sync({ force: true });
+      await models.Center.destroy({ force: true, truncate: { cascade: true } });
 
       await models.User.create(user);
       await models.GuestHouse
@@ -61,6 +63,7 @@ describe('Checklist Percentage', () => {
       await models.ChecklistItem.bulkCreate(checkListItems);
       await models.ChecklistItemResource.bulkCreate(checkListItemsResources);
       await models.ChecklistSubmission.bulkCreate(checklistSubmissions);
+      await models.Center.bulkCreate(centers);
     } catch (error) {
       return null;
     }
@@ -80,6 +83,7 @@ describe('Checklist Percentage', () => {
       .destroy({ force: true, truncate: { cascade: true } });
     await models.ChecklistSubmission
       .destroy({ force: true, truncate: { cascade: true } });
+    await models.Center.destroy({ force: true, truncate: { cascade: true } });
   });
 
   describe('Trave checklist Percentage Percentage', () => {

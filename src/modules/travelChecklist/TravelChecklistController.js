@@ -17,6 +17,7 @@ export default class TravelChecklistController {
       const { location } = req.user;
       const andelaCenters = await TravelChecklistHelper.getAndelaCenters();
       req.query.destinationName = location;
+
       await models.sequelize.transaction(async () => {
         if (await TravelChecklistController.checklistItemExists(rest.name, req, res)) {
           return CustomError.handleError(
@@ -121,7 +122,7 @@ export default class TravelChecklistController {
       }
       const errorMsg = 'There are currently no deleted travel checklist items for your location'; // eslint-disable-line
       CustomError.handleError(errorMsg, 404, res);
-    } catch (error) {
+    } catch (error) { /* istanbul ignore next */
       CustomError.handleError(error, 500, res);
     }
   }

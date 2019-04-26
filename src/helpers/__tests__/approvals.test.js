@@ -1,7 +1,9 @@
 import models from '../../database/models';
 import UserRoleController from '../../modules/userRole/UserRoleController';
 import TravelReadinessUtils from '../../modules/travelReadinessDocuments/TravelReadinessUtils';
-import { getTravelTeamEmailData } from '../approvals';
+import { getTravelTeamEmailData, updateStatus, emailTopic } from '../approvals';
+import UserHelper from '../user';
+import { srcRequestWhereClause } from '../requests';
 
 const users = [
   {
@@ -83,5 +85,62 @@ describe('Travel Team Email', () => {
     const data = await getTravelTeamEmailData(requests[2], 'Moses Gitau');
 
     expect(data).toBe(null);
+  });
+});
+
+describe('User country Test', () => {
+  it('Should return user country when city is passed', async () => {
+    const data = await UserHelper.getUserCountry('Lagos');
+    expect(data).toEqual('Nigeria');
+  });
+
+  it('Should return user country when country is passed', async () => {
+    const data = await UserHelper.getUserCountry('Nigeria');
+    expect(data).toEqual('Nigeria');
+  });
+});
+
+describe('Update Status Test', () => {
+  it('Should return new status given the initial state', async () => {
+    const data = await updateStatus('rejected');
+    expect(data).toEqual('Rejected');
+  });
+
+  it('Should return Open state when match not found', async () => {
+    const data = await updateStatus('Approved');
+    expect(data).toEqual('Open');
+  });
+});
+
+
+describe('Email Topic Test', () => {
+  const rejectRequest = {
+    id: 1,
+    status: 'Approved',
+    budgetStatus: 'Rejected'
+  };
+  const openRequest = {
+    id: 2,
+    status: 'Approved',
+    budgetStatus: 'Open'
+  };
+
+  it('Should rejected email topic', async () => {
+    const mailTopic = await emailTopic(rejectRequest);
+    expect(mailTopic).toEqual('Travela Budget Rejected Request');
+  });
+
+  it('Should open email topic', async () => {
+    const mailTopic = await emailTopic(openRequest);
+    expect(mailTopic).toEqual(`Travela ${openRequest.status} Request`);
+  });
+});
+
+
+describe('Request Where Clause Test', () => {
+  it('Should return where clause status', async () => {
+    const expected = { status: ['Approved', 'Verified'] };
+    const received = await srcRequestWhereClause();
+    expect(received).toEqual(expected);
   });
 });

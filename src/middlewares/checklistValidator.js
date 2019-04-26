@@ -2,6 +2,7 @@ import _ from 'lodash';
 
 import models from '../database/models';
 import CustomError from '../helpers/Error';
+import TravelChecklistHelper from '../helpers/travelChecklist';
 
 class ChecklistValidator {
   static validateSubmission(req, res, next) {
@@ -77,10 +78,17 @@ class ChecklistValidator {
   }
 
   static async getChecklistItem(checklistItemId, tripDestination, res) {
+    const andelaCenters = await TravelChecklistHelper.getAndelaCentersByCountry();
+    const destinationCountry = await tripDestination.split(',')[1].trim();
+    let destinationChecklist = await andelaCenters[destinationCountry];
+    if (destinationChecklist && destinationChecklist.includes('Austin, United States')) {
+      destinationChecklist = 'New York, United States';
+    }
+
     try {
       const checklistItem = await models.ChecklistItem.findOne({
         where: {
-          id: checklistItemId, destinationName: [tripDestination, 'Default']
+          id: checklistItemId, destinationName: [destinationChecklist, 'Default']
         }
       });
       return checklistItem;

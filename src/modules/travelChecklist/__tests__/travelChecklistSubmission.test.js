@@ -7,7 +7,7 @@ import {
 	checklistSubmission, checklist, requestMock,
 	tripsMock, bedData, roomData, guestHouse, userData
 } from './mocks/mockData';
-import { documentsData, commentMock} from './__mocks__/mockData';
+import { documentsData, centers } from './__mocks__/mockData';
 import TravelChecklistController from "../TravelChecklistController";
 
 class Error {
@@ -51,6 +51,7 @@ describe('Travel Checklist Submission', () => {
 			await models.Request.destroy({ force: true, truncate: { cascade: true } });
 			await models.Trip.sync({ force: true });
 			await models.User.sync({ force: true, truncate: { cascade: true } });
+			await models.Center.destroy({ force: true, truncate: { cascade: true } });
 
 			await models.User.create(userData)
 			await models.GuestHouse.create(guestHouse)
@@ -59,7 +60,7 @@ describe('Travel Checklist Submission', () => {
 			await models.Bed.bulkCreate(bedData)
 			await models.Trip.bulkCreate(tripsMock)
             await models.ChecklistItem.create(checklist)
-            await models.Comment.create(commentMock);
+			await models.Center.bulkCreate(centers);
             await models.TravelReadinessDocuments.bulkCreate(documentsData);
 			await models.ChecklistSubmission.create(checklistSubmission)
 		})
@@ -75,6 +76,8 @@ describe('Travel Checklist Submission', () => {
 			await models.Request.destroy({ force: true, truncate: { cascade: true } });
 			await models.Trip.sync({ force: true });
 			await models.User.destroy({ force: true, truncate: { cascade: true } });
+			await models.Center.destroy({ force: true, truncate: { cascade: true } });
+
 		})
 
 		it('should return 400 error if no tripId or file',
@@ -271,6 +274,7 @@ describe('Travel Checklist Submission', () => {
 			await models.Trip.sync({ force: true });
 			await models.User.destroy({ force: true, truncate: { cascade: true } });
 
+
 			await models.User.create(userData)
 			await models.GuestHouse.create(guestHouse)
 			await models.Request.bulkCreate(requestMock);
@@ -278,9 +282,9 @@ describe('Travel Checklist Submission', () => {
 			await models.Bed.bulkCreate(bedData)
 			await models.Trip.bulkCreate(tripsMock)
             await models.ChecklistItem.create(checklist);
-            await models.Comment.create(commentMock);
             await models.TravelReadinessDocuments.bulkCreate(documentsData);
-			await models.ChecklistSubmission.create(checklistSubmission)
+			await models.ChecklistSubmission.create(checklistSubmission);
+
 		})
 
 		afterEach(async () => {
@@ -298,6 +302,7 @@ describe('Travel Checklist Submission', () => {
 			await models.Request.destroy({ force: true, truncate: { cascade: true } });
 			await models.Trip.sync({ force: true });
 			await models.User.destroy({ force: true, truncate: { cascade: true } });
+
 		})
 
 		it('should get checklist item submission', async (done) => {

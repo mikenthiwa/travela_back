@@ -56,5 +56,17 @@ class UserHelper {
     };
     return countries[country] ? countries[country] : country;
   }
+
+  static getUserCountry(city) {
+    const countries = {
+      Lagos: 'Nigeria',
+      Nairobi: 'Kenya',
+      Kampala: 'Uganda',
+      Kigali: 'Rwanda',
+      'New York': 'United States'
+    };
+    return countries[city] ? countries[city] : city;
+  }
 }
+
 export default UserHelper;

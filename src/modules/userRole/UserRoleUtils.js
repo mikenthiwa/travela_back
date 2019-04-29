@@ -1,5 +1,6 @@
 import paginationHelper from '../../helpers/Pagination';
 import models from '../../database/models';
+import UserRoleController from './UserRoleController';
 
 class UserRoleUtils {
   static getPaginatedRoles(req, count, roles) {
@@ -77,6 +78,25 @@ class UserRoleUtils {
       attributes: ['email', 'fullName', 'userId', 'id']
     });
     return user;
+  }
+
+  static async searchReceived(req, roles, search, res) {
+    const { allPage } = req.query;
+    const count = roles.users.length;
+    const userRoles = UserRoleUtils.getAllOrPaginatedRoles({
+      req,
+      roles,
+      count,
+      allPage
+    });
+    const meta = { count, ...userRoles.meta, search };
+    const message = [200, 'data', true];
+
+    UserRoleController.response(res, message, {
+      ...userRoles.roleData,
+      users: userRoles.users,
+      meta
+    });
   }
 }
 

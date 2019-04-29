@@ -308,33 +308,11 @@ class UserRoleController {
 
     try {
       const roles = await UserRoleController.calculateUserRole(roleId, search);
-
       if (!roles) {
-        if (search) {
-          const message = [404, 'User does not exist for this role', false];
-          return UserRoleController.response(res, message);
-        }
         const message = [404, 'Role does not exist', false];
         return UserRoleController.response(res, message);
       }
-
-      const { allPage } = req.query;
-      const count = roles.users.length;
-      const userRoles = UserRoleUtils.getAllOrPaginatedRoles({
-        req,
-        roles,
-        count,
-        allPage
-      });
-
-      const meta = { count, ...userRoles.meta };
-      const message = [200, 'data', true];
-
-      UserRoleController.response(res, message, {
-        ...userRoles.roleData,
-        users: userRoles.users,
-        meta
-      });
+      UserRoleUtils.searchReceived(req, roles, search, res);
     } catch (error) {
       /* istanbul ignore next */
       CustomError.handleError(error, 500, res);
@@ -343,18 +321,19 @@ class UserRoleController {
 
   static async calculateUserRole(roleId, search = '') {
     const result = await models.Role.findById(roleId, {
-      order: [[{ model: models.User, as: 'users' }, models.UserRole, 'createdAt', 'DESC']],
+      order: [[{ model: models.User, as: 'users' }, 'fullName', 'ASC']],
       include: [
         {
           model: models.User,
           as: 'users',
           attributes: ['email', 'fullName', 'userId', 'id', 'location'],
+          through: { attributes: [] },
+          required: false,
           where: {
             fullName: {
               [Op.iLike]: `%${search}%`
             }
           },
-          through: { attributes: [] },
           include: [
             {
               model: models.Center,

@@ -786,9 +786,10 @@ describe('User Role Test', () => {
         .get('/api/v1/user/roles/10948?search=keng')
         .set('Content-Type', 'application/json')
         .set('authorization', token)
-        .expect(404)
+        .expect(200)
         .end((err, res) => {
-          expect(res.body.success).toEqual(false);
+          expect(res.body.success).toEqual(true);
+          expect(res.body.result.meta.search).toEqual('keng');
           if (err) return done(err);
           done();
         });

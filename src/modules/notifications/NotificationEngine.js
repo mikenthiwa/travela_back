@@ -143,7 +143,7 @@ export default class NotificationEngine {
   }
 
   static async notifyMany({
-    users = [], senderId, name, picture, id, message
+    users = [], senderId, name, picture, id, message, link = `/requests/${id}`
   }) {
     users.forEach((user) => {
       const { userId } = user.dataValues;
@@ -156,7 +156,7 @@ export default class NotificationEngine {
         requestId: id,
         notificationStatus: 'unread',
         message,
-        notificationLink: `/requests/${id}`
+        notificationLink: link
       };
       NotificationEngine.notify(data);
     });

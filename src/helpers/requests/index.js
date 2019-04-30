@@ -1,6 +1,7 @@
 import models from '../../database/models';
 import Error from '../Error';
 import Pagination from '../Pagination';
+import Centers from '../centers';
 
 
 const { Op } = models.Sequelize;
@@ -178,3 +179,59 @@ export const readinessRequestClause = (travelFlow, dateFrom, dateTo, location) =
 };
 
 export const srcRequestWhereClause = () => ({ status: ['Approved', 'Verified'] });
+
+export const getUserbyCenter = async (userCenterIds, roleIds) => {
+  const tripadmins = await userCenterIds.map(async (center) => {
+    const tripOriginAdmins = await models.UserRole.findAll({
+      where: {
+        roleId: {
+          [Op.in]: roleIds
+        },
+        centerId: center[0]
+      },
+      include: [{ model: models.User, as: 'user' }],
+    });
+    const tripDestinationAdmins = await models.UserRole.findAll({
+      where: {
+        roleId: {
+          [Op.in]: roleIds
+        },
+        centerId: center[1]
+      },
+      include: [{ model: models.User, as: 'user' }]
+    });
+    const originAdmins = tripOriginAdmins.map(user => user.dataValues.user);
+    const destinationAdmins = tripDestinationAdmins.map(user => user.dataValues.user);
+
+    return [originAdmins, destinationAdmins];
+  });
+  const availableAdmins = await Promise.all(tripadmins);
+  return availableAdmins;
+};
+
+export const getTravelTeams = async (trips) => {
+  const tripCenters = await Centers.getTripCenters(trips);
+  if (tripCenters) {
+    const originTravelAdmins = (await getUserbyCenter(tripCenters, ['29187', '339458'])) || [];
+    return originTravelAdmins;
+  }
+
+  return null;
+};
+
+
+export const switchInAppMessage = (messageType, id, name, tripLocation, tripType) => {
+  switch (messageType) {
+    case 'Request created from origin Travel Admin':
+      return `This is to inform you that ${name} has just submitted 
+      a ${tripType} travel request ${id} You will be notified once the request
+      has been approved by the budget holder of his/her department`;
+   
+    case 'Request created to visit destination Travel Admin':
+      return `This is to inform you that ${name} has just submitted
+      a ${tripType} travel request  ${id} to visit your centre ${tripLocation}.
+      You will be notified when the origin travel team verifies this request`;
+    default:
+      return '';
+  }
+};

@@ -13,7 +13,7 @@ export const dates = {
 
 const mockCenter = {
   id: 1,
-  location: 'National City, Wakanda',
+  location: 'Wakanda',
 };
 
 const mockUser = {
@@ -24,7 +24,7 @@ const mockUser = {
   email: 'test.user1@gmail.com',
   userId: 'test-user-1',
   picture: 'picture.png',
-  location: mockCenter.location,
+  location: 'National City, Wakanda',
   manager: 'Manager',
   gender: 'Male',
   roleId: 401938,
@@ -33,8 +33,8 @@ const mockUser = {
 
 const mockTrip = {
   id: 1,
-  origin: mockCenter.location,
-  destination: mockCenter.location,
+  origin: 'National City, Wakanda',
+  destination: 'National City, Wakanda',
   departureDate: '2018-05-20',
   returnDate: '2018-05-25',
   bedId: 1,
@@ -55,7 +55,7 @@ const mockRequest = {
 const mockGuestHouse = {
   id: 1,
   houseName: 'Stan Lee\'s Suites',
-  location: mockCenter.location,
+  location: 'National City, Wakanda',
   bathRooms: '2',
   imageUrl: 'https://url-to-picture.png',
   userId: mockUser.userId,

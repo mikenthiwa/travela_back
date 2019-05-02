@@ -5,6 +5,8 @@ import { urlCheck } from '../helpers/reg';
 import models from '../database/models';
 import Error from '../helpers/Error';
 import RoleValidator from './RoleValidator';
+import UserRoleController from '../modules/userRole/UserRoleController';
+import TravelAdminApprovalController from '../modules/approvals/TravelAdminApprovalController';
 
 export default class Validator {
   static validateRequest(req, res, next) {
@@ -215,7 +217,6 @@ export default class Validator {
         'Travel Team Member'
       ])(req, res, next);
     }
-
     next();
   }
 
@@ -239,14 +240,15 @@ export default class Validator {
   static async validateTeamMemberLocation(req, res, next) {
     try {
       const { requestId } = req.params;
-      let { location } = req.user;
-      location = location.toLowerCase();
+      const user = await UserRoleController.findUserDetails(req);
+      const adminCountries = TravelAdminApprovalController.getAdminCenter(user);
       const trip = await models.Trip.findOne({
         where: { requestId },
         order: [['departureDate', 'ASC']]
       });
-      if (trip && (trip.origin !== location && !trip.origin.toLowerCase().startsWith(location))) {
-        const error = "You don't have access to perform this action";
+      const country = trip.origin.split(',')[1].trim();
+      if (!adminCountries.includes(country)) {
+        const error = 'You can only verify a request that has the same origin as one of the locations in your location';
         return Error.handleError(error, 403, res);
       }
       return next();

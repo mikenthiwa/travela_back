@@ -15,7 +15,7 @@ import TravelReasonsValidator from './travelReasonsValidator';
 import TravelStipendValidator from './travelStipendValidator';
 import DepartmentValidation from './DepartmentValidation';
 import BambooWebhookValidator from './BambooWebhookValidator';
-
+import TravelRegionsValidator from './travelRegionsValidator';
 
 const middleware = {
   authenticate,
@@ -34,7 +34,8 @@ const middleware = {
   TravelReasonsValidator,
   TravelStipendValidator,
   DepartmentValidation,
-  BambooWebhookValidator
+  BambooWebhookValidator,
+  TravelRegionsValidator
 };
 
 export default middleware;

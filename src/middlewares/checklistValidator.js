@@ -80,7 +80,7 @@ class ChecklistValidator {
     try {
       const checklistItem = await models.ChecklistItem.findOne({
         where: {
-          id: checklistItemId, destinationName: [tripDestination, 'Default']
+          id: checklistItemId, destinationName: [tripDestination.split(', ')[1], 'Default']
         }
       });
       return checklistItem;

@@ -210,7 +210,7 @@ describe('Travel Checklists Controller', () => {
           if (err) done(err);
           expect(res.status).toEqual(expectedResponse.status);
           expect(res.body.travelChecklists[3])
-            .toMatchObject(expectedResponse.body.travelChecklists[3]);
+            .toMatchObject(expectedResponse.body.travelChecklists[0]);
           done();
         });
     });
@@ -268,7 +268,7 @@ describe('Travel Checklists Controller', () => {
         };
 
         request(app)
-          .get('/api/v1/checklists?destinationName=Nairobi, Kenya')
+          .get('/api/v1/checklists?destinationName=Kenya')
           .set('authorization', testToken)
           .end((err, res) => {
             if (err) done(err);
@@ -311,11 +311,11 @@ describe('Travel Checklists Controller', () => {
 
     it('should return andela centers', async () => {
       const expectedResponse = {
-        Lagos: 'Lagos, Nigeria',
-        Nairobi: 'Nairobi, Kenya',
-        Kigali: 'Kigali, Rwanda',
-        'New York': 'New York, United States',
-        Kampala: 'Kampala, Uganda'
+        Nigeria: 'Nigeria',
+        Kenya: 'Kenya',
+        Rwanda: 'Rwanda',
+        'United States': 'United States',
+        Uganda: 'Uganda'
       };
 
       const andelaCenters = await TravelChecklistHelper.getAndelaCenters();
@@ -330,11 +330,7 @@ describe('Travel Checklists Controller', () => {
         force: true,
         truncate: { cascade: true }
       });
-      await models.ChecklistItem.destroy({
-        where: { id: ['3', '4'] },
-        force: true,
-        truncate: { cascade: true }
-      });
+      await models.ChecklistItem.sync({ force: true });
       await models.ChecklistItem.create(defaultItem);
     });
 
@@ -356,8 +352,8 @@ describe('Travel Checklists Controller', () => {
           if (err) done(err);
           expect(res.status).toEqual(expectedResponse.status);
           expect(res.body.travelChecklists.length).toEqual(3);
-          expect(res.body.travelChecklists[0].destinationName).toEqual('Kigali, Rwanda');
-          expect(res.body.travelChecklists[0].checklist.length).toEqual(3);
+          expect(res.body.travelChecklists[0].destinationName).toEqual('Rwanda');
+          expect(res.body.travelChecklists[0].checklist.length).toEqual(1);
           expect(res.body.travelChecklists[0].tripId).toEqual('trip-10');
           done();
         });

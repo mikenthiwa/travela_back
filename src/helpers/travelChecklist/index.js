@@ -30,9 +30,9 @@ class TravelChecklistHelper {
     const checklistWithTripId = checklists.map((checklist) => {
       const { destinationName } = checklist;
       const destinationTrip = uniqueTrips
-        .find(trip => trip.destination === destinationName);
+        .find(trip => trip.destination.split(', ')[1] === destinationName);
 
-      return { ...checklist, tripId: destinationTrip.id };
+      return { ...checklist, tripId: destinationTrip.id, tripLocation: destinationTrip.destination };
     });
 
     return checklistWithTripId;
@@ -111,7 +111,7 @@ class TravelChecklistHelper {
         trips.forEach((trip) => {
           const { id, destination } = trip;
           tripsDestinationsWithId.push({ id, destination });
-          tripsDestination.push(destination);
+          tripsDestination.push(destination.split(', ')[1]);
         });
         where = { destinationName: [...tripsDestination, 'Default'] };
       } else if (destinationName) {

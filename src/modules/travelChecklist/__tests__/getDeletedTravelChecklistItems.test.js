@@ -22,7 +22,7 @@ describe('Notifications Controller', () => {
       id: '--MUyHJmKrxA90lPNQ1FOLNm',
       email: 'captan.ameria@andela.com',
       name: 'Samuel Kubai',
-      location: 'Lagos'
+      location: 'Nigeria'
     },
   };
 
@@ -31,7 +31,7 @@ describe('Notifications Controller', () => {
     fullName: 'Samuel Kubai',
     email: 'captan.ameria@andela.com',
     userId: '--MUyHJmKrxA90lPNQ1FOLNm',
-    location: 'Lagos',
+    location: 'Nigeria',
     createdAt: '2018-08-16 012:11:52.181+01',
     updatedAt: '2018-08-16 012:11:52.181+01'
   },
@@ -175,7 +175,7 @@ describe('Notifications Controller', () => {
         }
       };
       request(app)
-        .get('/api/v1/checklists/deleted?destinationName=Lagos')
+        .get('/api/v1/checklists/deleted?destinationName=Nigeria')
         .set('authorization', token)
         .end((err, res) => {
           if (err) done(err);
@@ -189,7 +189,7 @@ describe('Notifications Controller', () => {
       };
       await models.ChecklistItem.destroy({ force: true, truncate: { cascade: true } });
       request(app)
-        .get('/api/v1/checklists/deleted?destinationName=Lagos')
+        .get('/api/v1/checklists/deleted?destinationName=Nigeria')
         .set('authorization', token)
         .end((res) => {
           expect(res.status).toEqual(expectedResponse.status);

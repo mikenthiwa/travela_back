@@ -40,7 +40,7 @@ const userMock = [
     fullName: 'Samuel Kubai',
     email: 'captan.ameria@andela.com',
     userId: '--MUyHJmKrxA90lPNQ1FOLNm',
-    location: 'Lagos',
+    location: 'Nigeria',
     createdAt: '2018-08-16 012:11:52.181+01',
     updatedAt: '2018-08-16 012:11:52.181+01'
   },
@@ -179,7 +179,7 @@ describe('Travel ChecklistController', () => {
         message: 'Checklist item successfully restored',
         updatedChecklistItem: {
           name: 'Green card',
-          destinationName: 'Lagos, Nigeria',
+          destinationName: 'Nigeria',
           requiresFiles: true,
           resources: [{
             id: 'QWz-cHjSJ',
@@ -198,7 +198,7 @@ describe('Travel ChecklistController', () => {
         name: 'Green card',
         requiresFiles: true,
         deleteReason: 'kgkgkgm',
-        destinationName: 'Lagos, Nigeria',
+        destinationName: 'Nigeria',
         deletedAt: '2018-11-01T13:34:20.109Z',
         resources: [{
           label: 'National Identity',

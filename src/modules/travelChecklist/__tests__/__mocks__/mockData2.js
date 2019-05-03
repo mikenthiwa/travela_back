@@ -64,7 +64,7 @@ export const checkListItems = [
     name: 'travel stipend',
     requiresFiles: false,
     deleteReason: null,
-    destinationName: 'Lagos, Nigeria',
+    destinationName: 'Nigeria',
     createdAt: new Date(),
     updatedAt: new Date(),
     deletedAt: null
@@ -74,7 +74,7 @@ export const checkListItems = [
     name: 'visa application',
     requiresFiles: true,
     deleteReason: null,
-    destinationName: 'Lagos, Nigeria',
+    destinationName: 'Nigeria',
     createdAt: new Date(),
     updatedAt: new Date(),
     deletedAt: null
@@ -94,7 +94,7 @@ export const checkListItems = [
     name: 'Green card',
     requiresFiles: true,
     deleteReason: 'not needed',
-    destinationName: 'Lagos, Nigeria',
+    destinationName: 'Nigeria',
     createdAt: new Date(),
     updatedAt: new Date(),
     deletedAt: '2018-11-01T13:34:20.109Z',

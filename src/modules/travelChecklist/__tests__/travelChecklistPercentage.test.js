@@ -158,7 +158,7 @@ describe('Checklist Percentage', () => {
             done();
           });
       });
-    it('should get travechecklist percentage as 50 for approved and 100 for verified request',
+    it('should get travechecklist percentage as 25 for approved and 100 for verified request',
       async (done) => {
         const requestId = requests[0].id;
         try {
@@ -177,7 +177,7 @@ describe('Checklist Percentage', () => {
           .end((err, res) => {
             expect(res.body.requests.length).toEqual(2);
             expect(res.body.requests[0]).toHaveProperty('travelCompletion');
-            expect(res.body.requests[0].travelCompletion).toEqual('50% complete');
+            expect(res.body.requests[0].travelCompletion).toEqual('25% complete');
             expect(res.body.requests[1].travelCompletion).toEqual('100% complete');
             done();
           });

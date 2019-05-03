@@ -7,7 +7,7 @@ import {
 	checklistSubmission, checklist, requestMock,
 	tripsMock, bedData, roomData, guestHouse, userData
 } from './mocks/mockData';
-import { documentsData, commentMock} from './__mocks__/mockData';
+import { documentsData } from './__mocks__/mockData';
 import TravelChecklistController from "../TravelChecklistController";
 
 class Error {
@@ -59,7 +59,6 @@ describe('Travel Checklist Submission', () => {
 			await models.Bed.bulkCreate(bedData)
 			await models.Trip.bulkCreate(tripsMock)
             await models.ChecklistItem.create(checklist)
-            await models.Comment.create(commentMock);
             await models.TravelReadinessDocuments.bulkCreate(documentsData);
 			await models.ChecklistSubmission.create(checklistSubmission)
 		})
@@ -278,7 +277,6 @@ describe('Travel Checklist Submission', () => {
 			await models.Bed.bulkCreate(bedData)
 			await models.Trip.bulkCreate(tripsMock)
             await models.ChecklistItem.create(checklist);
-            await models.Comment.create(commentMock);
             await models.TravelReadinessDocuments.bulkCreate(documentsData);
 			await models.ChecklistSubmission.create(checklistSubmission)
 		})
@@ -314,7 +312,7 @@ describe('Travel Checklist Submission', () => {
 
 		it('should return null for non existent submission', async (done) => {
 			request
-				.get('/api/v1/checklists/35678/submissions')
+				.get('/api/v1/checklists/46664/submissions')
 				.set('Authorization', token)
 				.end((err, res) => {
 					if (err) done(err);

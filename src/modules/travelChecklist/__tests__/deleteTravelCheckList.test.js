@@ -33,7 +33,7 @@ const payload = {
     id: '--MUyHJmKrxA90lPNQ1FOLNm',
     email: 'captan.ameria@andela.com',
     name: 'Samuel Kubai',
-    location: 'Lagos'
+    location: 'Nigeria'
   },
 };
 
@@ -51,7 +51,7 @@ const userMock = [
     fullName: 'Samuel Kubai',
     email: 'captan.ameria@andela.com',
     userId: '--MUyHJmKrxA90lPNQ1FOLNm',
-    location: 'Lagos',
+    location: 'Nigeria',
     createdAt: '2018-08-16 012:11:52.181+01',
     updatedAt: '2018-08-16 012:11:52.181+01'
   },

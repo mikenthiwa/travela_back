@@ -10,6 +10,7 @@ const request = supertest;
 const clearDatabase = async () => {
   await models.UserRole.destroy({ force: true, truncate: { cascade: true } });
   await models.Role.destroy({ force: true, truncate: { cascade: true } });
+  await models.Comment.destroy({ force: true, truncate: { cascade: true } });
   await models.TravelReadinessDocuments.destroy({ force: true, truncate: { cascade: true } });
   await models.User.destroy({ force: true, truncate: { cascade: true } });
 };

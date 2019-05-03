@@ -4,7 +4,7 @@ export const checkListItems = [
     name: 'visa application',
     requiresFiles: true,
     deleteReason: null,
-    destinationName: 'Kigali, Rwanda',
+    destinationName: 'Rwanda',
     createdAt: new Date(),
     updatedAt: new Date(),
     deletedAt: null
@@ -14,7 +14,7 @@ export const checkListItems = [
     name: 'travel stipend',
     requiresFiles: false,
     deleteReason: null,
-    destinationName: 'Kigali, Rwanda',
+    destinationName: 'Rwanda',
     createdAt: new Date(),
     updatedAt: new Date(),
     deletedAt: null
@@ -24,7 +24,7 @@ export const checkListItems = [
     name: 'Travel Ticket Details',
     requiresFiles: false,
     deleteReason: null,
-    destinationName: 'New York, United States',
+    destinationName: 'United States',
     createdAt: new Date(),
     updatedAt: new Date(),
     deletedAt: null
@@ -34,7 +34,7 @@ export const checkListItems = [
     name: 'visa application',
     requiresFiles: true,
     deleteReason: null,
-    destinationName: 'New York, United States',
+    destinationName: 'United States',
     createdAt: new Date(),
     updatedAt: new Date(),
     deletedAt: null
@@ -44,7 +44,7 @@ export const checkListItems = [
     name: 'Travel stipend',
     requiresFiles: false,
     deleteReason: null,
-    destinationName: 'Nairobi, Kenya',
+    destinationName: 'Kenya',
     createdAt: new Date(),
     updatedAt: new Date(),
     deletedAt: null
@@ -54,7 +54,7 @@ export const checkListItems = [
     name: 'visa application',
     requiresFiles: true,
     deleteReason: null,
-    destinationName: 'Nairobi, Kenya',
+    destinationName: 'Kenya',
     createdAt: new Date(),
     updatedAt: new Date(),
     deletedAt: null
@@ -64,7 +64,7 @@ export const checkListItems = [
     name: 'travel stipend',
     requiresFiles: false,
     deleteReason: null,
-    destinationName: 'Lagos, Nigeria',
+    destinationName: 'Nigeria',
     createdAt: new Date(),
     updatedAt: new Date(),
     deletedAt: null
@@ -74,7 +74,7 @@ export const checkListItems = [
     name: 'visa application',
     requiresFiles: true,
     deleteReason: null,
-    destinationName: 'Lagos, Nigeria',
+    destinationName: 'Nigeria',
     createdAt: new Date(),
     updatedAt: new Date(),
     deletedAt: null
@@ -84,6 +84,16 @@ export const checkListItems = [
     name: 'yellow card',
     requiresFiles: false,
     deleteReason: null,
+    destinationName: 'Nigeria',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    deletedAt: null
+  },
+  {
+    id: '10',
+    name: 'green card',
+    requiresFiles: false,
+    deleteReason: null,
     destinationName: 'Lagos, Nigeria',
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -91,24 +101,9 @@ export const checkListItems = [
   }
 ];
 
-export const centers = [
-  {
-    location: 'Nairobi, Kenya'
-  },
-  {
-    location: 'Lagos, Nigeria'
-  },
-  {
-    location: 'Kigali, Rwanda'
-  },
-  {
-    location: 'New York, United States'
-  },
-  {
-    location: 'Kampala, Uganda'
-  }
-
-];
+export const centers = ['Kenya', 'Nigeria', 'Rwanda', 'United States', 'Uganda'].map(location => ({
+  location
+}));
 
 const date = new Date();
 const dateToday = new Date(date.setDate(date.getDate()))
@@ -137,7 +132,7 @@ export const tripsData = [
     id: 2,
     requestId: 'request-id-7',
     origin: 'New York',
-    destination: 'Nairobi',
+    destination: 'Kenya',
     bedId: 1,
     departureDate: dates.dateToday,
     returnDate: dates.returnDate,
@@ -146,7 +141,7 @@ export const tripsData = [
     id: 3,
     requestId: 'request-id-8',
     origin: 'New York',
-    destination: 'Nairobi',
+    destination: 'Kenya',
     bedId: 1,
     departureDate: '2018-09-27',
     returnDate: dates.returnDate,
@@ -442,13 +437,13 @@ export const approvedRequests = {
 };
 
 export const lagosCheckListResponse = {
-  destinationName: 'Lagos, Nigeria',
+  destinationName: 'Nigeria',
   checklist: [
     {
       id: '8',
       name: 'visa application',
       requiresFiles: true,
-      destinationName: 'Lagos, Nigeria',
+      destinationName: 'Nigeria',
       deleteReason: null,
       resources: [
         {
@@ -463,7 +458,7 @@ export const lagosCheckListResponse = {
       id: '9',
       name: 'yellow card',
       requiresFiles: false,
-      destinationName: 'Lagos, Nigeria',
+      destinationName: ' Nigeria',
       deleteReason: null,
       resources: []
     },
@@ -471,7 +466,7 @@ export const lagosCheckListResponse = {
       id: '7',
       name: 'travel stipend',
       requiresFiles: false,
-      destinationName: 'Lagos, Nigeria',
+      destinationName: 'Nigeria',
       deleteReason: null,
       resources: []
     }
@@ -479,13 +474,13 @@ export const lagosCheckListResponse = {
 };
 
 export const nairobiCheckListResponse = {
-  destinationName: 'Nairobi, Kenya',
+  destinationName: 'Kenya',
   checklist: [
     {
       id: '5',
       name: 'Travel stipend',
       requiresFiles: false,
-      destinationName: 'Nairobi, Kenya',
+      destinationName: 'Kenya',
       deleteReason: null,
       resources: []
     },
@@ -493,7 +488,7 @@ export const nairobiCheckListResponse = {
       id: '6',
       name: 'visa application',
       requiresFiles: true,
-      destinationName: 'Nairobi, Kenya',
+      destinationName: 'Kenya',
       deleteReason: null,
       resources: [
         {
@@ -507,13 +502,13 @@ export const nairobiCheckListResponse = {
   ]
 };
 export const nairobiCheckListResponse2 = {
-  destinationName: 'Nairobi, Kenya',
+  destinationName: 'Kenya',
   checklist: [
     {
       id: '5',
       name: 'Travel stipend',
       requiresFiles: false,
-      destinationName: 'Nairobi, Kenya',
+      destinationName: 'Kenya',
       deleteReason: null,
       resources: []
     },
@@ -521,7 +516,7 @@ export const nairobiCheckListResponse2 = {
       id: '6',
       name: 'visa application',
       requiresFiles: true,
-      destinationName: 'Nairobi, Kenya',
+      destinationName: 'Kenya',
       deleteReason: null,
       resources: [
         {
@@ -536,13 +531,13 @@ export const nairobiCheckListResponse2 = {
 };
 
 export const kigaliCheckListResponse = {
-  destinationName: 'Kigali, Rwanda',
+  destinationName: 'Rwanda',
   checklist: [
     {
       id: '1',
       name: 'visa application',
       requiresFiles: true,
-      destinationName: 'Kigali, Rwanda',
+      destinationName: 'Rwanda',
       deleteReason: null,
       resources: [
         {
@@ -557,7 +552,7 @@ export const kigaliCheckListResponse = {
       id: '2',
       name: 'travel stipend',
       requiresFiles: false,
-      destinationName: 'Kigali, Rwanda',
+      destinationName: 'Rwanda',
       deleteReason: null,
       resources: []
     }
@@ -565,13 +560,13 @@ export const kigaliCheckListResponse = {
 };
 
 export const newyorkCheckListResponse = {
-  destinationName: 'New York, United States',
+  destinationName: 'United States',
   checklist: [
     {
       id: '3',
       name: 'Travel Ticket Details',
       requiresFiles: false,
-      destinationName: 'New York, United States',
+      destinationName: 'United States',
       deleteReason: null,
       resources: []
     },
@@ -579,7 +574,7 @@ export const newyorkCheckListResponse = {
       id: '4',
       name: 'visa application',
       requiresFiles: true,
-      destinationName: 'New York, United States',
+      destinationName: 'United States',
       deleteReason: null,
       resources: [
         {
@@ -593,13 +588,13 @@ export const newyorkCheckListResponse = {
   ]
 };
 export const newyorkCheckListResponse2 = {
-  destinationName: 'New York, United States',
+  destinationName: 'United States',
   checklist: [
     {
       id: '4',
       name: 'visa application',
       requiresFiles: true,
-      destinationName: 'New York, United States',
+      destinationName: 'United States',
       deleteReason: null,
       resources: [
         {
@@ -614,7 +609,7 @@ export const newyorkCheckListResponse2 = {
       id: '3',
       name: 'Travel Ticket Details',
       requiresFiles: false,
-      destinationName: 'New York, United States',
+      destinationName: 'United States',
       deleteReason: null,
       resources: []
     },
@@ -707,13 +702,13 @@ export const expectedResponse = {
   message: 'travel checklist retrieved successfully',
   travelChecklists: [
     {
-      destinationName: 'Kigali, Rwanda',
+      destinationName: 'Rwanda',
       checkList: [
         {
           id: 1,
           name: 'visa application',
           requiresFiles: true,
-          destinationName: 'Kigali, Rwanda',
+          destinationName: 'Rwanda',
           deleteReason: null,
           resources: [
             {
@@ -736,7 +731,7 @@ export const expectedResponse = {
           id: 2,
           name: 'travel stipend',
           requiresFiles: false,
-          destinationName: 'Kigali, Rwanda',
+          destinationName: 'Rwanda',
           deleteReason: null,
           resources: [],
           submissions: []
@@ -744,13 +739,13 @@ export const expectedResponse = {
       ]
     },
     {
-      destinationName: 'New York, United States',
+      destinationName: 'United States',
       checkList: [
         {
           id: 4,
           name: 'visa application',
           requiresFiles: true,
-          destinationName: 'New York, United States',
+          destinationName: 'United States',
           deleteReason: null,
           resources: [
             {
@@ -773,7 +768,7 @@ export const expectedResponse = {
           id: 3,
           name: 'Travel Ticket Details',
           requiresFiles: false,
-          destinationName: 'New York, United States',
+          destinationName: 'United States',
           deleteReason: null,
           resources: [],
           submissions: []
@@ -781,13 +776,13 @@ export const expectedResponse = {
       ]
     },
     {
-      destinationName: 'Lagos, Nigeria',
+      destinationName: 'Nigeria',
       checkList: [
         {
           id: 8,
           name: 'visa application',
           requiresFiles: true,
-          destinationName: 'Lagos, Nigeria',
+          destinationName: 'Nigeria',
           deleteReason: null,
           resources: [
             {
@@ -810,7 +805,7 @@ export const expectedResponse = {
           id: 9,
           name: 'yellow card',
           requiresFiles: false,
-          destinationName: 'Lagos, Nigeria',
+          destinationName: 'Nigeria',
           deleteReason: null,
           resources: [],
           submissions: []
@@ -819,7 +814,7 @@ export const expectedResponse = {
           id: 7,
           name: 'travel stipend',
           requiresFiles: false,
-          destinationName: 'Lagos, Nigeria',
+          destinationName: 'Nigeria',
           deleteReason: null,
           resources: [],
           submissions: []
@@ -827,13 +822,13 @@ export const expectedResponse = {
       ]
     },
     {
-      destinationName: 'Nairobi, Kenya',
+      destinationName: 'Kenya',
       checkList: [
         {
           id: 6,
           name: 'visa application',
           requiresFiles: true,
-          destinationName: 'Nairobi, Kenya',
+          destinationName: 'Kenya',
           deleteReason: null,
           resources: [
             {
@@ -849,7 +844,7 @@ export const expectedResponse = {
           id: 5,
           name: 'Travel stipend',
           requiresFiles: false,
-          destinationName: 'Nairobi, Kenya',
+          destinationName: 'Kenya',
           deleteReason: null,
           resources: [],
           submissions: []

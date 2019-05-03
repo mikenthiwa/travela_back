@@ -29,7 +29,7 @@ const userMock = [
     fullName: 'Samuel Kubai',
     email: 'captan.ameria@andela.com',
     userId: '--MUyHJmKrxA90lPNQ1FOLNm',
-    location: 'Lagos',
+    location: 'Nigeria',
     createdAt: '2018-08-16 012:11:52.181+01',
     updatedAt: '2018-08-16 012:11:52.181+01'
   },
@@ -167,7 +167,7 @@ describe('Travel ChecklistController', () => {
           checklistItem: {
             name: 'Visa application',
             requiresFiles: true,
-            destinationName: 'Lagos, Nigeria',
+            destinationName: 'Nigeria',
             resources: [{ label: 'Visa', link: 'http://myvisa.test' }]
           }
         },
@@ -178,7 +178,7 @@ describe('Travel ChecklistController', () => {
         .send({
           name: 'Visa application',
           requiresFiles: true,
-          destinationName: 'Nairobi, Kenya',
+          destinationName: 'Nigeria',
           resources: [{ label: 'Visa', link: 'http://myvisa.test' }]
         });
       expect(res.statusCode).toEqual(expectedResponse.status);
@@ -193,7 +193,7 @@ describe('Travel ChecklistController', () => {
           checklistItem: {
             name: 'Visa applications',
             requiresFiles: true,
-            destinationName: 'Lagos, Nigeria',
+            destinationName: 'Nigeria',
             resources: []
           }
         },
@@ -204,7 +204,7 @@ describe('Travel ChecklistController', () => {
         .send({
           name: 'Visa applications',
           requiresFiles: true,
-          destinationName: 'Nairobi, Kenya',
+          destinationName: 'Nigeria',
           resources: []
         });
       expect(res.statusCode).toEqual(expectedResponse.status);
@@ -229,7 +229,7 @@ describe('Travel ChecklistController', () => {
       const requestBody = {
         name: 'passport',
         requiresFiles: true,
-        destinationName: 'Nairobi, Kenya',
+        destinationName: 'Nigeria',
         resources: []
       };
 

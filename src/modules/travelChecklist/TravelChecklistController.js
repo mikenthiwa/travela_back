@@ -121,7 +121,7 @@ export default class TravelChecklistController {
       }
       const errorMsg = 'There are currently no deleted travel checklist items for your location'; // eslint-disable-line
       CustomError.handleError(errorMsg, 404, res);
-    } catch (error) {
+    } catch (error) { /* istanbul ignore next */
       CustomError.handleError(error, 500, res);
     }
   }

@@ -84,7 +84,7 @@ const travelAdminMock = {
     },
     {
       id: '200',
-      name: 'Tomato Jos',
+      name: 'girly',
       manager: 'Tomato Jos',
       tripType: 'return',
       gender: 'male',
@@ -112,8 +112,8 @@ const travelAdminMock = {
   trips: [
     {
       id: 10,
-      origin: 'Nairobi, Kenya',
-      destination: 'Lagos, Nigeria',
+      origin: 'Lagos, Nigeria',
+      destination: 'Nairobi, Kenya',
       departureDate: '2019-04-25',
       returnDate: '2019-05-25',
       createdAt: '2019-04-24',

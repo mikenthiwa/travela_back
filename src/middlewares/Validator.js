@@ -248,7 +248,7 @@ export default class Validator {
       });
       const country = trip.origin.split(',')[1].trim();
       if (!adminCountries.includes(country)) {
-        const error = 'You can only verify a request that has the same origin as one of the locations in your location';
+        const error = 'You can only verify a request that has the same origin as one of your assigned locations';
         return Error.handleError(error, 403, res);
       }
       return next();

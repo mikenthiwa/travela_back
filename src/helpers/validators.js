@@ -14,6 +14,9 @@ export const getRequestsValidators = [
   query('limit', 'Limit must be a positive integer')
     .isInt({ gt: 0 })
     .optional(),
+  query('flow').isIn(['origin', 'destination'])
+    .withMessage('flow must be "origin" or "destination"')
+    .optional(),
 ];
 
 export const editAndCreateRequestValidators = [

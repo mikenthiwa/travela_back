@@ -44,6 +44,7 @@ describe('TravelAdmin Controller', () => {
           expect(res.body.success).toEqual(true);
           expect(res.body.message)
             .toEqual('Approvals retrieved successfully');
+          expect(res.body.approvals.length).toBe(3);
           done();
         });
     });
@@ -56,8 +57,26 @@ describe('TravelAdmin Controller', () => {
         .expect(200)
         .end((err, res) => {
           expect(res.body.success).toEqual(true);
+          expect(res.body.approvals.length).toBe(2);
           expect(res.body.message)
             .toEqual('Approvals retrieved successfully');
+          done();
+        });
+    });
+
+  it('should return all the request for the travel admin when a center and flow query is passed',
+    (done) => {
+      request(app)
+        .get('/api/v1/approvals/travel-admin?center=Kenya&flow=destination')
+        .set('authorization', token)
+        .expect(200)
+        .end((err, res) => {
+          expect(res.body.success).toEqual(true);
+          expect(res.body.message)
+            .toEqual('Approvals retrieved successfully');
+          expect(res.body.approvals.length).toBe(1);
+          expect(res.body.approvals[0].trips[0].destination)
+            .toEqual('Nairobi, Kenya');
           done();
         });
     });
@@ -65,13 +84,15 @@ describe('TravelAdmin Controller', () => {
   it('should return all the request for the travel admin when a search query is passed',
     (done) => {
       request(app)
-        .get('/api/v1/approvals/travel-admin?search=tomato')
+        .get('/api/v1/approvals/travel-admin?search=girly')
         .set('authorization', token)
         .expect(200)
         .end((err, res) => {
           expect(res.body.success).toEqual(true);
           expect(res.body.message)
             .toEqual('Approvals retrieved successfully');
+          expect(res.body.approvals.length).toBe(1);
+          expect(res.body.approvals[0].name).toEqual('girly');
           done();
         });
     });
@@ -86,6 +107,7 @@ describe('TravelAdmin Controller', () => {
           expect(res.body.success).toEqual(true);
           expect(res.body.message)
             .toEqual('You have no approvals at the moment');
+          expect(res.body.approvals.length).toBe(0);
           done();
         });
     });
@@ -98,6 +120,7 @@ describe('TravelAdmin Controller', () => {
         .expect(200)
         .end((err, res) => {
           expect(res.body.success).toEqual(true);
+          expect(res.body.approvals.length).toBe(0);
           expect(res.body.message)
             .toEqual('You dont have any center Assigned to you');
           done();

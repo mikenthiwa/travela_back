@@ -10,7 +10,8 @@ const whereObject = {
   whereTrip: centers => ({ [Op.iRegexp]: { [Op.any]: centers } }),
   whereApproved: { status: 'Approved', budgetStatus: 'Approved' },
   whereVerified: { status: 'Verified' },
-  whereSearch: searchString => ({
+  whereSearch: (searchString, whereStatus) => ({
+    ...whereStatus,
     $or: [
       { id: { $iLike: `%${searchString}%` } },
       { name: { $iLike: `%${searchString}%` } },
@@ -23,25 +24,25 @@ const whereObject = {
       verified: whereObject.whereVerified,
       undefined: { status: { [Op.in]: ['Approved', 'Verified', 'Open'] } },
     };
-    return search ? whereObject.whereSearch(search) : value[status];
+    return search ? whereObject.whereSearch(search, value[status]) : value[status];
   },
-  whereTrips: centers => [
+  whereTrips: (centers, flow = 'origin') => ([
     {
       model: models.Trip,
-      where: { origin: whereObject.whereTrip(centers) },
+      where: { [`${flow}`]: whereObject.whereTrip(centers) },
       as: 'trips'
     }
-  ],
+  ])
 };
 
 class TravelAdminApprovalController {
-  static handleResponse(res, approvals, meta) {
-    const checkApprovals = approvals.length < 1
+  static handleResponse(res, approvals, meta, search = '') {
+    const message = approvals.length < 1
       ? 'You have no approvals at the moment'
       : 'Approvals retrieved successfully';
     return res.status(200).json({
       success: true,
-      message: checkApprovals,
+      message: search && !approvals.length ? 'No records found' : message,
       approvals,
       meta,
     });
@@ -49,7 +50,9 @@ class TravelAdminApprovalController {
 
   static async getTravelAdminRequest(req, res) {
     try {
-      const { status, search, center } = req.query;
+      const {
+        status, search, center, flow
+      } = req.query;
       const user = await UserRoleController.findUserDetails(req);
       const centers = TravelAdminApprovalController.getAdminCenter(user);
       const message = 'You dont have any center Assigned to you';
@@ -67,23 +70,24 @@ class TravelAdminApprovalController {
         });
       }
       const { page, limit, offset } = await Pagination.initializePagination(req);
+      const includeQuery = whereObject.whereTrips(center ? [center] : centers, flow);
       const requests = await models.Request.findAndCountAll({
         offset,
         limit,
         where: { ...whereObject.whereRequest(status, search) },
         distinct: true,
-        include: center ? whereObject.whereTrips([center]) : whereObject.whereTrips(centers),
+        include: includeQuery,
         order: [['createdAt', 'DESC']]
       });
 
       const pagination = Pagination.getPaginationData(page, limit, requests.count);
       const approved = await TravelAdminApprovalController.calculateTravelApprovals(
-        whereObject.whereApproved,
-        centers
+        whereObject.whereRequest('approved', search),
+        includeQuery
       );
       const verified = await TravelAdminApprovalController.calculateTravelApprovals(
-        whereObject.whereVerified,
-        centers
+        whereObject.whereRequest('verified', search),
+        includeQuery
       );
       const approvals = await TravelAdminApprovalController.getChecklistPercentage(
         requests,
@@ -91,7 +95,7 @@ class TravelAdminApprovalController {
         res
       );
       const meta = { count: { approved, verified }, pagination, centers };
-      return TravelAdminApprovalController.handleResponse(res, approvals, meta);
+      return TravelAdminApprovalController.handleResponse(res, approvals, meta, search);
     } catch (error) { /* istanbul ignore next */
       return res.status(400).json({ error });
     }
@@ -125,12 +129,13 @@ class TravelAdminApprovalController {
     return centers;
   }
 
-  static async calculateTravelApprovals(status, centers) {
+  static async calculateTravelApprovals(whereQuery, includeQuery) {
     const result = await models.Request.count({
       where: {
-        ...status
+        ...whereQuery
       },
-      include: whereObject.whereTrips(centers)
+      distinct: true,
+      include: includeQuery
     });
     return result;
   }

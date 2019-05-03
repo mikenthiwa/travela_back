@@ -1714,7 +1714,7 @@ describe('Requests Controller', () => {
             .end((err, res) => {
               expect(res.status).toBe(403);
               expect(res.body.success).toEqual(false);
-              expect(res.body.error).toBe('You can only verify a request that has the same origin as one of the locations in your location');
+              expect(res.body.error).toBe('You can only verify a request that has the same origin as one of your assigned locations');
               done();
             });
         });

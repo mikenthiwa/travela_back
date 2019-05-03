@@ -164,6 +164,10 @@ of budget for this trip.`;
       <b>${msgDetail.details.requestId}</b> trip.</br>
                 Please  login and verify the trip accordingly</br><br/>
                 Thank you`;
+    case 'Travel Request Verified':
+      return `This is to inform you that ${msgDetail.details.RequesterName}’s request 
+      ${msgDetail.details.id} to visit your centre has just been verified by the local travel team. 
+      Please be aware about this request and plan for the traveller.`;
 
     case 'Notify finance team members':
       return `

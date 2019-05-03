@@ -102,7 +102,7 @@ export default class RequestUtils {
 
     const {
       users: financeTeamMembers
-    } = await UserRoleController.calculateUserRole('70001');
+    } = await UserRoleController.calculateUserRole('70001') || {};
 
     const financeTeam = await TravelReadinessUtils.getRoleMembers(
       financeTeamMembers,

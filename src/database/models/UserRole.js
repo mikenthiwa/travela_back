@@ -21,6 +21,10 @@ export default (sequelize, DataTypes) => {
       foreignKey: 'centerId',
       as: 'center',
     });
+    UserRole.belongsTo(models.User, {
+      foreignKey: 'userId',
+      as: 'user',
+    });
   };
 
   return UserRole;

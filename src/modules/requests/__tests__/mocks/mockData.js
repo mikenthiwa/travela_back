@@ -31,6 +31,7 @@ const mockUser = {
   id: 1
 };
 
+
 const mockTrip = {
   id: 1,
   origin: 'National City, Wakanda',
@@ -104,6 +105,14 @@ const mockGenerator = {
       id: '-2s34jkw-m0y',
       manager: 'My manager'
     };
+    const trips = [{
+      id: '-2s34jkw-m0y',
+      origin: 'National City, Wakanda',
+      destination: 'National City, Wakanda',
+      departureDate: '2018-05-20',
+      returnDate: '2018-05-25',
+      bedId: 1,
+    }];
     let message;
     let mailTopic;
     if (mailType === 'New Request') {
@@ -118,7 +127,7 @@ const mockGenerator = {
     }
 
     return {
-      req, res, travelRequest, message, mailType, mailTopic
+      trips, req, res, travelRequest, message, mailType, mailTopic
     };
   },
 };

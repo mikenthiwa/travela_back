@@ -1913,6 +1913,27 @@ describe('Requests Controller', () => {
     });
   });
 
+  describe('RequestController.sendNotificationToAdmin', () => {
+    beforeAll(() => {
+      NotificationEngine.notifyMany = jest.fn();
+      NotificationEngine.sendMailToMany = jest.fn();
+    });
+
+    it('should send "general" notification if mailType is "New Request"',
+      async (done) => {
+        const {
+          req, trips, travelRequest, message, mailTopic, mailType
+        } = generateMock.mailData('New Request');
+        await RequestsController.sendNotificationToTravelAdmin(
+          req, trips, travelRequest, message, mailTopic, mailType,
+        );
+        const [args] = NotificationEngine
+          .notify.mock.calls[NotificationEngine.notifyMany.mock.calls.length - 1];
+        expect(args.notificationType).toEqual('general');
+        done();
+      });
+  });
+
   // Tests to capture the sendNotificationToManager method
   describe('RequestController.sendNotificationToManager', () => {
     beforeAll(() => {

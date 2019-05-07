@@ -11,6 +11,8 @@ import {
   includeStatusSubquery,
   asyncWrapper,
   retrieveParams,
+  getTravelTeams,
+  switchInAppMessage
 } from '../../helpers/requests';
 import {
   countByStatus,
@@ -59,7 +61,8 @@ class RequestsController {
       };
 
       const multipleRoomsData = trips.map(trip => ({
-        arrivalDate: (requestData.tripType === 'oneWay' || (requestData.tripType === 'multi' && !trip.returnDate))
+        arrivalDate: (requestData.tripType === 'oneWay'
+        || (requestData.tripType === 'multi' && !trip.returnDate))
           ? trip.departureDate : trip.returnDate,
         departureDate: trip.departureDate,
         location: trip.destination,
@@ -139,6 +142,62 @@ class RequestsController {
     NotificationEngine.notify(notificationData);
     return NotificationEngine.sendMail(RequestUtils
       .getMailData(request, recipient, mailTopic, mailType));
+  }
+
+  static async inAppTravelAdmin(
+    tripLocation,
+    admins, name, id, messageType, picture, senderId,
+    link, tripType
+  ) {
+    const customMessage = switchInAppMessage(messageType, id, name, tripLocation, tripType);
+    NotificationEngine.notifyMany({
+      users: admins,
+      senderId,
+      name,
+      picture,
+      id,
+      message: customMessage,
+      link
+    });
+  }
+
+  static async sendNotificationToTravelAdmin(req,
+    trips,
+    request,
+    originType,
+    destinationType,
+    Emailtopic,
+    link,
+    deadlink) {
+    const allAdmins = await getTravelTeams(trips);
+    const { picture, id: senderId } = req.user.UserInfo;
+    const { id, name, tripType } = request;
+    
+    if (allAdmins) {
+      allAdmins.forEach((admin, index) => {
+        const originEmailData = {
+          sender: name,
+          topic: Emailtopic,
+          type: originType,
+          details: { requestId: id, requesterName: name, location: trips[index].origin },
+          redirectLink: link
+        };
+  
+        const destinationEmailData = {
+          sender: name,
+          topic: Emailtopic,
+          type: destinationType,
+          details: { requestId: id, requesterName: name, location: trips[index].destination },
+          redirectLink: link
+        };
+        this.inAppTravelAdmin(trips[index].origin, admin[0], name, id,
+          originType, picture, senderId, deadlink, tripType);
+        this.inAppTravelAdmin(trips[index].destination, admin[1], name, id,
+          destinationType, picture, senderId, deadlink, tripType);
+        NotificationEngine.sendMailToMany(admin[0], originEmailData);
+        NotificationEngine.sendMailToMany(admin[1], destinationEmailData);
+      });
+    }
   }
 
   static removeTripWhere(subquery) {

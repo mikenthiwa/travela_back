@@ -3,6 +3,8 @@ import app from '../../../app';
 
 const request = supertest(app);
 
+process.env.BAMBOOHR_SECRET_KEY = 'test';
+
 describe('Bamboo User controller', () => {
   describe('POST /bamboohr/user/:key', () => {
     it('Create a user from bamboohr', async (done) => {

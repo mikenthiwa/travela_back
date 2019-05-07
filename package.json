@@ -63,6 +63,8 @@
     "express-validator": "^5.3.0",
     "json2csv": "^4.2.1",
     "jsonwebtoken": "^8.3.0",
+    "jws-jwk": "^0.1.4",
+    "jwt-decode": "^2.2.0",
     "lodash": "^4.17.11",
     "mailgun-js": "^0.21.0",
     "moment": "^2.22.2",

@@ -215,6 +215,31 @@ export const postGuestHouse = {
   ]
 };
 
+export const testUser = [
+  {
+    id: 29219368,
+    fullName: 'John Snow',
+    email: 'john.snow@andela.com',
+    name: 'John Snow',
+    userId: '-MUyHJmKrxA90lPNQ1FOLNm',
+    picture: 'url',
+    location: 'Kigali, Rwanda',
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 29219369,
+    userId: '-AVwHJmKrxA90lPNQ1FOLNn',
+    fullName: 'Jack Sparrow',
+    email: 'jack.sparrow@andela.com',
+    name: 'Jack',
+    picture: '',
+    location: 'Kigali, Rwanda',
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+];
+
 export const user = [
   {
     id: 29219368,

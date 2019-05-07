@@ -18,6 +18,21 @@ const payload = {
   },
 };
 
+const testUser = [{
+  id: 79874134,
+  userId: 'wer45660+++',
+  fullName: 'test user',
+  location: 'Nairobi, Kenya',
+  name: 'test user',
+  email: 'test.user@andela.com',
+  picture: 'fakePicture.png'
+}];
+
+const testUserRoles = [{
+  userId: 79874134,
+  roleId: 10948
+}];
+
 const token = Utils.generateTestToken(payload);
 
 describe('Budget Checker role test', () => {
@@ -26,80 +41,14 @@ describe('Budget Checker role test', () => {
     await models.Role.destroy({ truncate: true, cascade: true });
     await models.Role.bulkCreate(role);
     await models.User.destroy({ truncate: true, cascade: true });
-    await models.UserRole
-      .destroy({ truncate: true, cascade: true });
+    await models.UserRole.destroy({ truncate: true, cascade: true });
     await models.Center.destroy({ truncate: true, cascade: true });
     await models.Center.bulkCreate(centers);
+    await models.User.bulkCreate(testUser);
+    await models.UserRole.bulkCreate(testUserRoles);
     process.env.DEFAULT_ADMIN = 'test.user@andela.com';
-    moxios.stubRequest(`${process.env.ANDELA_PROD_API}/users?email=test.user@andela.com`, {
-      status: 200,
-      response: {
-        values: [{
-          bamboo_hr_id: '01',
-        }]
-      }
-    });
-    moxios.stubRequest(process.env.BAMBOOHR_API.replace('{bambooHRId}', '01'), {
-      status: 200,
-      response: {
-        workEmail: 'lisa.doe@andela.com',
-        supervisorEId: '92',
-        location: 'Nigeria',
-        department: 'Partner-Programs',
-      }
-    });
-    moxios.stubRequest(process.env.BAMBOOHR_API.replace('{bambooHRId}', '92'), {
-      status: 200,
-      response: {
-        id: '92',
-        displayName: 'ssewilliam',
-        firstName: 'William',
-        lastName: 'Sserubiri',
-        jobTitle: 'Engineering Team Lead',
-        department: 'Partner-Programs',
-        location: 'Kenya',
-        workEmail: 'william.sserubiri@andela.com',
-        supervisorEId: '9',
-        supervisor: 'Samuel Kubai'
-      }
-    });
-    moxios.stubRequest(`${process.env.ANDELA_PROD_API}/users?bamboo_hr_id=92`, {
-      status: 200,
-      response: {
-        values: [{
-          email: 'william.sserubiri@andela.com',
-          name: 'ssewilliam',
-          department: 'Partner-Programs',
-          id: '92',
-          location: { name: 'Kampala' },
-          picture: 'http//:gif.jpg'
-        }]
-      }
-    });
-    moxios.stubRequest(`${process.env.ANDELA_PROD_API}/users?email=william.sserubiri@andela.com`, {
-      status: 200,
-      response: {
-        values: [{
-          email: 'william.sserubiri@andela.com',
-          name: 'ssewilliam',
-          department: 'Partner-Programs',
-          id: '92',
-          location: {
-            name: 'Kampala'
-          },
-          picture: 'http//:gif.jpg'
-        }]
-      }
-    });
-    request(app)
-      .post('/api/v1/user')
-      .set('authorization', token)
-      .send({ location: 'Lagos' })
-      .expect(201)
-      .end((err) => {
-        if (err) return done(err);
-        done();
-      });
+
+    done();
   });
 
   afterAll(async () => {
@@ -112,17 +61,7 @@ describe('Budget Checker role test', () => {
 
 
   describe('Authenticated user', () => {
-    beforeAll((done) => {
-      request(app)
-        .put('/api/v1/user/admin')
-        .set('authorization', token)
-        .expect(200)
-        .end((err) => {
-          if (err) return done(err);
-          done();
-        });
-    });
-    it('should return error if department is not given when adding ae budget checker',
+    it('should return error if department is not given when adding a budget checker',
       (done) => {
         request(app)
           .put('/api/v1/user/role/update')

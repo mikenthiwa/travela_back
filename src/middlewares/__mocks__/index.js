@@ -40,7 +40,9 @@ const middleware = {
     checkSignedInUser: jest.fn(invokeNextMiddleware),
     checkSignedInUserOrAdmin: jest.fn(invokeNextMiddleware),
     validateNewCentre: jest.fn(invokeNextMiddleware),
-    validateTeamMemberLocation: jest.fn(invokeNextMiddleware)
+    validateTeamMemberLocation: jest.fn(invokeNextMiddleware),
+    verifyToken: jest.fn(invokeNextMiddleware),
+    verifyLoginEmail: jest.fn(invokeNextMiddleware)
   },
   RoleValidator: {
     validateUpdateRole: jest.fn(() => invokeNextMiddleware),

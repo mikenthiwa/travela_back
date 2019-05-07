@@ -32,7 +32,12 @@ Router.put(
   UserRoleController.updateUserProfile
 );
 
-Router.post('/user', authenticate, Validator.checkEmail, UserRoleController.addUser);
+Router.post(
+  '/user',
+  Validator.verifyLoginEmail,
+  Validator.verifyToken,
+  UserRoleController.addUser
+);
 
 Router.post(
   '/user/role',

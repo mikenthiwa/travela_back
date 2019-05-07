@@ -28,6 +28,26 @@ const payload2 = {
   },
 };
 
+const testUser = [{
+  id: 294456,
+  fullName: 'test user',
+  email: 'test.user@andela.com',
+  name: 'test user',
+  userId: 'wer45660+++',
+  picture: 'http://picture.com',
+  location: 'Kampala',
+},
+{
+  id: 292236,
+  fullName: 'second test user',
+  email: 'secondTestuser@andela.com',
+  name: 'second test user',
+  userId: 'wer45660treui',
+  picture: 'http://picture.com',
+  location: 'Kampala',
+},
+];
+
 const token = Utils.generateTestToken(payload);
 const secondToken = Utils.generateTestToken(payload2);
 
@@ -37,80 +57,13 @@ describe('Travel team role test', () => {
     await models.Role.destroy({ truncate: true, cascade: true });
     await models.Role.bulkCreate(role);
     await models.User.destroy({ truncate: true, cascade: true });
-    await models.UserRole
-      .destroy({ truncate: true, cascade: true });
+    await models.UserRole.destroy({ truncate: true, cascade: true });
     await models.Center.destroy({ truncate: true, cascade: true });
     await models.Center.bulkCreate(centers);
+    await models.User.bulkCreate(testUser);
     process.env.DEFAULT_ADMIN = 'test.user@andela.com';
-    moxios.stubRequest(`${process.env.ANDELA_PROD_API}/users?email=test.user@andela.com`, {
-      status: 200,
-      response: {
-        values: [{
-          bamboo_hr_id: '01',
-        }]
-      }
-    });
-    moxios.stubRequest(process.env.BAMBOOHR_API.replace('{bambooHRId}', '01'), {
-      status: 200,
-      response: {
-        workEmail: 'lisa.doe@andela.com',
-        supervisorEId: '92',
-        location: 'Nigeria',
-        department: 'Partner-Programs',
-      }
-    });
-    moxios.stubRequest(process.env.BAMBOOHR_API.replace('{bambooHRId}', '92'), {
-      status: 200,
-      response: {
-        id: '92',
-        displayName: 'ssewilliam',
-        firstName: 'William',
-        lastName: 'Sserubiri',
-        jobTitle: 'Engineering Team Lead',
-        department: 'Partner-Programs',
-        location: 'Kenya',
-        workEmail: 'william.sserubiri@andela.com',
-        supervisorEId: '9',
-        supervisor: 'Samuel Kubai'
-      }
-    });
-    moxios.stubRequest(`${process.env.ANDELA_PROD_API}/users?bamboo_hr_id=92`, {
-      status: 200,
-      response: {
-        values: [{
-          email: 'william.sserubiri@andela.com',
-          name: 'ssewilliam',
-          department: 'Partner-Programs',
-          id: '92',
-          location: { name: 'Kampala' },
-          picture: 'http//:gif.jpg'
-        }]
-      }
-    });
-    moxios.stubRequest(`${process.env.ANDELA_PROD_API}/users?email=william.sserubiri@andela.com`, {
-      status: 200,
-      response: {
-        values: [{
-          email: 'william.sserubiri@andela.com',
-          name: 'ssewilliam',
-          department: 'Partner-Programs',
-          id: '92',
-          location: {
-            name: 'Kampala'
-          },
-          picture: 'http//:gif.jpg'
-        }]
-      }
-    });
-    request(app)
-      .post('/api/v1/user')
-      .set('authorization', token)
-      .send({ location: 'Lagos' })
-      .expect(201)
-      .end((err) => {
-        if (err) return done(err);
-        done();
-      });
+
+    done();
   });
 
   afterAll(async () => {
@@ -231,61 +184,7 @@ describe('Travel team role test', () => {
   });
   describe('Travel admin assigning roles other than travel team member', () => {
     beforeAll((done) => {
-      moxios.stubRequest(`${process.env.ANDELA_PROD_API}/users?email=secondTestuser@andela.com`, {
-        status: 200,
-        response: {
-          values: [{
-            bamboo_hr_id: '01',
-          }]
-        }
-      });
-      moxios.stubRequest(process.env.BAMBOOHR_API.replace('{bambooHRId}', '01'), {
-        status: 200,
-        response: {
-          workEmail: 'lisa.doe@andela.com',
-          supervisorEId: '92',
-          department: 'Partner-Programs',
-        }
-      });
-      moxios.stubRequest(process.env.BAMBOOHR_API.replace('{bambooHRId}', '92'), {
-        status: 200,
-        response: {
-          id: '92',
-          displayName: 'ssewilliam',
-          firstName: 'William',
-          lastName: 'Sserubiri',
-          jobTitle: 'Engineering Team Lead',
-          department: 'Partner-Programs',
-          location: 'Kenya',
-          workEmail: 'william.sserubiri@andela.com',
-          supervisorEId: '9',
-          supervisor: 'Samuel Kubai'
-        }
-      });
-      moxios.stubRequest(`${process.env.ANDELA_PROD_API}/users?email=william.sserubiri@andela.com`, {
-        status: 200,
-        response: {
-          values: [{
-            email: 'william.sserubiri@andela.com',
-            name: 'ssewilliam',
-            department: 'Partner-Programs',
-            id: '92',
-            location: {
-              name: 'Kampala'
-            },
-            picture: 'http//:gif.jpg'
-          }]
-        }
-      });
-      request(app)
-        .post('/api/v1/user')
-        .set('authorization', secondToken)
-        .send({ location: 'Lagos' })
-        .expect(201)
-        .end((err) => {
-          if (err) return done(err);
-          done();
-        });
+      done();
     });
     it('should assign travel administrator role to second user', (done) => {
       request(app)

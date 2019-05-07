@@ -5,13 +5,15 @@ import app from '../../../app';
 import models from '../../../database/models';
 import {
   role,
-  user,
   userRole,
   newRole,
   profile,
   userMock,
   userRoles,
-  center
+  center,
+  googleToken,
+  keys,
+  nonAndelaToken
 } from './mocks/mockData';
 import Utils from '../../../helpers/Utils';
 
@@ -35,15 +37,6 @@ const payload2 = {
   },
 };
 
-const payload3 = {
-  UserInfo: {
-    id: '-MUyHJmKrxA90lPNQ1FOLNm',
-    fullName: 'black window ',
-    name: 'black window ',
-    email: 'black.window@andela.com',
-    picture: 'fake.png'
-  },
-};
 
 const payload4 = {
   UserInfo: {
@@ -55,39 +48,7 @@ const payload4 = {
   },
 };
 
-const payload5 = {
-  UserInfo: {
-    id: '-jdif34444',
-    fullName: 'Nice Guy ',
-    name: 'Nice Guy ',
-    email: 'nice.guy@gmail.com',
-    picture: 'fake.png'
-  },
-};
 
-const payload6 = {
-  UserInfo: {
-    fullName: 'Nice Guy ',
-    name: 'Nice Guy ',
-    email: 'nice.guy@andela.com',
-    picture: 'fake.png'
-  },
-};
-
-const payload7 = {
-  UserInfo: {
-    ...user.user1,
-    name: user.user1.fullName,
-    id: user.user1.userId
-  }
-};
-const payload8 = {
-  UserInfo: {
-    ...user.user2,
-    name: user.user2.fullName,
-    id: user.user2.userId
-  }
-};
 const updateRoleData = {
   id: 10948,
   roleName: 'Super Administrator',
@@ -96,14 +57,26 @@ const updateRoleData = {
   updatedAt: '2018-08-16 012:11:52.181+01'
 };
 
+const userPayload = {
+  UserInfo: {
+    id: '333',
+    fullName: 'Wilson Kamau',
+    name: 'Wilson Kamau',
+    email: 'wilson.gaturu@andela.com',
+    picture: 'https://lh5.googleusercontent.com/-9PPHMmSAkxg/AAAAAAAAAAI/AAAAAAAAAAc/c6lcNC972W0/s96-c/photo.jpg',
+    roles: null
+  }
+};
+
+const invalidTokenPayload = {
+  email: 'some.email@andela.com'
+};
+
 const token = Utils.generateTestToken(payload);
-const token2 = Utils.generateTestToken(payload2);
-const token3 = Utils.generateTestToken(payload3);
-const tokenNonAndelan = Utils.generateTestToken(payload5);
-const tokenNoUserId = Utils.generateTestToken(payload6);
-const newUserToken = Utils.generateTestToken(payload7);
-const newUser2Token = Utils.generateTestToken(payload8);
+const token2 = Utils.generateTestToken(userPayload);
+const token3 = Utils.generateTestToken(payload2);
 const unSeededUserToken = Utils.generateTestToken(payload4);
+const invalidToken = Utils.generateTestToken(invalidTokenPayload);
 
 describe('User Role Test', () => {
   beforeAll(async () => {
@@ -141,16 +114,99 @@ describe('User Role Test', () => {
       });
   });
 
-  it('should return error if field is empty when adding a new user', (done) => {
+  it('should return the user if it exists', (done) => {
+    moxios.stubRequest('https://www.googleapis.com/oauth2/v3/certs', {
+      status: 200,
+      response: keys
+    });
+    moxios.stubRequest(process.env.BAMBOOHR_API.replace('{bambooHRId}', '333'), {
+      status: 200,
+      response: {
+        id: '333',
+        displayName: 'WilsonG',
+        firstName: 'Wilson',
+        lastName: 'Kamau',
+        jobTitle: 'Fellows-TDD',
+        department: 'Fellows Partnership',
+        location: 'Kenya',
+        workEmail: 'wilson.gaturu@andela.com',
+        supervisorEId: '20200',
+        supervisor: 'Samuel Kubai'
+      }
+    });
     request(app)
       .post('/api/v1/user')
       .set('Content-Type', 'application/json')
-      .set('authorization', '')
-      .send({ location: 'Kampala' })
+      .send({ token: googleToken.token })
+      .expect(201)
+      .end((err, res) => {
+        expect(res.body.message).toEqual('User Found');
+        expect(res.body.success).toEqual(true);
+        if (err) return done(err);
+        done();
+      });
+  });
+
+  it('should return 401 if a token is not provided', (done) => {
+    request(app)
+      .post('/api/v1/user')
+      .set('Content-Type', 'application/json')
+      .send({})
       .expect(401)
       .end((err, res) => {
-        expect(res.body.error).toEqual('Please provide a token');
+        expect(res.body.message).toEqual('Please Provide a token');
         expect(res.body.success).toEqual(false);
+        if (err) return done(err);
+        done();
+      });
+  });
+
+  it('should return invalid token if it cannot verify token', (done) => {
+    moxios.stubRequest('https://www.googleapis.com/oauth2/v3/certs', {
+      status: 200,
+      response: keys
+    });
+    request(app)
+      .post('/api/v1/user')
+      .set('Content-Type', 'application/json')
+      .send({ token: invalidToken })
+      .expect(401)
+      .end((err, res) => {
+        console.log({ res });
+        expect(res.body.message).toEqual('Invalid Token');
+        expect(res.body.success).toEqual(false);
+        if (err) return done(err);
+        done();
+      });
+  });
+
+  it('should return 500 error if invalid token', (done) => {
+    moxios.stubRequest('https://www.googleapis.com/oauth2/v3/certs', {
+      status: 200,
+      response: keys
+    });
+    moxios.stubRequest(process.env.BAMBOOHR_API.replace('{bambooHRId}', '333'), {
+      status: 200,
+      response: {
+        id: '333',
+        displayName: 'WilsonG',
+        firstName: 'Wilson',
+        lastName: 'Kamau',
+        jobTitle: 'Fellows-TDD',
+        department: 'Fellows Partnership',
+        location: 'Kenya',
+        workEmail: 'wilson.gaturu@andela.com',
+        supervisorEId: '20200',
+        supervisor: 'Samuel Kubai'
+      }
+    });
+    request(app)
+      .post('/api/v1/user')
+      .set('Content-Type', 'application/json')
+      .send({ token: 'googleToken.token' })
+      .expect(500)
+      .end((err, res) => {
+        expect(res.status).toEqual(500);
         if (err) return done(err);
         done();
       });
@@ -160,186 +216,11 @@ describe('User Role Test', () => {
     request(app)
       .post('/api/v1/user')
       .set('Content-Type', 'application/json')
-      .set('authorization', tokenNonAndelan)
-      .send({ location: 'kampala' })
-      .expect(400)
+      .send({ token: nonAndelaToken.token })
+      .expect(401)
       .end((err, res) => {
         expect(res.body.success).toEqual(false);
-        if (err) return done(err);
-        done();
-      });
-  });
-
-  it('should return error if user Id is empty', (done) => {
-    request(app)
-      .post('/api/v1/user')
-      .set('Content-Type', 'application/json')
-      .set('authorization', tokenNoUserId)
-      .send({ location: 'Lagos' })
-      .expect(400)
-      .end((err, res) => {
-        expect(res.body.success).toEqual(false);
-        expect(res.body.message).toEqual('User Id required');
-        if (err) return done(err);
-        done();
-      });
-  });
-
-  it('should add a new user to the database', (done) => {
-    moxios.stubRequest(`${process.env.ANDELA_PROD_API}/users?email=${user.user1.email}`, {
-      status: 200,
-      response: {
-        values: [{
-          bamboo_hr_id: '01',
-        }]
-      }
-    });
-    moxios.stubRequest(process.env.BAMBOOHR_API.replace('{bambooHRId}', '01'), {
-      status: 200,
-      response: {
-        workEmail: 'lisa.doe@andela.com',
-        supervisorEId: '92',
-        location: 'Nigeria',
-        department: 'Partner-Programs',
-      }
-    });
-    moxios.stubRequest(process.env.BAMBOOHR_API.replace('{bambooHRId}', '92'), {
-      status: 200,
-      response: {
-        id: '92',
-        displayName: 'ssewilliam',
-        firstName: 'William',
-        lastName: 'Sserubiri',
-        jobTitle: 'Engineering Team Lead',
-        department: 'Partner-Programs',
-        location: 'Kenya',
-        workEmail: 'william.sserubiri@andela.com',
-        supervisorEId: '9',
-        supervisor: 'Samuel Kubai'
-      }
-    });
-    moxios.stubRequest(`${process.env.ANDELA_PROD_API}/users?bamboo_hr_id=92`, {
-      status: 200,
-      response: {
-        values: [{
-          email: 'william.sserubiri@andela.com',
-          name: 'ssewilliam',
-          department: 'Partner-Programs',
-          id: '92',
-          location: { name: 'Kampala' },
-          picture: 'http//:gif.jpg'
-        }]
-      }
-    });
-    moxios.stubRequest(`${process.env.ANDELA_PROD_API}/users?email=william.sserubiri@andela.com`, {
-      status: 200,
-      response: {
-        values: [{
-          email: 'william.sserubiri@andela.com',
-          name: 'ssewilliam',
-          id: '92',
-          department: 'Partner-Programs',
-          location: {
-            name: 'Kampala'
-          },
-          picture: 'http//:gif.jpg'
-        }]
-      }
-    });
-    request(app)
-      .post('/api/v1/user')
-      .set('Content-Type', 'application/json')
-      .set('authorization', newUserToken)
-      .send({ location: user.user1.location })
-      .expect(201)
-      .end((err, res) => {
-        expect(res.body.result).toHaveProperty('userId');
-        expect(res.body.result).toHaveProperty('fullName');
-        expect(res.body.result).toHaveProperty('email');
-        expect(res.body.result).toHaveProperty('location');
-        expect(res.body.result.email).toEqual(user.user1.email);
-        expect(res.body.result.fullName).toEqual(user.user1.fullName);
-        expect(res.body.result.location).toEqual(user.user1.location);
-        expect(res.body.success).toEqual(true);
-        if (err) return done(err);
-        done();
-      });
-  });
-
-  it('should add another new user to the database', (done) => {
-    moxios.stubRequest(`${process.env.ANDELA_PROD_API}/users?email=${user.user2.email}`, {
-      status: 200,
-      response: {
-        values: [{
-          bamboo_hr_id: '01',
-        }]
-      }
-    });
-    moxios.stubRequest(process.env.BAMBOOHR_API.replace('{bambooHRId}', '01'), {
-      status: 200,
-      response: {
-        workEmail: 'lisa.doe@andela.com',
-        supervisorEId: '92',
-        location: 'Nigeria',
-        department: 'Partner-Programs',
-      }
-    });
-    moxios.stubRequest(process.env.BAMBOOHR_API.replace('{bambooHRId}', '92'), {
-      status: 200,
-      response: {
-        id: '92',
-        displayName: 'ssewilliam',
-        firstName: 'William',
-        lastName: 'Sserubiri',
-        jobTitle: 'Engineering Team Lead',
-        department: 'Partner-Programs',
-        location: 'Kenya',
-        workEmail: 'william.sserubiri@andela.com',
-        supervisorEId: '9',
-        supervisor: 'Samuel Kubai'
-      }
-    });
-    moxios.stubRequest(`${process.env.ANDELA_PROD_API}/users?bamboo_hr_id=92`, {
-      status: 200,
-      response: {
-        values: [{
-          email: 'william.sserubiri@andela.com',
-          name: 'ssewilliam',
-          department: 'Partner-Programs',
-          id: '92',
-          location: { name: 'Kampala' },
-          picture: 'http//:gif.jpg'
-        }]
-      }
-    });
-    moxios.stubRequest(`${process.env.ANDELA_PROD_API}/users?email=william.sserubiri@andela.com`, {
-      status: 200,
-      response: {
-        values: [{
-          email: 'william.sserubiri@andela.com',
-          name: 'ssewilliam',
-          department: 'Partner-Programs',
-          id: '92',
-          location: {
-            name: 'Kampala'
-          },
-          picture: 'http//:gif.jpg'
-        }]
-      }
-    });
-    request(app)
-      .post('/api/v1/user')
-      .set('Content-Type', 'application/json')
-      .set('authorization', newUser2Token)
-      .send({ location: user.user2.location })
-      .expect(201)
-      .end((err, res) => {
-        expect(res.body.result).toHaveProperty('userId');
-        expect(res.body.result).toHaveProperty('fullName');
-        expect(res.body.result).toHaveProperty('email');
-        expect(res.body.result.email).toEqual(user.user2.email);
-        expect(res.body.result.fullName).toEqual(user.user2.fullName);
-        expect(res.body.success).toEqual(true);
+        expect(res.body.message).toEqual('Only Andela Email address allowed');
         if (err) return done(err);
         done();
       });
@@ -348,7 +229,7 @@ describe('User Role Test', () => {
 
   it('should return only one user from the database', (done) => {
     request(app)
-      .get('/api/v1/user/JNDVNFSFDK')
+      .get('/api/v1/user/20200')
       .set('Content-Type', 'application/json')
       .set('authorization', token)
       .expect(200)
@@ -373,12 +254,12 @@ describe('User Role Test', () => {
       });
   });
 
-  it(`should return error if login user does not 
+  it(`should return error if login user does not
   exist in database when changing user role`, (done) => {
     request(app)
       .put('/api/v1/user/role/update')
       .set('Content-Type', 'application/json')
-      .set('authorization', token2)
+      .set('authorization', token3)
       .send(userRole.superAdminRole)
       .expect(400)
       .end((err, res) => {
@@ -406,12 +287,12 @@ describe('User Role Test', () => {
         done();
       });
   });
-  it(`should throw error if user does not exist in the database 
+  it(`should throw error if user does not exist in the database
   when user is set to super admin`, (done) => {
     request(app)
       .put('/api/v1/user/admin')
       .set('Content-Type', 'application/json')
-      .set('authorization', token2)
+      .set('authorization', token3)
       .expect(400)
       .end((err, res) => {
         expect(res.body.success).toEqual(false);
@@ -435,12 +316,12 @@ describe('User Role Test', () => {
       });
   });
 
-  it(`should throw if email does not match process env 
+  it(`should throw if email does not match process env
   when changing user to super admin`, (done) => {
     request(app)
       .put('/api/v1/user/admin')
       .set('Content-Type', 'application/json')
-      .set('authorization', token3)
+      .set('authorization', token2)
       .send(userRole.superAdminRole)
       .expect(409)
       .end((err, res) => {
@@ -468,9 +349,9 @@ describe('User Role Test', () => {
 
   it('should update user profile', (done) => {
     request(app)
-      .put('/api/v1/user/-MUyHJmKrxA90lPNQ1FOLNm/profile')
+      .put('/api/v1/user/333/profile')
       .set('Content-Type', 'application/json')
-      .set('authorization', token)
+      .set('authorization', token2)
       .send(profile.profile1)
       .expect(200)
       .end((err, res) => {
@@ -483,8 +364,8 @@ describe('User Role Test', () => {
 
   it('should update user profile including their location', (done) => {
     request(app)
-      .put('/api/v1/user/-MUyHJmKrxA90lPNQ1FOLNm/profile')
-      .set('authorization', token)
+      .put('/api/v1/user/333/profile')
+      .set('authorization', token2)
       .send({ ...profile.profile1, location: 'San Fransisco' })
       .expect(200)
       .end((err, res) => {
@@ -499,7 +380,7 @@ describe('User Role Test', () => {
     request(app)
       .put('/api/v1/user/-MUyHJmKrxA/profile')
       .set('Content-Type', 'application/json')
-      .set('authorization', token)
+      .set('authorization', token2)
       .send(profile.profile1)
       .expect(403)
       .end((err, res) => {
@@ -538,9 +419,9 @@ describe('User Role Test', () => {
 
   it('should throw an error if the gender is wrong', (done) => {
     request(app)
-      .put('/api/v1/user/JNDVNFSFDK/profile')
+      .put('/api/v1/user/333/profile')
       .set('Content-Type', 'application/json')
-      .set('authorization', token)
+      .set('authorization', token2)
       .send(profile.profile2)
       .expect(400)
       .end((err, res) => {
@@ -666,7 +547,7 @@ describe('User Role Test', () => {
       });
   });
 
-  it(`should throw error if role already exist when adding  
+  it(`should throw error if role already exist when adding
   new role when user is super admin `, (done) => {
     request(app)
       .post('/api/v1/user/role')

@@ -14,6 +14,7 @@ class Utils {
     return token;
   }
 
+
   static getResponseMessage(pagination, status, modelName) {
     let message;
     if (pagination.pageCount >= pagination.currentPage) {

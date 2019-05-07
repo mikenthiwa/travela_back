@@ -1,5 +1,8 @@
 import dotenv from 'dotenv';
 import axios from 'axios';
+
+import jwtDecode from 'jwt-decode';
+import jwt from 'jsonwebtoken';
 import models from '../../database/models';
 
 dotenv.config();
@@ -16,35 +19,6 @@ class UserHelper {
         Accept: 'application/json'
       }
     });
-  }
-
-  static getUserOnProduction(res) {
-    const workEmail = res.dataValues ? res.dataValues.email : res.data.workEmail;
-    return axios.get(`${process.env.ANDELA_PROD_API}/users?email=${workEmail}`);
-  }
-
-  static getManagerOnProduction(id) {
-    return axios.get(`${process.env.ANDELA_PROD_API}/users?bamboo_hr_id=${id}`);
-  }
-
-
-  static generateTravelaUser(productionUser, bambooUser) {
-    const locations = productionUser.data.values[0].location != null
-      ? productionUser.data.values[0].location.name
-      : UserHelper.getUserLocation(bambooUser.data.location);
-    const travelaUser = {
-      fullName: productionUser.data.values[0].name,
-      email: productionUser.data.values[0].email,
-      userId: productionUser.data.values[0].id,
-      passportName: productionUser.data.values[0].name,
-      department: bambooUser.data.department,
-      occupation: bambooUser.data.jobTitle,
-      location: locations,
-      picture: productionUser.data.values[0].picture,
-      manager: bambooUser.data.supervisor,
-      gender: bambooUser.data.gender,
-    };
-    return travelaUser;
   }
 
   static getUserLocation(country) {
@@ -67,6 +41,25 @@ class UserHelper {
     });
     const [travelAdmins] = await Promise.all(users);
     return travelAdmins;
+  }
+
+  static decodeToken(token) {
+    const userData = jwtDecode(token);
+    return userData;
+  }
+
+  static async setToken(userInfo) {
+    const UserInfo = await {
+      id: userInfo.dataValues.userId,
+      fullName: userInfo.dataValues.fullName,
+      name: userInfo.dataValues.fullName,
+      email: userInfo.dataValues.email,
+      picture: userInfo.dataValues.picture,
+      roles: userInfo.dataValues.occupation
+    };
+
+    const token = jwt.sign({ UserInfo }, process.env.JWT_PUBLIC_KEY, { expiresIn: '30d' });
+    return token;
   }
 }
 export default UserHelper;

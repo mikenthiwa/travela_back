@@ -22,6 +22,16 @@ const payload = {
   },
 };
 
+const testUser = [{
+  id: 7978234,
+  userId: '-TRUniolpknbnk',
+  fullName: 'Collins Muru',
+  name: 'Collins Muru',
+  location: 'Nairobi, Kenya',
+  email: 'collins.muru@andela.com',
+  picture: 'fakePicture.png'
+}];
+
 const token = Utils.generateTestToken(payload);
 const invalidToken = 'YYTRYIM0nrbuy7tonfenu';
 
@@ -32,71 +42,10 @@ describe('Update the room fault status', () => {
     await models.Role.bulkCreate(role);
     await models.User.sync({ force: true });
     await models.UserRole.destroy({ force: true, truncate: { cascade: true } });
+    await models.User.bulkCreate(testUser);
     process.env.DEFAULT_ADMIN = 'collins.muru@andela.com';
-    moxios.stubRequest(`${process.env.ANDELA_PROD_API}/users?email=collins.muru@andela.com`, {
-      status: 200,
-      response: {
-        values: [{
-          bamboo_hr_id: '01',
-        }]
-      }
-    });
-    moxios.stubRequest(process.env.BAMBOOHR_API.replace('{bambooHRId}', '01'), {
-      status: 200,
-      response: {
-        workEmail: 'lisa.doe@andela.com',
-        supervisorEId: '92'
-      }
-    });
-    moxios.stubRequest(process.env.BAMBOOHR_API.replace('{bambooHRId}', '92'), {
-      status: 200,
-      response: {
-        id: '92',
-        displayName: 'ssewilliam',
-        firstName: 'William',
-        lastName: 'Sserubiri',
-        jobTitle: 'Engineering Team Lead',
-        department: 'Partner-Programs',
-        location: 'Kenya',
-        workEmail: 'william.sserubiri@andela.com',
-        supervisorEId: '9',
-        supervisor: 'Samuel Kubai'
-      }
-    });
-    moxios.stubRequest(`${process.env.ANDELA_PROD_API}/users?bamboo_hr_id=92`, {
-      status: 200,
-      response: {
-        values: [{
-          email: 'william.sserubiri@andela.com',
-          name: 'ssewilliam',
-          id: '92',
-          location: { name: 'Kampala' },
-          picture: 'http//:gif.jpg'
-        }]
-      }
-    });
-    moxios.stubRequest(`${process.env.ANDELA_PROD_API}/users?email=william.sserubiri@andela.com`, {
-      status: 200,
-      response: {
-        values: [{
-          email: 'william.sserubiri@andela.com',
-          name: 'ssewilliam',
-          id: '92',
-          location: {
-            name: 'Kampala'
-          },
-          picture: 'http//:gif.jpg'
-        }]
-      }
-    });
-    request(app)
-      .post('/api/v1/user')
-      .set('authorization', token)
-      .send({ location: 'Lagos' })
-      .end((err) => {
-        if (err) return done(err);
-        done();
-      });
+
+    done();
   });
   afterAll(async () => {
     moxios.uninstall();

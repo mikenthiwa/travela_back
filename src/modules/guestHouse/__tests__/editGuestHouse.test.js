@@ -28,81 +28,31 @@ const payload = {
     picture: 'fake.png'
   },
 };
+
+const guestUser = [{
+  id: 294456,
+  fullName: 'Jones Akili',
+  email: 'jones.akili@andela.com',
+  name: 'Jones Akili',
+  userId: '-TRUniplpknbbh',
+  picture: 'http://picture.com',
+  location: 'Kampala',
+  bambooHRId: '2223'
+}];
+
 const token = Utils.generateTestToken(payload);
 const invalidToken = 'YYTRYIM0nrbuy7tonfenu';
 describe('Update Guest Houses', () => {
   beforeAll(async (done) => {
     moxios.install();
-    await models.Role.sync({ force: true });
-    await models.Role.bulkCreate(role);
+    await models.Role.destroy({ truncate: true, cascade: true });
     await models.User.destroy({ truncate: true, cascade: true });
     await models.UserRole.destroy({ truncate: true, cascade: true });
+    await models.Role.sync({ force: true });
+    await models.Role.bulkCreate(role);
+    await models.User.bulkCreate(guestUser);
     process.env.DEFAULT_ADMIN = 'jones.akili@andela.com';
-    moxios.stubRequest(`${process.env.ANDELA_PROD_API}/users?email=jones.akili@andela.com`, {
-      status: 200,
-      response: {
-        values: [{
-          bamboo_hr_id: '01',
-        }]
-      }
-    });
-    moxios.stubRequest(process.env.BAMBOOHR_API.replace('{bambooHRId}', '01'), {
-      status: 200,
-      response: {
-        workEmail: 'lisa.doe@andela.com',
-        supervisorEId: '92'
-      }
-    });
-    moxios.stubRequest(process.env.BAMBOOHR_API.replace('{bambooHRId}', '92'), {
-      status: 200,
-      response: {
-        id: '92',
-        displayName: 'ssewilliam',
-        firstName: 'William',
-        lastName: 'Sserubiri',
-        jobTitle: 'Engineering Team Lead',
-        department: 'Partner-Programs',
-        location: 'Kenya',
-        workEmail: 'william.sserubiri@andela.com',
-        supervisorEId: '9',
-        supervisor: 'Samuel Kubai'
-      }
-    });
-    moxios.stubRequest(`${process.env.ANDELA_PROD_API}/users?bamboo_hr_id=92`, {
-      status: 200,
-      response: {
-        values: [{
-          email: 'william.sserubiri@andela.com',
-          name: 'ssewilliam',
-          id: '92',
-          location: { name: 'Kampala' },
-          picture: 'http//:gif.jpg'
-        }]
-      }
-    });
-
-    moxios.stubRequest(`${process.env.ANDELA_PROD_API}/users?email=william.sserubiri@andela.com`, {
-      status: 200,
-      response: {
-        values: [{
-          email: 'william.sserubiri@andela.com',
-          name: 'ssewilliam',
-          id: '92',
-          location: {
-            name: 'Kampala'
-          },
-          picture: 'http//:gif.jpg'
-        }]
-      }
-    });
-    request(app)
-      .post('/api/v1/user')
-      .set('authorization', token)
-      .send({ location: 'Lagos' })
-      .end((err) => {
-        if (err) return done(err);
-        done();
-      });
+    done();
   });
 
   afterAll(async () => {
@@ -113,7 +63,7 @@ describe('Update Guest Houses', () => {
   });
 
   describe('Unauthenticated user', () => {
-    it('returns 403 error if user is not a travel admin', (done) => {
+    it('returns 403 error if user is not a travel admin', async (done) => {
       request(app)
         .put('/api/v1/guesthouses/rtDHgJ4D')
         .set('authorization', token)

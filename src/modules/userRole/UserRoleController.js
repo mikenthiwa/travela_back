@@ -11,11 +11,12 @@ import DepartmentController from '../department/DepartmentController';
 dotenv.config();
 
 class UserRoleController {
-  static response(res, message, result) {
+  static response(res, message, result, token = null) {
     return res.status(message[0]).json({
       success: message[2],
       message: message[1],
-      result
+      result,
+      token
     });
   }
 
@@ -101,71 +102,46 @@ class UserRoleController {
     const message = [200, 'Profile updated successfully', true];
     UserRoleController.response(res, message, result);
   }
+  
 
   static async addUser(req, res) {
-    const userId = req.user.UserInfo.id;
     try {
-      if (!userId) {
-        const message = [400, 'User Id required', false];
-        return UserRoleController.response(res, message);
+      const userData = UserHelper.decodeToken(req.body.token);
+      const result = await models.User.find({
+        where: {
+          email: { ilike: userData.email }
+        },
+        include: [
+          {
+            model: models.Role,
+            as: 'roles',
+            attributes: ['roleName', 'description'],
+            through: { attributes: [] }
+          },
+          {
+            model: models.Department,
+            as: 'budgetCheckerDepartments',
+            attributes: ['id', 'name'],
+            through: { attributes: [] },
+          }
+        ]
+      });
+      await result.addRole(401938);
+      if (result.dataValues.manager === null) {
+        const userOnBamboo = await UserHelper.getUserOnBamboo(result.userId);
+        const manager = await models.User.find({
+          where: {
+            userId: userOnBamboo.data.supervisorEId
+          },
+        });
+        manager.addRole(53019);
+        await result.update({ manager: manager.dataValues.fullName });
       }
-      const [result, userCreated] = await models.User.findOrCreate({
-        where: {
-          email: req.user.UserInfo.email,
-          userId: req.user.UserInfo.id
-        },
-        defaults: {
-          picture: req.user.UserInfo.picture,
-          fullName: req.user.UserInfo.name,
-          location: 'Lagos'
-        }
-      });
-      const [userRole] = await result.addRole(401938);
-      result.dataValues.roles = userRole;
-      const message = [201, 'User created successfully', true];
-      UserHelper.authorizeRequests(req.userToken);
-      const userOnProduction = await UserHelper.getUserOnProduction(result);
-      const bambooHRID = userOnProduction.data.values[0].bamboo_hr_id;
-      const userOnBamboo = await UserHelper.getUserOnBamboo(bambooHRID);
-      const managerOnBamboo = await UserHelper.getUserOnBamboo(userOnBamboo.data.supervisorEId);
-      const managerOnProduction = await
-      UserHelper.getManagerOnProduction(userOnBamboo.data.supervisorEId);
-      const travelaUser = UserHelper.generateTravelaUser(managerOnProduction, managerOnBamboo);
-      const userLocation = UserHelper.getUserLocation(userOnBamboo.data.location);
-      const [managerResult] = await models.User.findOrCreate({
-        where: {
-          email: travelaUser.email,
-          userId: travelaUser.userId
-        },
-        defaults: {
-          picture: travelaUser.picture,
-          fullName: travelaUser.fullName,
-          location: travelaUser.location,
-          gender: travelaUser.gender,
-          department: travelaUser.department,
-          occupation: travelaUser.occupation
-        }
-      });
-      await DepartmentController.createDepartmentFromEndpoint(managerResult.department);
-      const newLocation = !userOnProduction.data.values[0].location
-        ? userLocation
-        : userOnProduction.data.values[0].location.name;
-
-      const updateData = {
-        department: userOnBamboo.data.department,
-        occupation: userOnBamboo.data.jobTitle,
-        manager: travelaUser.fullName,
-        passportName: userOnProduction.data.values[0].name,
-        location: newLocation,
-        gender: userOnBamboo.data.gender
-      };
-      await managerResult.addRole(53019);
-      // Update data for only new users or users with valid bambooHR id
-      if (bambooHRID !== 0 || userCreated) await result.update(updateData);
-      await DepartmentController.createDepartmentFromEndpoint(updateData.department);
-      return UserRoleController.response(res, message, result);
+      await result.update({ picture: userData.picture });
+      const message = [201, 'User Found', true];
+      const token = await UserHelper.setToken(result);
+      return UserRoleController.response(res, message, result, token);
     } catch (error) {
-      /* istanbul ignore next */
       return CustomError.handleError(error.toString(), 500, res);
     }
   }

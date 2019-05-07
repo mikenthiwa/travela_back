@@ -6,6 +6,18 @@ import models from '../../../database/models';
 import Utils from '../../../helpers/Utils';
 import { role } from '../../userRole/__tests__/mocks/mockData';
 
+const testUser = [{
+  id: 292129,
+  userId: '-MUyHJmKrxA90lPNQ1FOLNm',
+  fullName: 'John Snow',
+  email: 'john.snow@andela.com',
+  name: 'John Snow',
+  picture: '',
+  location: 'Kigali, Rwanda',
+  createdAt: new Date(),
+  updatedAt: new Date()
+}];
+
 const payload = {
   UserInfo: {
     id: '-MUyHJmKrxA90lPNQ1FOLNm',
@@ -15,8 +27,18 @@ const payload = {
     picture: 'fakePicture.png'
   },
 };
+const nonExistingUserPayload = {
+  UserInfo: {
+    id: '-MUyHJmKrxA90lPNQ1FOLNms',
+    fullName: 'John Snows',
+    name: 'John Snows',
+    email: 'john.snows@andela.com',
+    picture: 'fakePicture.png'
+  },
+};
 
 const token = Utils.generateTestToken(payload);
+const nonExistingUserToken = Utils.generateTestToken(nonExistingUserPayload);
 describe('Guest Role Test', () => {
   beforeAll(async (done) => {
     moxios.install();
@@ -24,6 +46,7 @@ describe('Guest Role Test', () => {
     await models.Role.bulkCreate(role);
     await models.User.sync({ force: true });
     await models.UserRole.destroy({ force: true, truncate: { cascade: true } });
+    await models.User.bulkCreate(testUser);
     process.env.DEFAULT_ADMIN = 'john.snow@andela.com';
     done();
   });
@@ -38,89 +61,13 @@ describe('Guest Role Test', () => {
     request(app)
       .post('/api/v1/guesthouses')
       .set('Content-Type', 'application/json')
-      .set('authorization', token)
+      .set('authorization', nonExistingUserToken)
       .send(postGuestHouse)
       .expect(400)
       .end((err, res) => {
         expect(res.body.success).toEqual(false);
         expect(res.body.message)
           .toEqual('You are not signed in to the application');
-        if (err) return done(err);
-        done();
-      });
-  });
-  it('should add a new user to the database', (done) => {
-    moxios.stubRequest(`${process.env.ANDELA_PROD_API}/users?email=john.snow@andela.com`, {
-      status: 200,
-      response: {
-        values: [{
-          bamboo_hr_id: '01',
-        }]
-      }
-    });
-    moxios.stubRequest(process.env.BAMBOOHR_API.replace('{bambooHRId}', '01'), {
-      status: 200,
-      response: {
-        workEmail: 'lisa.doe@andela.com',
-        supervisorEId: '92',
-        department: 'Partner-Programs',
-        location: 'Nigeria'
-      }
-    });
-    moxios.stubRequest(process.env.BAMBOOHR_API.replace('{bambooHRId}', '92'), {
-      status: 200,
-      response: {
-        id: '92',
-        displayName: 'ssewilliam',
-        firstName: 'William',
-        lastName: 'Sserubiri',
-        jobTitle: 'Engineering Team Lead',
-        department: 'Partner-Programs',
-        location: 'Kenya',
-        workEmail: 'william.sserubiri@andela.com',
-        supervisorEId: '9',
-        supervisor: 'Samuel Kubai'
-      }
-    });
-    moxios.stubRequest(`${process.env.ANDELA_PROD_API}/users?bamboo_hr_id=92`, {
-      status: 200,
-      response: {
-        values: [{
-          email: 'william.sserubiri@andela.com',
-          name: 'ssewilliam',
-          id: '92',
-          location: { name: 'Kampala' },
-          picture: 'http//:gif.jpg',
-          department: 'Partner-Programs',
-        }]
-      }
-    });
-
-    moxios.stubRequest(`${process.env.ANDELA_PROD_API}/users?email=william.sserubiri@andela.com`, {
-      status: 200,
-      response: {
-        values: [{
-          email: 'william.sserubiri@andela.com',
-          name: 'ssewilliam',
-          department: 'Partner-Programs',
-          id: '92',
-          location: {
-            name: 'Kampala'
-          },
-          picture: 'http//:gif.jpg'
-        }]
-      }
-    });
-    request(app)
-      .post('/api/v1/user')
-      .set('Content-Type', 'application/json')
-      .set('authorization', token)
-      .send({ location: 'Lagos' })
-      .expect(201)
-      .end((err, res) => {
-        expect(res.body.result).toHaveProperty('fullName');
-        expect(res.body.result).toHaveProperty('email');
-        expect(res.body.success).toEqual(true);
         if (err) return done(err);
         done();
       });

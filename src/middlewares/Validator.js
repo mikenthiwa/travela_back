@@ -1,6 +1,9 @@
 /* eslint-disable indent */
 import { validationResult } from 'express-validator/check';
 import { Op } from 'sequelize';
+import jwtDecode from 'jwt-decode';
+import jws from 'jws-jwk';
+import axios from 'axios';
 import { urlCheck } from '../helpers/reg';
 import models from '../database/models';
 import Error from '../helpers/Error';
@@ -86,6 +89,41 @@ export default class Validator {
     }
     next();
   }
+
+  static async verifyToken(req, res, next) {
+    const { token } = req.body;
+    const jwk = await axios.get('https://www.googleapis.com/oauth2/v3/certs');
+    const { data: { keys } } = await jwk;
+    const isTokenValid = await keys.map(key => jws.verify(token, key));
+    const tokenVerified = isTokenValid.includes(true);
+    if (!tokenVerified) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid Token'
+      });
+    }
+    next();
+  }
+
+  static verifyLoginEmail(req, res, next) {
+    const { token } = req.body;
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        message: 'Please Provide a token'
+      });
+    }
+    const tokenPayload = jwtDecode(token);
+    const { email } = tokenPayload;
+    const isAndelaEmail = email.split('@')[1] === 'andela.com';
+    if (!isAndelaEmail) {
+      return res.status(401).json({
+        success: false,
+        message: 'Only Andela Email address allowed'
+      });
+    }
+    next();
+   }
 
   static validateStatus(req, res, next) {
     req

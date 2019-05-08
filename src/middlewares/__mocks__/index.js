@@ -167,6 +167,10 @@ const middleware = {
     validateSecretKey: jest.fn(invokeNextMiddleware),
     validateBambooUsers: jest.fn(invokeNextMiddleware),
     validateRequest: jest.fn(invokeNextMiddleware),
+  },
+  TravelRegionsValidator: {
+    conditionValidation: jest.fn(invokeNextMiddleware),
+    inputValidation: jest.fn(invokeNextMiddleware),
   }
 };
 

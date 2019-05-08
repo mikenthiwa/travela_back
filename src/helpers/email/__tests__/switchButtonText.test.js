@@ -41,4 +41,12 @@ describe('Switch Button helper', () => {
     expect(switchButtonText('Travel Readiness Document Verified')).toEqual('View Document');
     done();
   });
+  it('should show View Notification in case of Request deletion', (done) => {
+    expect(switchButtonText('Notify Origin Tavel Team On Request Deletion')).toEqual('View Notification');
+    done();
+  });
+  it('should show View Notification in case of Request deletion', (done) => {
+    expect(switchButtonText('Notify Destination Tavel Team On Request Deletion')).toEqual('View Notification');
+    done();
+  });
 });

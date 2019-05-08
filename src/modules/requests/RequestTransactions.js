@@ -66,9 +66,9 @@ export default class RequestTransactions {
       request,
       message,
       'New Travel Request',
-      'New Requester Request',
+      'New Requester Request'
     );
-  
+
     RequestsController.sendNotificationToTravelAdmin(
       req,
       trips,
@@ -130,6 +130,8 @@ export default class RequestTransactions {
 
       if (!requestToApprove) {
         const error = 'Approval request not found';
+
+        /* istanbul ignore next */
         return Error.handleError(error, 404, res);
       }
       await requestToApprove.update({ approverId: req.body.manager });
@@ -154,6 +156,7 @@ export default class RequestTransactions {
     const userId = req.user.UserInfo.id;
     await models.sequelize.transaction(async () => {
       const request = await RequestUtils.getRequest(requestId, userId);
+      const trips = await RequestUtils.getTrips(requestId);
       if (!request) {
         return Error.handleError('Request was not found', 404, res);
       }
@@ -162,9 +165,7 @@ export default class RequestTransactions {
       }
       request.destroy();
       RequestsController.handleDestroyTripComments(req);
-
-      const notificationMessage = 'deleted a travel request';
-      this.sendNotificationOnDelete(res, req, request, notificationMessage);
+      await this.sendNotificationOnDelete(req, res, request, trips);
       const message = `Request ${request.id} has been successfully deleted`;
       return res.status(200).json({
         success: true,
@@ -173,7 +174,10 @@ export default class RequestTransactions {
     });
   }
 
-  static async sendNotificationOnDelete(res, req, request, notificationMessage) {
+  static async sendNotificationOnDelete(req, res, request, trips) {
+    const notificationMessage = 'deleted a travel request';
+    const link = `${process.env.REDIRECT_URL}/requests/my-verifications`;
+    const deadLink = '/#';
     RequestsController.sendNotificationToManager(
       req,
       res,
@@ -181,6 +185,16 @@ export default class RequestTransactions {
       notificationMessage,
       'Deleted Travel Request',
       'Deleted Request'
+    );
+    RequestsController.sendNotificationToTravelAdmin(
+      req,
+      trips,
+      request,
+      'Notify Origin Tavel Team On Request Deletion',
+      'Notify Destination Tavel Team On Request Deletion',
+      'Deleted Travel Request',
+      link,
+      deadLink
     );
   }
 }

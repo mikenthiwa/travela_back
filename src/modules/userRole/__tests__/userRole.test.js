@@ -172,7 +172,6 @@ describe('User Role Test', () => {
       .send({ token: invalidToken })
       .expect(401)
       .end((err, res) => {
-        console.log({ res });
         expect(res.body.message).toEqual('Invalid Token');
         expect(res.body.success).toEqual(false);
         if (err) return done(err);

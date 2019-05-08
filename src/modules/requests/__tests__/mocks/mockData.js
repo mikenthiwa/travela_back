@@ -1,10 +1,6 @@
 const date = new Date();
-const departureDate = new Date(date.setDate(date.getDate() + 1))
-  .toISOString()
-  .split('T')[0];
-const returnDate = new Date(date.setDate(date.getDate() + 3))
-  .toISOString()
-  .split('T')[0];
+const departureDate = new Date(date.setDate(date.getDate() + 1)).toISOString().split('T')[0];
+const returnDate = new Date(date.setDate(date.getDate() + 3)).toISOString().split('T')[0];
 
 export const dates = {
   departureDate,
@@ -13,7 +9,7 @@ export const dates = {
 
 const mockCenter = {
   id: 1,
-  location: 'Wakanda',
+  location: 'Wakanda'
 };
 
 const mockUser = {
@@ -31,14 +27,13 @@ const mockUser = {
   id: 1
 };
 
-
 const mockTrip = {
   id: 1,
   origin: 'National City, Wakanda',
   destination: 'National City, Wakanda',
   departureDate: '2018-05-20',
   returnDate: '2018-05-25',
-  bedId: 1,
+  bedId: 1
 };
 
 const mockRequest = {
@@ -51,15 +46,15 @@ const mockRequest = {
   department: mockUser.department,
   picture: mockUser.picture,
   role: mockUser.occupation,
-  trips: [{ ...mockTrip, requestId: 1 }],
+  trips: [{ ...mockTrip, requestId: 1 }]
 };
 const mockGuestHouse = {
   id: 1,
-  houseName: 'Stan Lee\'s Suites',
+  houseName: "Stan Lee's Suites",
   location: 'National City, Wakanda',
   bathRooms: '2',
   imageUrl: 'https://url-to-picture.png',
-  userId: mockUser.userId,
+  userId: mockUser.userId
 };
 
 const mockRoom = {
@@ -73,7 +68,7 @@ const mockRoom = {
 const mockBed = {
   id: 1,
   bedName: 'bed 1',
-  roomId: mockRoom.id,
+  roomId: mockRoom.id
 };
 
 const mockGenerator = {
@@ -105,14 +100,17 @@ const mockGenerator = {
       id: '-2s34jkw-m0y',
       manager: 'My manager'
     };
-    const trips = [{
-      id: '-2s34jkw-m0y',
-      origin: 'National City, Wakanda',
-      destination: 'National City, Wakanda',
-      departureDate: '2018-05-20',
-      returnDate: '2018-05-25',
-      bedId: 1,
-    }];
+    const trips = [
+      {
+        id: '-2s34jkw-m0y',
+        origin: 'National City, Wakanda',
+        destination: 'National City, Wakanda',
+        departureDate: '2018-05-20',
+        returnDate: '2018-05-25',
+        bedId: 1
+      }
+    ];
+
     let message;
     let mailTopic;
     if (mailType === 'New Request') {
@@ -127,11 +125,16 @@ const mockGenerator = {
     }
 
     return {
-      trips, req, res, travelRequest, message, mailType, mailTopic
+      trips,
+      req,
+      res,
+      travelRequest,
+      message,
+      mailType,
+      mailTopic
     };
-  },
+  }
 };
-
 
 export const emptyRequestResponse = {
   success: false,
@@ -199,9 +202,9 @@ export const newRequest = {
       destination: 'New York',
       departureDate,
       returnDate,
-      bedId: 1,
-    },
-  ],
+      bedId: 1
+    }
+  ]
 };
 
 export const travelAdmin = {
@@ -209,7 +212,15 @@ export const travelAdmin = {
   email: 'travel.admin@andela.com',
   userId: '-HyfghjTUGfghjkIJM',
   passportName: 'Travel Admin',
-  location: 'Lagos',
+  location: 'Lagos'
+};
+
+export const mockNotificationDetails = {
+  mailTopic: 'Deleted Travel Request',
+  originType: 'Notify Origin Tavel Team On Request Deletion',
+  destinationType: 'Notify Destination Tavel Team On Request Deletion',
+  link: '/requests',
+  deadLink: '/#'
 };
 
 export default mockGenerator;

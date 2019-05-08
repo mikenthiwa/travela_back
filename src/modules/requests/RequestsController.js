@@ -14,10 +14,7 @@ import {
   getTravelTeams,
   switchInAppMessage
 } from '../../helpers/requests';
-import {
-  countByStatus,
-  getTotalCount,
-} from '../../helpers/requests/paginationHelper';
+import { countByStatus, getTotalCount } from '../../helpers/requests/paginationHelper';
 import UserRoleController from '../userRole/UserRoleController';
 import NotificationEngine from '../notifications/NotificationEngine';
 import Error from '../../helpers/Error';
@@ -41,7 +38,7 @@ class RequestsController {
       limit: params.limit,
       offset: params.offset,
       modelName: 'Request',
-      search: params.search,
+      search: params.search
     };
   }
 
@@ -68,7 +65,7 @@ class RequestsController {
         location: trip.destination,
         gender: requestDetails.gender,
         travelReasons: trip.travelReasons,
-        otherTravelReasons: trip.otherTravelReasons,
+        otherTravelReasons: trip.otherTravelReasons
       }));
 
       const availableRoomsAndBeds = await RequestUtils.fetchMultiple(multipleRoomsData);
@@ -78,7 +75,9 @@ class RequestsController {
 
       trips = trips.map((trip) => {
         if (
-          availableBedSpaces.length < 1 || !availableBedSpaces.includes(trip.bedId) || !trip.bedId
+          availableBedSpaces.length < 1
+          || !availableBedSpaces.includes(trip.bedId)
+          || !trip.bedId
         ) {
           // eslint-disable-next-line
           trip.accommodationType = trip.bedId == -1 ? 'Hotel Booking' : 'Not Required';
@@ -96,30 +95,16 @@ class RequestsController {
     }
   }
 
-  static async sendNotificationToRequester(
-    req,
-    res,
-    request,
-    message,
-    mailTopic,
-    mailType
-  ) {
+  static async sendNotificationToRequester(req, res, request, message, mailTopic, mailType) {
     const { userId } = request;
     const recipient = await UserRoleController.getRecipient(null, userId);
 
-    return NotificationEngine.sendMail(RequestUtils.getMailData(
-      request, recipient, mailTopic, mailType, null, false
-    ));
+    return NotificationEngine.sendMail(
+      RequestUtils.getMailData(request, recipient, mailTopic, mailType, null, false)
+    );
   }
 
-  static async sendNotificationToManager(
-    req,
-    res,
-    request,
-    message,
-    mailTopic,
-    mailType,
-  ) {
+  static async sendNotificationToManager(req, res, request, message, mailTopic, mailType) {
     const { userId, id, manager } = request;
     const recipient = await UserRoleController.getRecipient(manager);
     // map the mailType to a notificationType.
@@ -137,11 +122,12 @@ class RequestsController {
       message,
       notificationLink: `/requests/my-approvals/${id}`,
       senderName: req.user.UserInfo.name,
-      senderImage: req.user.UserInfo.picture,
+      senderImage: req.user.UserInfo.picture
     };
     NotificationEngine.notify(notificationData);
-    return NotificationEngine.sendMail(RequestUtils
-      .getMailData(request, recipient, mailTopic, mailType));
+    return NotificationEngine.sendMail(
+      RequestUtils.getMailData(request, recipient, mailTopic, mailType)
+    );
   }
 
   static async inAppTravelAdmin(
@@ -179,7 +165,9 @@ class RequestsController {
           sender: name,
           topic: Emailtopic,
           type: originType,
-          details: { requestId: id, requesterName: name, location: trips[index].origin },
+          details: {
+            requestId: id, requesterName: name, location: trips[index].destination, tripType
+          },
           redirectLink: link
         };
   
@@ -187,13 +175,16 @@ class RequestsController {
           sender: name,
           topic: Emailtopic,
           type: destinationType,
-          details: { requestId: id, requesterName: name, location: trips[index].destination },
+          details: {
+            requestId: id, requesterName: name, location: trips[index].destination, tripType
+          },
           redirectLink: link
         };
-        this.inAppTravelAdmin(trips[index].origin, admin[0], name, id,
-          originType, picture, senderId, deadlink, tripType);
-        this.inAppTravelAdmin(trips[index].destination, admin[1], name, id,
-          destinationType, picture, senderId, deadlink, tripType);
+        
+        [originType, destinationType].forEach((locationType, i) => this.inAppTravelAdmin(
+          trips[index].destination, admin[i], name, id, locationType, picture, senderId, deadlink, tripType
+        ));
+
         NotificationEngine.sendMailToMany(admin[0], originEmailData);
         NotificationEngine.sendMailToMany(admin[1], destinationEmailData);
       });
@@ -216,11 +207,7 @@ class RequestsController {
     let newSubQuery = subquery;
     newSubQuery.where = { userId: params.userId };
     if (params.status) {
-      newSubQuery = includeStatusSubquery(
-        newSubQuery,
-        params.status,
-        'Request',
-      );
+      newSubQuery = includeStatusSubquery(newSubQuery, params.status, 'Request');
     }
     return newSubQuery;
   }
@@ -246,37 +233,41 @@ class RequestsController {
       countByStatus,
       models.Request,
       params.userId,
-      params.search,
+      params.search
     );
     const pagination = Pagination.getPaginationData(
       params.page,
       params.limit,
-      getTotalCount(params.status, count),
+      getTotalCount(params.status, count)
     );
     const message = params.search && !requests.count
       ? noResult
       : Utils.getResponseMessage(pagination, params.status, 'Request');
-    const newRequest = Promise.all(requests.rows.map(async (request) => {
-      const travelCompletion = await TravelChecklistController
-        .checkListPercentage(req, res, request.id);
-      request.dataValues.travelCompletion = travelCompletion;
-      return request;
-    }));
+    const newRequest = Promise.all(
+      requests.rows.map(async (request) => {
+        const travelCompletion = await TravelChecklistController.checkListPercentage(
+          req,
+          res,
+          request.id
+        );
+        request.dataValues.travelCompletion = travelCompletion;
+        return request;
+      })
+    );
 
     const allRequests = await newRequest;
     return res.status(200).json({
-      success: true, message, requests: allRequests, meta: { count, pagination }
+      success: true,
+      message,
+      requests: allRequests,
+      meta: { count, pagination }
     });
   }
 
   static async processResult(req, res, searchTrips = false) {
     const subquery = RequestsController.generateSubquery(searchTrips);
     let requests = { count: 0 };
-    requests = await asyncWrapper(
-      res,
-      RequestsController.getRequestsFromDb,
-      subquery,
-    );
+    requests = await asyncWrapper(res, RequestsController.getRequestsFromDb, subquery);
     if (!requests.count && !searchTrips) {
       return RequestsController.processResult(req, res, !searchTrips);
     }
@@ -301,23 +292,25 @@ class RequestsController {
       const requests = await models.Request.findAll({
         where: { department: dept, status: 'Verified', userId: { [Op.ne]: currentUserId } },
         order: [[{ model: models.Trip, as: 'trips' }, 'departureDate', 'asc']],
-        include: [{
-          model: models.Trip,
-          as: 'trips',
-          where: { departureDate: { [Op.gte]: today } },
-        }]
+        include: [
+          {
+            model: models.Trip,
+            as: 'trips',
+            where: { departureDate: { [Op.gte]: today } }
+          }
+        ]
       });
       const uniqRequests = _.uniqBy(requests, 'userId');
 
       const teammates = uniqRequests.map(({ trips, name, picture }) => {
         const { returnDate } = trips[trips.length - 1];
-        return ({
+        return {
           name,
           picture,
           destination: trips[0].destination.split(',')[0],
           departureDate: trips[0].departureDate,
-          returnDate,
-        });
+          returnDate
+        };
       });
 
       res.status(200).json({
@@ -352,11 +345,12 @@ class RequestsController {
         requestData.dataValues.budgetApprovedAt = approver.budgetApprovedAt;
       }
       requestData.dataValues.stipend = requestData.dataValues.stipendBreakdown
-        ? JSON.parse(requestData.dataValues.stipendBreakdown) : requestData.dataValues.stipend;
+        ? JSON.parse(requestData.dataValues.stipendBreakdown)
+        : requestData.dataValues.stipend;
       delete requestData.dataValues.stipendBreakdown;
       return res.status(200).json({
         success: true,
-        requestData,
+        requestData
       });
     } catch (error) {
       /* istanbul ignore next */
@@ -368,7 +362,7 @@ class RequestsController {
     const { requestId } = req.params;
     let { trips } = req.body;
     // eslint-disable-next-line
-    trips = trips.map((trip) => {
+    trips = trips.map(trip => {
       if (trip.bedId < 1) {
         // eslint-disable-next-line
         trip.accommodationType = trip.bedId == -1 ? 'Hotel Booking' : 'Not Required';
@@ -454,25 +448,44 @@ class RequestsController {
 
       if (centerIds.length) {
         const travelAdmins = await Users.getDestinationTravelAdmin(centerIds);
-        const message = `This is to inform you that ${request.name}'s request ${request.id} to visit 
+        const message = `This is to inform you that ${request.name}'s request ${
+          request.id
+        } to visit 
           your centre has just been verified by the local travel team.
           Please be aware of this request and plan for the traveller.`;
         NotificationEngine.notifyMany({
-          users: travelAdmins, senderId, name, picture, id, message
+          users: travelAdmins,
+          senderId,
+          name,
+          picture,
+          id,
+          message
         });
-        NotificationEngine.sendMailToMany(travelAdmins, RequestsController.notificationMessages(senderId, name, request, picture, userId, id).travelAdminEmailData);
+        NotificationEngine.sendMailToMany(
+          travelAdmins,
+          RequestsController.notificationMessages(senderId, name, request, picture, userId, id)
+            .travelAdminEmailData
+        );
       }
 
       const emailRequest = { name, manager: request.name, id: request.id };
       const emailData = RequestUtils.getMailData(
-        emailRequest, recipient, 'Travel Request Verified', 'Verified', `/redirect/requests/${emailRequest.id}`
+        emailRequest,
+        recipient,
+        'Travel Request Verified',
+        'Verified',
+        `/redirect/requests/${emailRequest.id}`
       );
-      
-      NotificationEngine.notify(RequestsController.notificationMessages(senderId, name, request, picture, userId, id).notificationData);
+
+      NotificationEngine.notify(
+        RequestsController.notificationMessages(senderId, name, request, picture, userId, id)
+          .notificationData
+      );
       NotificationEngine.sendMail(emailData);
       await RequestUtils.sendEmailToFinanceTeam(request);
 
-      return res.status(200)
+      return res
+        .status(200)
         .json({ success: true, message: 'Verification Successful', updatedRequest: { request } });
     } catch (error) {
       /* istanbul ignore next */

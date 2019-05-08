@@ -180,26 +180,24 @@ export const readinessRequestClause = (travelFlow, dateFrom, dateTo, location) =
 
 export const srcRequestWhereClause = () => ({ status: ['Approved', 'Verified'] });
 
+export const getUsers = async (roleIds, centerId) => {
+  const users = await models.UserRole.findAll({
+    where: {
+      roleId: {
+        [Op.in]: roleIds
+      },
+      centerId
+    },
+    include: [{ model: models.User, as: 'user' }],
+  });
+  
+  return users;
+};
+
 export const getUserbyCenter = async (userCenterIds, roleIds) => {
   const tripadmins = await userCenterIds.map(async (center) => {
-    const tripOriginAdmins = await models.UserRole.findAll({
-      where: {
-        roleId: {
-          [Op.in]: roleIds
-        },
-        centerId: center[0]
-      },
-      include: [{ model: models.User, as: 'user' }],
-    });
-    const tripDestinationAdmins = await models.UserRole.findAll({
-      where: {
-        roleId: {
-          [Op.in]: roleIds
-        },
-        centerId: center[1]
-      },
-      include: [{ model: models.User, as: 'user' }]
-    });
+    const tripOriginAdmins = await getUsers(roleIds, center[0]);
+    const tripDestinationAdmins = await getUsers(roleIds, center[1]);
     const originAdmins = tripOriginAdmins.map(user => user.dataValues.user);
     const destinationAdmins = tripDestinationAdmins.map(user => user.dataValues.user);
 
@@ -219,18 +217,23 @@ export const getTravelTeams = async (trips) => {
   return null;
 };
 
-
 export const switchInAppMessage = (messageType, id, name, tripLocation, tripType) => {
   switch (messageType) {
     case 'Request created from origin Travel Admin':
       return `This is to inform you that ${name} has just submitted 
-      a ${tripType} travel request ${id} You will be notified once the request
+      a ${tripType} travel request ${id} to ${tripLocation}. You will be notified once the request
       has been approved by the budget holder of his/her department`;
    
     case 'Request created to visit destination Travel Admin':
       return `This is to inform you that ${name} has just submitted
       a ${tripType} travel request  ${id} to visit your centre ${tripLocation}.
       You will be notified when the origin travel team verifies this request`;
+    case 'Notify Origin Tavel Team On Request Deletion':
+      return `This is to inform you that ${name} has just deleted the ${tripType} travel request ${id}  to ${tripLocation}.
+      Please cancel all initial plans for this trip.`;
+    case 'Notify Destination Tavel Team On Request Deletion':
+      return `This is to inform you that ${name} has just deleted the ${tripType} travel request ${id}  to your center ${tripLocation}. 
+      Please cancel all initial plans for this trip.`;
     default:
       return '';
   }

@@ -178,4 +178,53 @@ describe('switchMessage helper', () => {
     expect(budgetRejectedMsg.split(' ')[0]).toContain('Your');
     done();
   });
+  it('should return email deletion message on requet deletion', (done) => {
+    const budgetRejectedMsg = switchMessage({
+      type: 'Notify Origin Tavel Team On Request Deletion',
+      details: {
+        requesterName: 'Sammy njau',
+        requestId: 'trerefsv',
+        location: 'Nakuru',
+        tripType: 'return'
+      }
+    });
+    expect(budgetRejectedMsg).toContain('This');
+    done();
+  });
+
+  it('should return email deletion message on requet deletion', (done) => {
+    const emailMsg = switchMessage({
+      type: 'Notify Destination Tavel Team On Request Deletion',
+      details: {
+        requesterName: 'Sammy njau',
+        requestId: 'trerefsv',
+        location: 'Nakuru',
+        tripType: 'return'
+      }
+    });
+    expect(emailMsg).toContain('This');
+    done();
+  });
+  it('should return email verification message', (done) => {
+    const emailMsg = switchMessage({
+      type: 'Travel Request Verified',
+      details: {
+        requesterName: 'Sammy njau',
+        id: '12'
+      }
+    });
+    expect(emailMsg.split(' ')[0]).toContain('This');
+    done();
+  });
+
+  it('should return email  message to finance team', (done) => {
+    const emailMsg = switchMessage({
+      type: 'Notify finance team members',
+      details: {
+        requesterName: 'Sammy njau'
+      }
+    });
+    expect(emailMsg).toContain('has');
+    done();
+  });
 });

@@ -79,6 +79,13 @@ export default class RequestUtils {
     return request;
   }
 
+  static async getTrips(requestId) {
+    const trips = await models.Trip.findAll({
+      where: { requestId },
+    });
+    return trips;
+  }
+  
   // Finance team email notification
   static async sendEmailToFinanceTeam(request) {
     const {

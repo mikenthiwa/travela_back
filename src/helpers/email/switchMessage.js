@@ -177,14 +177,27 @@ of budget for this trip.`;
       Thank you`;
     case 'Request created from origin Travel Admin':
       return `
-    <b> This is to inform you that ${msgDetail.details.requesterName} has just submitted a travel request.
+    This is to inform you that <b>${msgDetail.details.requesterName}</b> has just submitted a <b>${msgDetail.details.tripType}</b> travel request
+    to <b>${msgDetail.details.location}</b>.
     You will be notified once the request has been approved by the budget holder of his/her department.`;
 
     case 'Request created to visit destination Travel Admin':
       return `
-    <b> This is to inform you that  ${msgDetail.details.requesterName} has 
-    just submitted a travel request to visit your center ${msgDetail.details.location}. 
+    This is to inform you that  <b>${msgDetail.details.requesterName}</b> has 
+    just submitted a <b>${msgDetail.details.tripType}</b> travel request to visit your center <b>${msgDetail.details.location}</b>. 
     You will be notified when the origin travel team verifies this request`;
+
+    case 'Notify Origin Tavel Team On Request Deletion':
+      return `
+      This is to inform you that <b> ${msgDetail.details.requesterName}</b> has just deleted the <b>${msgDetail.details.tripType}</b>
+      travel request  <b>${msgDetail.details.requestId}</b> to <b>${msgDetail.details.location}</b>  Please cancel all initial plans for this trip.`;
+
+    case 'Notify Destination Tavel Team On Request Deletion':
+      return `
+      This is to inform you that <b> ${msgDetail.details.requesterName}</b> has just deleted the <b>${msgDetail.details.tripType}</b>
+      travel request <b>${msgDetail.details.requestId}</b>  to your center <b>${msgDetail.details.location}</b> . Please cancel all initial plans for this trip.
+      `;
+
     default:
       return '';
   }

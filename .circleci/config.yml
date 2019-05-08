@@ -132,6 +132,23 @@ jobs:
             .circleci/build_deploy.sh main
       - *send_failure_notification
 
+  deploy-qa:
+    <<: *defaults
+    steps:
+      - setup_remote_docker
+      - *attach_workspace
+      - run:
+          name: Install and setup K8s deployment requirements
+          command: |
+            chmod +x .circleci/gcloud_login.sh
+            .circleci/gcloud_login.sh main
+      - run:
+          name: Build and deploy travela Backend Application
+          command: |
+            chmod +x .circleci/build_deploy.sh
+            .circleci/build_deploy.sh main
+      - *send_failure_notification
+
 workflows:
   version: 2
   test_build_deploy:
@@ -152,3 +169,10 @@ workflows:
           requires:
             - build_application_artifacts
           <<: *filters
+      - deploy-qa:
+          requires:
+            - build_application_artifacts
+          filters:
+            branches:
+              only:
+                - master

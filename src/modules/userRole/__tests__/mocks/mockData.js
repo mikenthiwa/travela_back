@@ -168,6 +168,7 @@ export const userMock = [
     fullName: 'Samuel Kubai',
     email: 'captan.ameria@andela.com',
     userId: '20200',
+    bambooHrId: '20200',
     location: 'Lagos',
     createdAt: '2018-08-16 012:11:52.181+01',
     updatedAt: '2018-08-16 012:11:52.181+01'
@@ -186,6 +187,7 @@ export const userMock = [
     fullName: 'Wilson Kamau',
     email: 'wilson.gaturu@andela.com',
     userId: '333',
+    bambooHrId: '333',
     location: 'Nairobi',
     createdAt: '2018-08-16 012:11:52.181+01',
     updatedAt: '2018-08-16 012:11:52.181+01'

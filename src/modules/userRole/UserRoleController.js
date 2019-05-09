@@ -128,14 +128,16 @@ class UserRoleController {
       });
       await result.addRole(401938);
       if (result.dataValues.manager === null) {
-        const userOnBamboo = await UserHelper.getUserOnBamboo(result.userId);
+        const userOnBamboo = await UserHelper.getUserOnBamboo(result.bambooHrId);
         const manager = await models.User.find({
           where: {
-            userId: userOnBamboo.data.supervisorEId
+            bambooHrId: userOnBamboo.data.supervisorEId
           },
         });
-        manager.addRole(53019);
-        await result.update({ manager: manager.dataValues.fullName });
+        if (manager) {
+          await manager.addRole(53019);
+          await result.update({ manager: manager.dataValues.fullName });
+        }
       }
       await result.update({ picture: userData.picture });
       const message = [201, 'User Found', true];

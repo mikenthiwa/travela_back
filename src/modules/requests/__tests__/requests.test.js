@@ -3,7 +3,7 @@ import moment from 'moment';
 import models from '../../../database/models';
 import app from '../../../app';
 import { role as roles } from '../../userRole/__tests__/mocks/mockData';
-import generateMock, { emptyRequestResponse, } from './mocks/mockData';
+import generateMock, { emptyRequestResponse, mockNotificationDetails } from './mocks/mockData';
 import Utils from '../../../helpers/Utils';
 import RequestsController from '../RequestsController';
 import UserRoleController from '../../userRole/UserRoleController';
@@ -1911,6 +1911,30 @@ describe('Requests Controller', () => {
           });
       });
     });
+  });
+
+  describe('RequestController.sendNotificationToAdmin', () => {
+    beforeAll(() => {
+      NotificationEngine.notifyMany = jest.fn();
+      NotificationEngine.sendMailToMany = jest.fn();
+    });
+
+    it('should send "general" notification if mailType is "New Request"',
+      async (done) => {
+        const {
+          req, trips, travelRequest
+        } = generateMock.mailData();
+        const {
+          mailTopic, originType, destinationType, link, deadLink
+        } = mockNotificationDetails;
+        await RequestsController.sendNotificationToTravelAdmin(
+          req, trips, travelRequest, originType, destinationType, mailTopic, link, deadLink
+        );
+        const [args] = NotificationEngine
+          .notify.mock.calls[NotificationEngine.notifyMany.mock.calls.length - 1];
+        expect(args.notificationType).toEqual('general');
+        done();
+      });
   });
 
   // Tests to capture the sendNotificationToManager method

@@ -28,6 +28,10 @@ const switchButtonText = (type) => {
       return 'Fill Checklist';
     case 'Notify Travel Admins Checklist Completion':
       return 'Verify';
+    case 'Notify Origin Tavel Team On Request Deletion':
+      return 'View Notification';
+    case 'Notify Destination Tavel Team On Request Deletion':
+      return 'View Notification';
     default:
       return 'View Request';
   }

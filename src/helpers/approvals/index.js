@@ -135,6 +135,7 @@ export const getTravelTeamEmailData = async (
     };
     return travelAdmins.length ? { travelAdmins, data } : null;
   }
+  
   return null;
 };
 

@@ -150,7 +150,8 @@ const switchMessage = (msgDetail) => {
 of budget for this trip.`;
     case 'Notify finance team':
       return `This is to notify you that a travel request <b>${msgDetail.details.id}
-      </b> for <b> ${msgDetail.details.requesterName}</b> has now been approved by the budget holder 
+      </b> for <b> ${msgDetail.details.requesterName}</b> 
+      has now been approved by the budget holder
       <b>${msgDetail.details.budgetCheckerName} </b> of the department.
       You will be notified again as soon as the request is verified by the Travel team.Thank you.`;
     case 'Notify Travel Admins of Manager Approval':
@@ -172,10 +173,30 @@ of budget for this trip.`;
     case 'Notify finance team members':
       return `
       <b> ${msgDetail.details.requesterName}</b> has now been verified as travel ready.
+      Please view travel request and make arrangements to disburse travel stipend for this trip.
+      Thank you`;
+    case 'Request created from origin Travel Admin':
+      return `
+    This is to inform you that <b>${msgDetail.details.requesterName}</b> has just submitted a <b>${msgDetail.details.tripType}</b> travel request
+    to <b>${msgDetail.details.location}</b>.
+    You will be notified once the request has been approved by the budget holder of his/her department.`;
 
- Please view travel request and make arrangements to disburse travel stipend for this trip.
+    case 'Request created to visit destination Travel Admin':
+      return `
+    This is to inform you that  <b>${msgDetail.details.requesterName}</b> has 
+    just submitted a <b>${msgDetail.details.tripType}</b> travel request to visit your center <b>${msgDetail.details.location}</b>. 
+    You will be notified when the origin travel team verifies this request`;
 
-Thank you`;
+    case 'Notify Origin Tavel Team On Request Deletion':
+      return `
+      This is to inform you that <b> ${msgDetail.details.requesterName}</b> has just deleted the <b>${msgDetail.details.tripType}</b>
+      travel request  <b>${msgDetail.details.requestId}</b> to <b>${msgDetail.details.location}</b>  Please cancel all initial plans for this trip.`;
+
+    case 'Notify Destination Tavel Team On Request Deletion':
+      return `
+      This is to inform you that <b> ${msgDetail.details.requesterName}</b> has just deleted the <b>${msgDetail.details.tripType}</b>
+      travel request <b>${msgDetail.details.requestId}</b>  to your center <b>${msgDetail.details.location}</b> . Please cancel all initial plans for this trip.
+      `;
 
     default:
       return '';

@@ -13,9 +13,15 @@ export default class NotificationEngine {
     if (dataKeys.length < 1) {
       return false;
     }
-    const validKeys = ['senderId', 'recipientId', 'notificationType',
-      'message', 'notificationLink',
-      'senderName', 'senderImage'];
+    const validKeys = [
+      'senderId',
+      'recipientId',
+      'notificationType',
+      'message',
+      'notificationLink',
+      'senderName',
+      'senderImage'
+    ];
     const validateData = validKeys.map((value) => {
       if (dataKeys.includes(value) === false) {
         return false;
@@ -28,7 +34,7 @@ export default class NotificationEngine {
     }
     const notification = {
       ...data,
-      notificationStatus: 'unread',
+      notificationStatus: 'unread'
     };
     const newNotification = await models.Notification.create(notification);
     global.io.sockets.emit('notification', newNotification);
@@ -47,25 +53,31 @@ export default class NotificationEngine {
   }
 
   static sendMail({
-    recipient, sender, topic, type, redirectLink, requestId, comment, details, picture
+    recipient,
+    sender,
+    topic,
+    type,
+    redirectLink,
+    requestId,
+    comment,
+    details,
+    picture
   }) {
     const data = {
       from: `Travela <${process.env.MAIL_SENDER}>`,
       to: `${recipient.email}`,
       subject: topic,
       details,
-      html: mailTemplate(
-        {
-          recipientName: recipient.name,
-          senderName: sender,
-          type,
-          redirectLink,
-          requestId,
-          comment,
-          details,
-          picture
-        }
-      )
+      html: mailTemplate({
+        recipientName: recipient.name,
+        senderName: sender,
+        type,
+        redirectLink,
+        requestId,
+        comment,
+        details,
+        picture
+      })
     };
     NotificationEngine.dispatchEmail(data);
   }
@@ -74,7 +86,7 @@ export default class NotificationEngine {
     const recipientVars = {};
     const emails = recipients.map((recipient) => {
       recipientVars[recipient.email] = {
-        name: recipient.fullName,
+        name: recipient.fullName
       };
       return recipient.email || recipient.user.email;
     });
@@ -89,23 +101,21 @@ export default class NotificationEngine {
       from: `Travela <${process.env.MAIL_SENDER}>`,
       to: emails,
       subject: data.topic,
-      html: mailTemplate(
-        {
-          recipientName: '%recipient.name%',
-          senderName: data.sender,
-          type: data.type,
-          redirectLink: data.redirectLink,
-          requestId: data.requestId,
-          comment: data.comment,
-          guesthouseName: data.guesthouseName,
-          checkInTime: data.checkInTime,
-          durationOfStay: data.durationOfStay,
-          destination,
-          checkoutTime: data.checkoutTime,
-          details: data.details,
-        }
-      ),
-      'recipient-variables': recipientVars,
+      html: mailTemplate({
+        recipientName: '%recipient.name%',
+        senderName: data.sender,
+        type: data.type,
+        redirectLink: data.redirectLink,
+        requestId: data.requestId,
+        comment: data.comment,
+        guesthouseName: data.guesthouseName,
+        checkInTime: data.checkInTime,
+        durationOfStay: data.durationOfStay,
+        destination,
+        checkoutTime: data.checkoutTime,
+        details: data.details
+      }),
+      'recipient-variables': recipientVars
     };
 
     NotificationEngine.dispatchEmail(mailData);
@@ -113,29 +123,29 @@ export default class NotificationEngine {
 
   static async sendReminderEmail(userGroup, emailTemplates) {
     emailTemplates.map(async (data, index) => {
-      if (userGroup[index].length < 1) { return; }
+      if (userGroup[index].length < 1) {
+        return;
+      }
       userGroup[index].map((users) => {
         const mailData = {
           from: `Travela <${process.env.MAIL_SENDER}>`,
           to: users.user.email,
           cc: data.emailTemplate.cc,
           subject: data.emailTemplate.subject,
-          html: mailTemplate(
-            {
-              recipientName: users.user.fullName,
-              senderName: data.emailTemplate.name,
-              type: 'Reminder',
-              redirectLink: '',
-              requestId: '',
-              comment: '',
-              guesthouseName: '',
-              checkInTime: '',
-              durationOfStay: '',
-              destination: '',
-              checkoutTime: '',
-              details: data.emailTemplate.message,
-            }
-          )
+          html: mailTemplate({
+            recipientName: users.user.fullName,
+            senderName: data.emailTemplate.name,
+            type: 'Reminder',
+            redirectLink: '',
+            requestId: '',
+            comment: '',
+            guesthouseName: '',
+            checkInTime: '',
+            durationOfStay: '',
+            destination: '',
+            checkoutTime: '',
+            details: data.emailTemplate.message
+          })
         };
         return NotificationEngine.dispatchEmail(mailData);
       });
@@ -143,7 +153,13 @@ export default class NotificationEngine {
   }
 
   static async notifyMany({
-    users = [], senderId, name, picture, id, message
+    users = [],
+    senderId,
+    name,
+    picture,
+    id,
+    message,
+    link = `/requests/${id}`
   }) {
     users.forEach((user) => {
       const { userId } = user.dataValues;
@@ -156,7 +172,7 @@ export default class NotificationEngine {
         requestId: id,
         notificationStatus: 'unread',
         message,
-        notificationLink: `/requests/${id}`
+        notificationLink: link
       };
       NotificationEngine.notify(data);
     });

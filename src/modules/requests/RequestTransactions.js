@@ -6,7 +6,6 @@ import Error from '../../helpers/Error';
 import RequestUtils from './RequestUtils';
 import UserRoleController from '../userRole/UserRoleController';
 
-
 const { Op } = models.Sequelize;
 
 export default class RequestTransactions {
@@ -18,8 +17,8 @@ export default class RequestTransactions {
         trips.map(trip => ({
           ...trip,
           requestId: request.id,
-          id: Utils.generateUniqueId(),
-        })),
+          id: Utils.generateUniqueId()
+        }))
       );
 
       // create a comment submitted with the request
@@ -35,30 +34,31 @@ export default class RequestTransactions {
         await models.Comment.create(commentData);
       }
 
-
       const approval = await ApprovalsController.createApproval(request);
       request.dataValues.trips = requestTrips;
 
-      this.sendNotification(req, res, request);
+      this.sendNotification(req, res, request, requestTrips);
 
       return res.status(201).json({
         success: true,
         message: 'Request created successfully',
         request,
-        approval,
+        approval
       });
     });
   }
 
-  static sendNotification(req, res, request) {
+  static sendNotification(req, res, request, trips) {
     const message = 'created a new travel request';
+    const { id } = request;
+    const link = `${process.env.REDIRECT_URL}/requests/${id}`;
     RequestsController.sendNotificationToManager(
       req,
       res,
       request,
       message,
       'New Travel Request',
-      'New Request',
+      'New Request'
     );
     RequestsController.sendNotificationToRequester(
       req,
@@ -68,21 +68,29 @@ export default class RequestTransactions {
       'New Travel Request',
       'New Requester Request'
     );
+
+    RequestsController.sendNotificationToTravelAdmin(
+      req,
+      trips,
+      request,
+      'Request created from origin Travel Admin',
+      'Request created to visit destination Travel Admin',
+      'New Request',
+      link
+    );
   }
 
   static async updateRequestTrips(trips, tripData, requestId) {
     const alteredTripData = { ...tripData };
     // Delete trips with ids not included in the update field
-    const tripIds = trips
-      .filter(trip => trip.id !== undefined)
-      .map(trip => trip.id);
+    const tripIds = trips.filter(trip => trip.id !== undefined).map(trip => trip.id);
     await models.Trip.destroy({
       where: {
         requestId,
-        id: { [Op.notIn]: tripIds },
-      },
+        id: { [Op.notIn]: tripIds }
+      }
     });
-    alteredTripData.bedId = (tripData.bedId < 1) ? null : tripData.bedId;
+    alteredTripData.bedId = tripData.bedId < 1 ? null : tripData.bedId;
     const trip = await models.Trip.findById(alteredTripData.id);
     let requestTrip;
     if (trip) {
@@ -91,7 +99,7 @@ export default class RequestTransactions {
       requestTrip = await models.Trip.create({
         requestId,
         ...alteredTripData,
-        id: Utils.generateUniqueId(),
+        id: Utils.generateUniqueId()
       });
     }
     return requestTrip;
@@ -111,7 +119,7 @@ export default class RequestTransactions {
         return Error.handleError(error, 409, res);
       }
       const requestTrips = await Promise.all(
-        trips.map(trip => RequestTransactions.updateRequestTrips(trips, trip, request.id)),
+        trips.map(trip => RequestTransactions.updateRequestTrips(trips, trip, request.id))
       );
       delete requestDetails.status; // status cannot be updated by requester
       requestDetails.stipendBreakdown = JSON.stringify(requestDetails.stipendBreakdown);
@@ -122,16 +130,23 @@ export default class RequestTransactions {
 
       if (!requestToApprove) {
         const error = 'Approval request not found';
+
+        /* istanbul ignore next */
         return Error.handleError(error, 404, res);
       }
       await requestToApprove.update({ approverId: req.body.manager });
       RequestsController.sendNotificationToManager(
-        req, res, request, message, 'Updated Travel Request', 'Updated Request',
+        req,
+        res,
+        request,
+        message,
+        'Updated Travel Request',
+        'Updated Request'
       );
       return res.status(200).json({
         success: true,
         request: updatedRequest,
-        trips: requestTrips,
+        trips: requestTrips
       });
     });
   }
@@ -141,6 +156,7 @@ export default class RequestTransactions {
     const userId = req.user.UserInfo.id;
     await models.sequelize.transaction(async () => {
       const request = await RequestUtils.getRequest(requestId, userId);
+      const trips = await RequestUtils.getTrips(requestId);
       if (!request) {
         return Error.handleError('Request was not found', 404, res);
       }
@@ -149,22 +165,36 @@ export default class RequestTransactions {
       }
       request.destroy();
       RequestsController.handleDestroyTripComments(req);
-
-      const notificationMessage = 'deleted a travel request';
-
-      RequestsController.sendNotificationToManager(
-        req,
-        res,
-        request,
-        notificationMessage,
-        'Deleted Travel Request',
-        'Deleted Request',
-      );
+      await this.sendNotificationOnDelete(req, res, request, trips);
       const message = `Request ${request.id} has been successfully deleted`;
       return res.status(200).json({
         success: true,
         message
       });
     });
+  }
+
+  static async sendNotificationOnDelete(req, res, request, trips) {
+    const notificationMessage = 'deleted a travel request';
+    const link = `${process.env.REDIRECT_URL}/requests/my-verifications`;
+    const deadLink = '/#';
+    RequestsController.sendNotificationToManager(
+      req,
+      res,
+      request,
+      notificationMessage,
+      'Deleted Travel Request',
+      'Deleted Request'
+    );
+    RequestsController.sendNotificationToTravelAdmin(
+      req,
+      trips,
+      request,
+      'Notify Origin Tavel Team On Request Deletion',
+      'Notify Destination Tavel Team On Request Deletion',
+      'Deleted Travel Request',
+      link,
+      deadLink
+    );
   }
 }

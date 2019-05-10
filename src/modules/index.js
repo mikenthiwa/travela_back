@@ -19,6 +19,7 @@ import travelStipendRouter from './travelStipend';
 import departmentRouter from './department';
 import bamboohrRouter from './bamboohr';
 import travelRegionsRouter from './travelRegions';
+import countriesRouter from './countries';
 
 const apiPrefix = '/api/v1';
 
@@ -44,7 +45,8 @@ const routes = [
   travelStipendRouter,
   departmentRouter,
   bamboohrRouter,
-  travelRegionsRouter
+  travelRegionsRouter,
+  countriesRouter
 ];
 export default (app) => {
   routes.forEach(route => app.use(apiPrefix, route));

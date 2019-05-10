@@ -21,6 +21,11 @@ export default (sequelize, DataTypes) => {
       type: DataTypes.DATE
     }
   });
-  
+  TravelRegions.associate = (models) => {
+    TravelRegions.hasMany(models.Country, {
+      foreignKey: 'regionId',
+      as: 'countries'
+    });
+  };
   return TravelRegions;
 };

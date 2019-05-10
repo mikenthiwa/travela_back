@@ -171,6 +171,11 @@ const middleware = {
   TravelRegionsValidator: {
     conditionValidation: jest.fn(invokeNextMiddleware),
     inputValidation: jest.fn(invokeNextMiddleware),
+  },
+  CountryValidator: {
+    regionExistsValidation: jest.fn(invokeNextMiddleware),
+    inputValidation: jest.fn(invokeNextMiddleware),
+    countryExistsValidation: jest.fn(invokeNextMiddleware),
   }
 };
 

@@ -167,7 +167,7 @@ describe('Travel ChecklistController', () => {
           checklistItem: {
             name: 'Visa application',
             requiresFiles: true,
-            destinationName: 'Nigeria',
+            location: 'Nigeria',
             resources: [{ label: 'Visa', link: 'http://myvisa.test' }]
           }
         },
@@ -178,11 +178,12 @@ describe('Travel ChecklistController', () => {
         .send({
           name: 'Visa application',
           requiresFiles: true,
-          destinationName: 'Nigeria',
+          location: 'Nigeria',
           resources: [{ label: 'Visa', link: 'http://myvisa.test' }]
         });
       expect(res.statusCode).toEqual(expectedResponse.status);
-      expect(res.body).toMatchObject(expectedResponse.body);
+      expect(res.body.message).toEqual(expectedResponse.body.message);
+      expect(res.body.checklistItem.name).toEqual(expectedResponse.body.checklistItem.name);
     });
     it('should create a new travel checklist item without a resource', async () => {
       const expectedResponse = {
@@ -193,7 +194,7 @@ describe('Travel ChecklistController', () => {
           checklistItem: {
             name: 'Visa applications',
             requiresFiles: true,
-            destinationName: 'Nigeria',
+            location: 'Nigeria',
             resources: []
           }
         },
@@ -204,11 +205,12 @@ describe('Travel ChecklistController', () => {
         .send({
           name: 'Visa applications',
           requiresFiles: true,
-          destinationName: 'Nigeria',
+          location: 'Nigeria',
           resources: []
         });
       expect(res.statusCode).toEqual(expectedResponse.status);
-      expect(res.body).toMatchObject(expectedResponse.body);
+      expect(res.body.message).toEqual(expectedResponse.body.message);
+      expect(res.body.checklistItem.name).toEqual(expectedResponse.body.checklistItem.name);
     });
 
     it('should not create a duplicate travel checklist item', async () => {
@@ -229,7 +231,7 @@ describe('Travel ChecklistController', () => {
       const requestBody = {
         name: 'passport',
         requiresFiles: true,
-        destinationName: 'Nigeria',
+        location: 'Nigeria',
         resources: []
       };
 

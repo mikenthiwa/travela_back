@@ -215,7 +215,7 @@ class UserRoleController {
       });
       const error = 'User already has this role';
       if (hasRole) return CustomError.handleError(error, 409, res);
-      
+
       await UserRoleController.addMuftiCenter(centerId, user, roleId);
       if (roleId === 60000) {
         dept = await DepartmentController.assignDepartments(departments, user);

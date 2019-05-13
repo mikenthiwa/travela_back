@@ -112,7 +112,7 @@ const dateDeparture = new Date(date.setDate(date.getDate() + 1))
   .toISOString().split('T')[0];
 const dateReturn = new Date(date.setDate(date.getDate() + 3))
   .toISOString().split('T')[0];
-  
+
 export const dates = {
   departureDate: dateDeparture,
   returnDate: dateReturn,
@@ -687,15 +687,26 @@ export const beds = [
   }
 ];
 
-export const user = {
-  id: 10000,
-  fullName: 'black window ',
-  email: 'black.window@andela.com',
-  userId: '-MUyHJmKrxA90lPNQ1FOLNm',
-  createdAt: '2018-08-16 012:11:52.181+01',
-  updatedAt: '2018-08-16 012:11:52.181+01',
-  location: 'Lagos',
-};
+export const user = [
+  {
+    id: 10000,
+    fullName: 'black window ',
+    email: 'black.window@andela.com',
+    userId: '-MUyHJmKrxA90lPNQ1FOLNm',
+    createdAt: '2018-08-16 012:11:52.181+01',
+    updatedAt: '2018-08-16 012:11:52.181+01',
+    location: 'Lagos'
+  },
+  {
+    id: 10010,
+    fullName: 'Samuel Kubai',
+    userId: '-MUyHJmKrxA90lPNOLNm',
+    createdAt: '2018-08-16 012:11:52.181+01',
+    updatedAt: '2018-08-16 012:11:52.181+01',
+    location: 'Lagos',
+    email: 'samuel.kubai@andela.com'
+  }
+];
 
 export const expectedResponse = {
   success: true,

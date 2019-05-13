@@ -114,20 +114,23 @@ describe('Travel ChecklistController', () => {
   describe('Update /api/v1/checklist/:checklistId', () => {
     it('should update a checklist item if the user is a travel or super admin', (done) => {
       const expectedResponse = {
-        success: true,
         message: "Checklist item successfully updated",
+        success: true,
         updatedChecklistItem: {
-            name: "Expenditure",
-            requiresFiles: false,
-            resources: []
-        }
+        deletedAt: null,
+        destinationName: "Nigeria",
+        name: "Expenditure",
+        requiresFiles: false,
+        resources: []
+      },
       };
       request(app).put('/api/v1/checklists/7')
       .set('authorization', token)
       .send({
         name: "Expenditure",
         requiresFiles: false,
-        resources: [ ]
+        resources: [ ],
+        location: 'Nigeria',
       })
       .end((err, res) => {
         if (err) done(err);

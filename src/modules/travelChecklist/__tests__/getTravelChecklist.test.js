@@ -32,7 +32,8 @@ describe('Travel Checklists Controller', () => {
       id: '-MUyHJmKrxA90lPNQ1FOLNm',
       name: 'Samuel Kubai',
       userId: '-MUyHJmKrxA90lPNQ1FOLNm',
-      location: 'Lagos'
+      location: 'Lagos',
+      email: 'samuel.kubai@andela.com'
     }
   };
 
@@ -41,7 +42,9 @@ describe('Travel Checklists Controller', () => {
       id: '--MUyHJmKrxA90lPNOLNm',
       name: 'Optimum Price',
       userId: '-MUyHJmKrxA90lPNQ1FOLNm',
-      location: 'Lagos'
+      location: 'Lagos',
+      email: 'optimum.price@andela.com'
+
     },
   };
 
@@ -68,7 +71,7 @@ describe('Travel Checklists Controller', () => {
     await models.Role.destroy({ force: true, truncate: { cascade: true } });
 
     await models.Role.bulkCreate(role);
-    await models.User.create(user);
+    await models.User.bulkCreate(user);
     await models.UserRole.create(userRole);
     await models.GuestHouse.create(guestHouse);
     await models.Room.bulkCreate(rooms);
@@ -249,7 +252,7 @@ describe('Travel Checklists Controller', () => {
             id: '-MUyHJmKrxA90lPNQ1FOLNm',
             name: 'Samuel Kubai',
             email: 'black.window@andela.com',
-            location: 'Lagos'
+            location: 'Lagos',
           }
         };
         user.roleId = 401938;

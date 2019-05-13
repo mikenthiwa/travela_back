@@ -7,6 +7,8 @@ import CustomError from '../../helpers/Error';
 import Centers from '../../helpers/centers';
 import { getTravelTeamEmailData } from '../../helpers/approvals';
 import NotificationEngine from '../notifications/NotificationEngine';
+import UserRoleController from '../userRole/UserRoleController';
+import TravelAdminApprovalController from '../approvals/TravelAdminApprovalController';
 
 const { Op } = models.Sequelize;
 
@@ -14,7 +16,7 @@ export default class TravelChecklistController {
   static async createChecklistItem(req, res) {
     try {
       const { resources, ...rest } = req.body;
-      const { location } = req.user;
+      const { location } = rest;
       const andelaCenters = await TravelChecklistHelper.getAndelaCenters();
       req.query.destinationName = location;
       await models.sequelize.transaction(async () => {
@@ -76,12 +78,15 @@ export default class TravelChecklistController {
 
   static async getChecklistsResponse(req, res) {
     try {
+      const user = await UserRoleController.findUserDetails(req);
+      const userCenters = TravelAdminApprovalController.getAdminCenter(user);
       const { requestId } = req.query;
       const checklists = await TravelChecklistHelper.getChecklists(req, res, requestId);
       const response = {
         success: true,
         message: 'travel checklist retrieved successfully',
         travelChecklists: checklists,
+        userCenters
       };
       if (checklists.length) return res.status(200).json(response);
 
@@ -215,10 +220,10 @@ export default class TravelChecklistController {
       name,
       picture
     } = requestData;
-    const message = `Hi ${name}, 
-    Congratulations, you have now responded to all the 
+    const message = `Hi ${name},
+    Congratulations, you have now responded to all the
     checklist requirements for your trip ${requestId}.
-    The travel team will review your submissions and 
+    The travel team will review your submissions and
     advise accordingly.`;
     const notificationData = {
       senderId: userId,
@@ -232,7 +237,7 @@ export default class TravelChecklistController {
     };
     NotificationEngine.notify(notificationData);
   }
-  
+
   static async checkListPercentage(req, res, requestId) {
     const requestData = await models.Request.findByPk(requestId);
     const { status } = requestData;
@@ -255,15 +260,20 @@ export default class TravelChecklistController {
 
   static async updateChecklistItem(req, res) {
     try {
-      const { location } = req.user;
       const andelaCenters = await TravelChecklistHelper.getAndelaCenters();
       const checklistItemId = req.params.checklistId;
+      const {
+        requiresFiles,
+        name,
+        resources,
+        destinationName,
+        location,
+      } = req.body;
       req.query.destinationName = location;
 
-      const { name, requiresFiles, resources } = req.body;
       const checklistItem = await models.ChecklistItem.findOne({
         paranoid: false,
-        where: { id: checklistItemId, destinationName: andelaCenters[`${location}`] }
+        where: { id: checklistItemId, destinationName: andelaCenters[`${location || destinationName}`] }
       });
       if (checklistItem) {
         if (await TravelChecklistController.checklistItemExists(
@@ -305,10 +315,8 @@ export default class TravelChecklistController {
   }
 
   static async fetchChecklistItemAndResources(req, checklistId) {
-    const andelaCenters = await TravelChecklistHelper.getAndelaCenters();
-    const { location } = req.user;
     const checklistItem = await models.ChecklistItem.findOne({
-      where: { id: checklistId, destinationName: andelaCenters[`${location}`] }
+      where: { id: checklistId }
     });
     const checklistItemResources = await models.ChecklistItemResource
       .find({ where: { checklistItemId: checklistId } });
@@ -323,7 +331,6 @@ export default class TravelChecklistController {
       const { checklistId } = req.params;
       const resources = await TravelChecklistController
         .fetchChecklistItemAndResources(req, checklistId);
-
       const {
         checklistItem, checklistItemResources, checklistSubmissions
       } = resources;
@@ -333,6 +340,7 @@ export default class TravelChecklistController {
           success: false, message: 'Checklist item not found'
         });
       }
+
       await checklistItem.update({ deleteReason });
       await checklistItem.destroy(); /* istanbul ignore next */
       if (checklistItemResources) checklistItemResources.destroy(); /* istanbul ignore next */
@@ -355,7 +363,7 @@ export default class TravelChecklistController {
         .checkListPercentageNumber(req, res, requestId);
       const { documentId } = file;
       const id = documentId || null;
-      
+
       const retrievedDoc = await TravelChecklistHelper.retrieveTravelDocumentData(documentId);
       if (!retrievedDoc && documentId) {
         return res.status(404).json({

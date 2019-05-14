@@ -1,7 +1,7 @@
 import { Parser } from 'json2csv';
 import models from '../../../database/models';
 import Error from '../../../helpers/Error';
-import TravelChecklistHelper from '../../../helpers/travelChecklist';
+import Utils from '../../../helpers/Utils';
 
 const { Op } = models.Sequelize;
 class TripsController {
@@ -18,9 +18,9 @@ class TripsController {
   }
 
   static async getTripsPerMonth(req, res) {
-    const { location } = req.user;
-    const { firstDate, lastDate } = req.query;
-    const andelaCenters = await TravelChecklistHelper.getAndelaCenters();
+    const { center, firstDate, lastDate } = req.query;
+    const { regex } = await Utils.checkAdminCenter(req, center);
+
     try {
       const trips = await models.Request.findAll({
         group: ['department'],
@@ -32,7 +32,9 @@ class TripsController {
         include: [{
           model: models.Trip,
           where: {
-            origin: andelaCenters[`${location}`],
+            origin: {
+              [Op.iRegexp]: `(${regex})`
+            },
             departureDate: {
               [Op.gte]: new Date(firstDate),
               [Op.lte]: new Date(lastDate)

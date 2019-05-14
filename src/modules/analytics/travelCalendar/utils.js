@@ -34,12 +34,12 @@ class Utils {
     const noValue = '--';
     const returnData = [origin, returnAirline, returnTicketNumber, returnTime, returnDepartureTime];
     const filteredOrigin = tripType === 'return' ? origin : noValue;
-    if (origin === location) {
+    if (location.includes(origin.split(', ')[1])) {
       const departureData = [destination, airline, ticketNumber, arrivalTime, departureTime];
       const flightDetails = Utils.getConsolidateItenerary(returnData, departureData);
       return flightDetails;
     }
-    if (destination === location) {
+    if (location.includes(destination.split(', ')[1])) {
       if (tripType === 'oneWay') {
         const noValueArray = [noValue, noValue, noValue, noValue, noValue];
         const onewayArrival = [destination, airline, ticketNumber, arrivalTime, departureTime];
@@ -64,11 +64,22 @@ class Utils {
         name, department, role, picture
       };
 
-      const filteredMultiTrip = _.orderBy(multiTrip.filter(t => (t.id === trip.id)), ['trips.departureDate'], ['asc']);
+      const filteredMultiTrip = _.orderBy(multiTrip.filter(t => (t.id === trip.id)),
+        ['trips.departureDate'], ['asc']);
 
       if (filteredMultiTrip.length > 1) {
-        const arrivalTrip = _.orderBy(_.filter(filteredMultiTrip, { 'trips.destination': location }), ['trips.departureDate'], ['asc']);
-        const departureTrip = _.orderBy(_.filter(filteredMultiTrip, { 'trips.origin': location }), ['trips.departureDate'], ['asc']);
+        const tripLocations = [];
+        ['trips.destination', 'trips.origin'].forEach((locationType) => {
+          const filteredTrips = _.orderBy((filteredMultiTrip.filter(t => (
+            location.includes(t[locationType].split(', ')[1])))),
+          ['trips.departureDate'], ['asc']);
+          tripLocations.push(filteredTrips);
+        });
+
+        const {
+          arrivalTrip = tripLocations[0],
+          departureTrip = tripLocations[1]
+        } = tripLocations;
 
         const trips = [];
         _.forEach(arrivalTrip, (arrival, index) => {
@@ -81,7 +92,9 @@ class Utils {
         return trips;
       }
       const ticket = JSON.parse(trip['trips.submissions.value']);
-      const flight = Utils.handleDestinations(location, 'multi', trip['trips.origin'], trip['trips.destination'], ticket);
+      const flight = Utils.handleDestinations(
+        location, 'multi', trip['trips.origin'], trip['trips.destination'], ticket
+      );
       return { ...userDetails, flight };
     }));
 

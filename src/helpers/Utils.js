@@ -1,6 +1,9 @@
 import shortid from 'shortid';
 import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
+import UserRoleController from '../modules/userRole/UserRoleController';
+import TravelAdminApprovalController from '../modules/approvals/TravelAdminApprovalController';
+
 
 dotenv.config();
 
@@ -39,6 +42,15 @@ class Utils {
   static filterInt(value) {
     if (/^(-|\+)?(\d+|Infinity)$/.test(value)) return Number(value);
     return NaN;
+  }
+
+  static async checkAdminCenter(req, center) {
+    const user = await UserRoleController.findUserDetails(req);
+    const centers = center === 'All Locations' ? (
+      await TravelAdminApprovalController.getAdminCenter(user)) : [center];
+    const regex = center === 'All Locations' ? (
+      JSON.parse(JSON.stringify(centers.map(cen => `.*${cen}.*`).join('|')))) : center;
+    return { regex, centers };
   }
 }
 

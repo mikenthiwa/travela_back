@@ -164,9 +164,9 @@ export const retrieveParams = (req) => {
 };
 
 // Generates the where clause for the trips fetched for the travel readiness analytics
-export const readinessRequestClause = (travelFlow, dateFrom, dateTo, location) => {
-  const locationQuery = travelFlow === 'inflow' ? { destination: location }
-    : { origin: location };
+export const readinessRequestClause = (travelFlow, dateFrom, dateTo, center) => {
+  const locationQuery = travelFlow === 'inflow' ? { destination: { [Op.iRegexp]: `(${center})` } }
+    : { origin: { [Op.iRegexp]: `(${center})` } };
   const rangeQuery = {
     departureDate: { [Op.gte]: dateFrom, [Op.lte]: dateTo },
   };

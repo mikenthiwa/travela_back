@@ -119,7 +119,7 @@ describe('Test Suite for Trips Analytics (Get Trips / Month by Department)', () 
 
   it('should get trips from admin location', (done) => {
     request(app)
-      .get(`/api/v1/analytics/trips/departments?filterBy=month&type=json&firstDate=${firstDate}&lastDate=${lastDate}`)
+      .get(`/api/v1/analytics/trips/departments?filterBy=month&center=All%20Locations&type=json&firstDate=${firstDate}&lastDate=${lastDate}`)
       .set('Content-Type', 'application/json')
       .set('authorization', travelAdminToken)
       .end((err, res) => {

@@ -113,7 +113,7 @@ describe.only('Test Suite for Trips Analytics => Get Travel Readiness of request
   });
   it('should return 200 status, travel readiness and pagination data', async (done) => {
     request(app)
-      .get(`/api/v1/analytics/readiness?page=1&limit=3&type=json&travelFlow=inflow${dateParams()}`)
+      .get(`/api/v1/analytics/readiness?page=1&limit=3&type=json&travelFlow=inflow${dateParams()}&center=All%20Locations`)
       .set('Content-Type', 'application/json')
       .set('authorization', adminToken)
       .end((err, res) => {

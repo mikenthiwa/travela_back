@@ -143,7 +143,7 @@ class UserRoleController {
       const message = [201, 'User Found', true];
       const token = await UserHelper.setToken(result);
       return UserRoleController.response(res, message, result, token);
-    } catch (error) {
+    } catch (error) { /* istanbul ignore next */
       return CustomError.handleError(error.toString(), 500, res);
     }
   }

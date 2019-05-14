@@ -117,7 +117,7 @@ describe('Test Suite for Travel Calendar Analytics', () => {
 
   it('should get travel calendar from admin location', (done) => {
     request(app)
-      .get('/api/v1/analytics/calendar?location=Nairobi&dateFrom=2018-11-21&dateTo=2018-11-21&type=json&limit=5&page=1')
+      .get('/api/v1/analytics/calendar?location=Kenya&dateFrom=2018-11-21&dateTo=2018-11-21&type=json&limit=5&page=1')
       .set('Content-Type', 'application/json')
       .set('authorization', travelAdminToken)
       .end((err, res) => {

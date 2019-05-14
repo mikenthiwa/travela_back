@@ -1,3 +1,4 @@
+/* eslint-disable import/no-named-default */
 import { Parser } from 'json2csv';
 import _ from 'lodash';
 
@@ -7,8 +8,8 @@ import Pagination from '../../../helpers/Pagination';
 import fields from './fields';
 import Utils from './utils';
 import TravelCalendarError from '../../../exceptions/travelCalendarExceptions';
-import Centers from '../../../helpers/centers';
 import { srcRequestWhereClause } from '../../../helpers/requests';
+import { default as HelperUtils } from '../../../helpers/Utils';
 
 const { Op } = models.Sequelize;
 
@@ -43,7 +44,7 @@ class CalendarController {
         attributes: ['origin', 'destination', 'departureDate', 'returnDate'],
         where: {
           [Op.and]: [
-            { [Op.or]: [{ origin: center }, { destination: center }] },
+            { [Op.or]: [{ origin: { [Op.iRegexp]: `(${center})` } }, { destination: { [Op.iRegexp]: `(${center})` } }] },
             { [Op.or]: [{ departureDate: dateQuery }, { returnDate: dateQuery }] },
           ]
         },
@@ -95,10 +96,11 @@ class CalendarController {
     let { limit } = req.query;
     limit = limit || 3;
 
-    const center = await Centers.getCenter(location);
+    const { regex, centers } = await HelperUtils.checkAdminCenter(req, location);
+
     try {
-      const requestDetails = await CalendarController.getRequestDetails(center, dateFrom, dateTo);
-      const allData = CalendarController.getTravelDetails(center, requestDetails.rows);
+      const requestDetails = await CalendarController.getRequestDetails(regex, dateFrom, dateTo);
+      const allData = CalendarController.getTravelDetails(centers, requestDetails.rows);
       const pagination = Pagination.getPaginationData(page, limit, allData.length);
       pagination.limit = limit;
       pagination.nextPage = pagination.currentPage + 1;

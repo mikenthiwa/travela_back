@@ -84,7 +84,7 @@ export const analyticsResopnse = {
   data: {
     totalRequests: 1,
     pendingRequests: 1,
-    peopleVisiting: 0,
+    peopleVisiting: 1,
     peopleLeaving: 1,
     travelDurationBreakdown: {
       durations: [
@@ -103,7 +103,8 @@ export const analyticsResopnse = {
         }
       ],
       total: 1
-    }
+    },
+    userCenters: []
   }
 };
 export const postGuestHouse = {

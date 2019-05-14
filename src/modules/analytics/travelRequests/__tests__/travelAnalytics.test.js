@@ -85,7 +85,7 @@ describe('Test for travel analytics by location', () => {
 
   it(' should display details of travel admin location', (done) => {
     request(app)
-      .get('/api/v1/analytics?location=Nairobi')
+      .get('/api/v1/analytics?center=All%20Locations')
       .set('Content-Type', 'application/json')
       .set('authorization', travelAdminToken)
       .end((err, res) => {

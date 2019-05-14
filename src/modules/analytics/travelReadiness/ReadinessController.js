@@ -4,8 +4,8 @@ import models from '../../../database/models';
 import CustomError from '../../../helpers/Error';
 import TravelCompletion from '../../travelChecklist/TravelChecklistController';
 import Pagination from '../../../helpers/Pagination';
-import Centers from '../../../helpers/centers';
 import { readinessRequestClause } from '../../../helpers/requests';
+import Utils from '../../../helpers/Utils';
 
 const { Op } = models.Sequelize;
 
@@ -36,22 +36,16 @@ class ReadinessController {
 
   static async getReadiness(req, res) {
     const {
-      page, limit, travelFlow = 'inflow', dateFrom, dateTo
+      page, limit, travelFlow = 'inflow', dateFrom, dateTo, center
     } = req.query;
-    try {
-      const currentUserId = req.user.UserInfo.id;
-      const location = await models.User.findOne({
-        attributes: ['location'],
-        where: { userId: currentUserId },
-        raw: true
-      });
-      const andelaCenter = await Centers.getCenter(Object.values(location).toString());
 
+    try {
+      const { regex } = await Utils.checkAdminCenter(req, center);
       const offset = (page - 1) * limit;
       const result = await models.Trip.findAndCountAll({
         limit: limit || null,
         offset: offset || null,
-        where: readinessRequestClause(travelFlow, dateFrom, dateTo, andelaCenter),
+        where: readinessRequestClause(travelFlow, dateFrom, dateTo, regex),
         attributes: ['departureDate'],
         include: [{
           model: models.Request,

@@ -5,6 +5,9 @@ import fs from 'fs';
 import { Parser } from 'json2csv';
 import models from '../../../database/models';
 import Error from '../../../helpers/Error';
+import Utils from '../../../helpers/Utils';
+import TravelAdminApprovalController from '../../approvals/TravelAdminApprovalController';
+import UserRoleController from '../../userRole/UserRoleController';
 
 const { Op } = models.Sequelize;
 class AnalyticsController {
@@ -26,8 +29,8 @@ class AnalyticsController {
     return requests;
   }
 
-  static async leadTime(city, dateQuery) {
-    const allTrips = await AnalyticsController.getAllTrips(city, dateQuery);
+  static async leadTime(center, dateQuery) {
+    const allTrips = await AnalyticsController.getAllTrips(center, dateQuery);
     const alltripDetails = allTrips.rows.map(trip => trip.trips);
     const requestDates = allTrips.rows.map(trip => moment(trip.createdAt).format('YYYY-MM-DD'));
     const departDates = alltripDetails.map(trip => trip.map(departure => departure.departureDate));
@@ -46,20 +49,20 @@ class AnalyticsController {
     return leadTimeduration;
   }
 
-  static isLocationInTrips(trips, key, city) {
-    const regexCity = new RegExp(`^${city}`, 'i');
+  static isLocationInTrips(trips, key, center) {
+    const regexCity = new RegExp(`${center}`, 'i');
     const found = trips.findIndex(trip => regexCity.test(trip[`${key}`]));
     const isFound = found >= 0;
     return isFound;
   }
 
-  static async getPendingRequests(city, dateQuery) {
+  static async getPendingRequests(center, dateQuery) {
     const pendingRequestsQuery = {
       include: [
         {
           model: models.Trip,
           as: 'trips',
-          where: { origin: { [Op.iRegexp]: `^${city},` }, departureDate: dateQuery }
+          where: { origin: { [Op.iRegexp]: `(${center})` }, departureDate: dateQuery }
         }
       ],
       where: { status: 'Approved' }
@@ -67,11 +70,11 @@ class AnalyticsController {
     return pendingRequestsQuery;
   }
 
-  static async getAllTrips(city, dateQuery) {
+  static async getAllTrips(center, dateQuery) {
     const where = {
       [Op.and]: [
         { departureDate: { [Op.ne]: null } },
-        { origin: { [Op.iRegexp]: `^${city},` } },
+        { origin: { [Op.iRegexp]: `(${center})` } },
         { departureDate: dateQuery }
       ]
     };
@@ -82,11 +85,11 @@ class AnalyticsController {
     return allTrips;
   }
 
-  static async getPeopleRequests(city, dateQuery) {
+  static async getPeopleRequests(center, dateQuery) {
     const where = {
       [Op.or]: {
-        destination: { [Op.iRegexp]: `^${city},` },
-        origin: { [Op.iRegexp]: `^${city},` }
+        destination: { [Op.iRegexp]: `(${center})` },
+        origin: { [Op.iRegexp]: `(${center})` }
       },
       departureDate: dateQuery
     };
@@ -94,19 +97,23 @@ class AnalyticsController {
       include: [{ model: models.Trip, as: 'trips', where }]
     };
     const peopleRequests = await AnalyticsController.getRequestFromDb(query);
-    const peopleLeaving = peopleRequests.rows.filter(request => this.isLocationInTrips(request.trips, 'origin', city));
-    const peopleVisiting = peopleRequests.rows.filter(request => this.isLocationInTrips(request.trips, 'destination', city));
+    const peopleLeaving = peopleRequests.rows.filter(
+      request => this.isLocationInTrips(request.trips, 'origin', center)
+    );
+    const peopleVisiting = peopleRequests.rows.filter(
+      request => this.isLocationInTrips(request.trips, 'destination', center)
+    );
     return { allRequests: peopleRequests, peopleLeaving, peopleVisiting };
   }
 
-  static async getRequestsDuration(dateQuery, city) {
+  static async getRequestsDuration(dateQuery, center) {
     const query = {
       include: [
         {
           model: models.Trip,
           required: true,
           as: 'trips',
-          where: { origin: { [Op.iRegexp]: `^${city},` }, departureDate: dateQuery }
+          where: { origin: { [Op.iRegexp]: `(${center})` }, departureDate: dateQuery }
         }
       ],
       where: { tripType: { [Op.ne]: 'oneWay' } }
@@ -193,24 +200,29 @@ class AnalyticsController {
 
   static async analytics(req, res) {
     try {
-      const { dateFrom, dateTo, location } = req.query;
+      const { dateFrom, dateTo, center } = req.query;
       const dateQuery = await AnalyticsController.dateQuery(dateFrom, dateTo);
-      const [city] = location.split(',');
-      const pendingRequestsQuery = await AnalyticsController.getPendingRequests(city, dateQuery);
+      const { regex } = await Utils.checkAdminCenter(req, center);
+
+      const user = await UserRoleController.findUserDetails(req);
+      const userCenters = await TravelAdminApprovalController.getAdminCenter(user);
+      const pendingRequestsQuery = await AnalyticsController.getPendingRequests(regex, dateQuery);
       const pendingRequests = await AnalyticsController.getRequestFromDb(pendingRequestsQuery);
-      const peopleRequests = await AnalyticsController.getPeopleRequests(city, dateQuery);
-      const { durationsResult, requestsWithReturnDate } = await AnalyticsController.getRequestsDuration(dateQuery, city);
-      const leadTripDetails = await AnalyticsController.leadTime(city, dateQuery, res);
+      const peopleRequests = await AnalyticsController.getPeopleRequests(regex, dateQuery);
+      const { durationsResult, requestsWithReturnDate } = await AnalyticsController.getRequestsDuration(dateQuery, regex);
+      const leadTripDetails = await AnalyticsController.leadTime(regex, dateQuery, res);
       const {
         allRequests: { count },
         peopleVisiting,
         peopleLeaving
       } = peopleRequests;
+
       const defaultResponse = {
         totalRequests: count,
         pendingRequests: pendingRequests.count,
         peopleVisiting: peopleVisiting.length,
-        peopleLeaving: peopleLeaving.length
+        peopleLeaving: peopleLeaving.length,
+        userCenters
       };
       const response = {
         ...defaultResponse,

@@ -12,7 +12,9 @@ describe('switchMessage helper', () => {
 
   it('should return approved message', (done) => {
     const receivedMessage = switchMessage(
-      { type: 'Approved', senderName: 'An_Jin', requestId: '36Ydgha42e' }
+      {
+        type: 'Approved', senderName: 'An_Jin', requestId: '36Ydgha42e', details: { checker: 'checker Sammy Njau' }
+      }
     );
 
     expect(receivedMessage.split(' ')).toContain('travel');

@@ -181,12 +181,14 @@ class ApprovalsController {
     });
     const requestError = BudgetApprovalsController.noRequest(requestToApprove);
     if (requestError) {
+      /* istanbul ignore next */
       return Error.handleError(requestError, 404, res);
     }
     const { status } = requestToApprove;
 
     const error = BudgetApprovalsController.approvals(status);
     if (error) {
+      /* istanbul ignore next */
       return Error.handleError(error, 400, res);
     }
     return requestToApprove.update({ status: request[1] });
@@ -203,11 +205,11 @@ class ApprovalsController {
 
   static setNotificationMessage({
     status, budgetStatus, name, id
-  }) {
+  }, chekersFullName) {
     if (status === 'Approved' && budgetStatus === 'Open') {
       return `Hi ${name}
         Now that your travel request ${id} has been approved by your manager,
-        please be informed that it has been forwarded to budget check.`;
+        please be informed that it has been forwarded to your department's budget ${chekersFullName}.`;
     }
     if (status === 'Approved' && budgetStatus === 'Approved') {
       return `Hi ${name} , Your travel request ${id} has passed
@@ -216,13 +218,31 @@ class ApprovalsController {
     if (status === 'Rejected' || budgetStatus === 'Rejected') return 'rejected your request';
   }
 
+  
+  static async getbudgetCheckerMembersFullNames(department) {
+    const budgetCheckerMembers = await BudgetApprovalsController.findBudgetCheckerDepartment(
+      department
+    );
+
+    if (budgetCheckerMembers) {
+      let chekerFullName;
+      if (budgetCheckerMembers.length === 1) {
+        chekerFullName = `checker <b>${budgetCheckerMembers[0].dataValues.fullName}</b>`;
+      } else {
+        chekerFullName = `checkers <b>${budgetCheckerMembers[0].dataValues.fullName}</b> and <b>${budgetCheckerMembers[1].dataValues.fullName}</b>`;
+      }
+      return chekerFullName;
+    }
+  }
+
   // eslint-disable-next-line
   static async sendNotificationAfterApproval(req, user, updatedRequest, res) {
     const {
-      status, id, userId, budgetStatus,
+      status, id, userId, budgetStatus, department
     } = updatedRequest;
     const { name: userName, picture } = user.UserInfo;
     const recipientEmail = await UserRoleController.getRecipient(null, userId);
+    const chekersFullName = await ApprovalsController.getbudgetCheckerMembersFullNames(department);
     const notificationData = {
       senderId: user.UserInfo.id,
       senderName: userName,
@@ -230,12 +250,12 @@ class ApprovalsController {
       recipientId: userId,
       notificationType: 'general',
       requestId: id,
-      message: ApprovalsController.setNotificationMessage(updatedRequest),
+      message: ApprovalsController.setNotificationMessage(updatedRequest, chekersFullName),
       notificationLink: `/requests/${id}`
     };
 
     const budgetEmailData = ApprovalsController.emailData(updatedRequest, recipientEmail, userName);
-    const managerEmailData = ApprovalsController.managerData(updatedRequest, recipientEmail, userName);
+    const managerEmailData = ApprovalsController.managerData(updatedRequest, recipientEmail, userName, chekersFullName);
     const budgetRejectedData = ApprovalsController.budgetRejectData(updatedRequest, recipientEmail, userName);
 
     ApprovalsController.notify(
@@ -286,7 +306,7 @@ class ApprovalsController {
     };
   }
 
-  static managerData(request, recipient, name) {
+  static managerData(request, recipient, name, checkersFullName) {
     const msg = emailTopic(request);
     return {
       recipient: {
@@ -297,7 +317,8 @@ class ApprovalsController {
       topic: msg,
       type: request.status,
       redirectLink: `${process.env.REDIRECT_URL}/requests/${request.id}`,
-      requestId: request.id
+      requestId: request.id,
+      details: { checker: checkersFullName }
     };
   }
 
@@ -361,7 +382,7 @@ class ApprovalsController {
       UserInfo: { name }
     } = user;
     const data = await getTravelTeamEmailData(updatedRequest, name);
-
+    /* istanbul ignore next */
     if (data) {
       const { travelAdmins, data: emailData } = data;
       NotificationEngine.sendMailToMany(travelAdmins, emailData);

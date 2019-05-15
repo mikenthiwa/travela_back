@@ -83,7 +83,8 @@ const switchMessage = (msgDetail) => {
         approval decision.`;
     case 'Approved':
       return `Your travel request has been approved by your manager
-      <b>${msgDetail.senderName}</b>. Kindly login to view the status of the request.
+      <b>${msgDetail.senderName}</b> and passed to your department's budget ${msgDetail.details.checker}.
+       Kindly login to view the status of the request.
       Thank you`;
     case 'Budget Approval':
       return budgetApprovalMessage();

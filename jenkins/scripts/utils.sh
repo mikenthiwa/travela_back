@@ -104,7 +104,7 @@ require STAGING_DB_INSTANCE_CONNECTION_NAME $STAGING_DB_INSTANCE_CONNECTION_NAME
 require STAGING_LASTCHANGED_BAMBOO_API $STAGING_LASTCHANGED_BAMBOO_API
 require STAGING_BAMBOOHRID_API $STAGING_BAMBOOHRID_API
 
-if [ "$CIRCLE_BRANCH" == 'master' ]; then
+if [ "$BRANCH_NAME" == 'master' ]; then
     IMAGE_TAG=production-$(git rev-parse --short HEAD)
     export ENVIRONMENT=production
     export COMPUTE_ZONE=$PRODUCTION_COMPUTE_ZONE
@@ -167,7 +167,7 @@ fi
 export NAMESPACE=$ENVIRONMENT
 
 # overwrite certain env vars for qa testing environment
-if [ "$CIRCLE_JOB" == 'deploy-qa' ]; then
+if [ "$BRANCH_NAME" == 'deploy-qa' ]; then
   export ENVIRONMENT=qa
   export CLUSTER_NAME=$QA_CLUSTER_NAME
   export STATIC_IP=$QA_STATIC_IP
@@ -187,6 +187,6 @@ RANDOM=$$$(date +%s)
 
 EMOJI=${EMOJIS[$RANDOM % ${#EMOJIS[@]} ]}
 
-LINK="https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/commit/${CIRCLE_SHA1}"
+LINK="https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/commit/${GIT_COMMIT}"
 
 SLACK_TEXT="Git Commit Tag: <$LINK|${IMAGE_TAG}> has just been deployed to *${PROJECT_NAME}* in *${ENVIRONMENT}* ${EMOJI}"

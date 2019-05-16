@@ -32,12 +32,9 @@ agent {
       }
     }
 
-   
-
     stage('Install dependencies') {
       steps {
         container('travela-backend-agent') {
-          sh "printenv"
           sh "yarn install"
         }
       }
@@ -54,7 +51,6 @@ agent {
         }
       }
     }
-
 
     stage('Run migrations') {
       steps {
@@ -88,21 +84,19 @@ agent {
     }
   }
 
-   stage('build application artifacts') {
+   stage('Build application artifacts') {
       steps {
         container('travela-backend-agent') {
           sh "yarn run build"
         }
       }
     }
-   
 
-    stage('Deploy testing') {
+    stage('Deploy') {
       when {
         anyOf {
           branch 'master'
           branch 'develop'
-          branch 'jenkins-test-branch'
         }
       }
       steps {

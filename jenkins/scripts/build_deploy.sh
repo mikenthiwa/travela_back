@@ -57,12 +57,12 @@ buildLintAndDeployK8sConfiguration(){
 
 slackPayLoad() {
   if [ "$1" == "fail" ]; then
-    TEXT=":fire: This is test notification from jenkins ${CIRCLE_JOB} job failed :fire:"
+    TEXT=":fire: Travela Backend deploy job failed ${CIRCLE_JOB} job failed :fire:"
     STYLE="danger"
     TITLE="Failed to deploy commit"
     COLOR="danger"
   else
-    TEXT=":rocket: This is a test notification from jenkins ${ENVIRONMENT} environment :rocket:"
+    TEXT=":rocket: Travela Backend has been successfully deployed to ${ENVIRONMENT} environment (Jenkins) :rocket:"
     STYLE="primary"
     TITLE="Deployed commit"
     COLOR="good"
@@ -76,25 +76,25 @@ cat <<EOF
     "attachments": [
       {
         "title": "${TITLE} >> $(git rev-parse --short HEAD)",
-        "title_link": "https://github.com/andela/travel_tool_back/commit/$CIRCLE_SHA1",
+        "title_link": "https://github.com/andela/travel_tool_back/commit/$GIT_COMMIT",
         "color": "${COLOR}",
         "actions": [
           {
             "text": "View Commit",
             "type": "button",
-            "url": "https://github.com/andela/travel_tool_back/commit/${CIRCLE_SHA1}",
+            "url": "https://github.com/andela/travel_tool_back/commit/${GIT_COMMIT}",
             "style": "${STYLE}"
           },
           {
             "text": "View Build",
             "type": "button",
-            "url": "${CIRCLE_BUILD_URL}",
+            "url": "${BUILD_URL}",
             "style": "${STYLE}"
           },
           {
             "text": "View Workflow",
             "type": "button",
-            "url": "https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID}",
+            "url": "${BUILD_URL}",
             "style": "${STYLE}"
           }
         ]
@@ -106,8 +106,7 @@ EOF
 
 sendSlackDeployNotification() {
  if [ "${BRANCH_NAME}" == "master" ] \
-  || [ "${BRANCH_NAME}" == "develop" ] \
-  || [ "${BRANCH_NAME}" == "jenkins-test-branch" ]
+  || [ "${BRANCH_NAME}" == "develop" ] 
   then
     require NOTIFICATION_CHANNEL $NOTIFICATION_CHANNEL
     require SLACK_CHANNEL_HOOK $SLACK_CHANNEL_HOOK

@@ -1,0 +1,128 @@
+#!groovy​
+
+pipeline {
+agent {
+  kubernetes {
+    label 'travela-backend'
+    defaultContainer 'jnlp'
+    yamlFile 'jenkins/agent.yaml'
+}
+  }
+
+  environment {
+    PROJECT_NAME = 'travela-backend'
+    NODE_ENV =  'test'
+    DATABASE_URL = 'postgres://postgres:postgres@127.0.0.1/travela'
+    POSTGRES_USER = 'postgres'
+    POSTGRES_DB = 'travela'
+    REDIRECT_URL = 'http://travela-local.andela.com:3000'
+  }
+
+  stages {
+    stage('Load travela backend environment variable file') {
+      steps {
+        container('travela-backend-agent') {
+          withCredentials([
+            file(credentialsId: 'travela-backend-env-vars', variable: 'TRAVELA_BACKEND_ENV_VARS')
+          ]) {
+            load "$TRAVELA_BACKEND_ENV_VARS"
+             sh "chmod +x jenkins/scripts/*"
+          }
+        }
+      }
+    }
+
+   
+
+    stage('Install dependencies') {
+      steps {
+        container('travela-backend-agent') {
+          sh "printenv"
+          sh "yarn install"
+        }
+      }
+    }
+
+    stage('Load deployment environment variable file') {
+      steps {
+        container('travela-backend-agent') {
+          withCredentials([
+            file(credentialsId: 'travela-deployment-env-vars', variable: 'DEPLOYMENT_ENV_VARS')
+          ]) {
+            load "$DEPLOYMENT_ENV_VARS"
+          }
+        }
+      }
+    }
+
+
+    stage('Run migrations') {
+      steps {
+        container('travela-backend-agent') {
+          sh "yarn db:migrate"
+        }
+      }
+    }
+
+    stage('Run travela backend lint test') {
+      steps {
+        container('travela-backend-agent') {
+          sh "yarn lint"
+        }
+      }
+    }
+
+      stage('Run test and coverage') {
+      steps {
+        container('travela-backend-agent') {
+          withCredentials([
+            string(credentialsId: 'travela-backend-codeclimate-id', variable: 'CC_TEST_REPORTER_ID')
+          ]) {
+           sh "curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter"
+            sh "chmod +x ./cc-test-reporter"
+            sh "./cc-test-reporter before-build"
+            sh "yarn test --coverage"
+            sh "./cc-test-reporter after-build --exit-code \$?"
+        }
+      }
+    }
+  }
+
+   stage('build application artifacts') {
+      steps {
+        container('travela-backend-agent') {
+          sh "yarn run build"
+        }
+      }
+    }
+   
+
+    stage('Deploy testing') {
+      when {
+        anyOf {
+          branch 'master'
+          branch 'develop'
+          branch 'jenkins-test-branch'
+        }
+      }
+      steps {
+        container('travela-backend-agent') {
+          withCredentials([
+            file(credentialsId: 'apprenticeship-projects-svc-acc', variable: 'GCLOUD_SERVICE_KEY'),
+            string(credentialsId: 'travela-deployment-clone-branch', variable: 'CLONE_BRANCH'),
+          ]) {
+            sh "jenkins/scripts/gcloud_login.sh main"
+            sh "jenkins/scripts/build_deploy.sh main"
+          }
+        }
+      }
+    }
+  }
+   post {
+    failure {
+      container('travela-backend-agent') {
+        sh "jenkins/scripts/build_deploy.sh sendSlackDeployNotification fail"
+      }
+    }
+  }
+}

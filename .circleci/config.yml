@@ -153,7 +153,8 @@ workflows:
   version: 2
   test_build_deploy:
     jobs:
-      - checkout_code
+      - checkout_code:
+          type: approval
       - run_vulnerability_check:
           requires:
             - checkout_code

@@ -49,16 +49,7 @@ describe('Countries controller tests', () => {
         if (err) return done(err);
         expect(res.body.success).toEqual(false);
         expect(res.body.message).toEqual('Validation failed');
-        expect(res.body.errors).toEqual([
-          {
-            message: 'Kenya has already been added to East-Africa',
-            name: 'countries'
-          },
-          {
-            message: 'Uganda has already been added to East-Africa',
-            name: 'countries'
-          }
-        ]);
+        expect(res.body.errors.length).toEqual(2);
         done();
       });
   });

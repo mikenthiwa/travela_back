@@ -14,6 +14,13 @@ module.exports = {
         description: 'Nigeria',
         createdAt: '2019-10-05T09:37:11.170Z',
         updatedAt: '2019-10-05T09:37:11.170Z',
+      },
+      {
+        id: '9999',
+        region: 'Default Region',
+        description: 'Fallback Region for countries that don\'t have regions yet',
+        createdAt: '2019-10-05T09:38:11.170Z',
+        updatedAt: '2019-10-05T09:38:11.170Z',
       }
     ], {}),
 

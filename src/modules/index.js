@@ -20,6 +20,7 @@ import departmentRouter from './department';
 import bamboohrRouter from './bamboohr';
 import travelRegionsRouter from './travelRegions';
 import countriesRouter from './countries';
+import hotelEstimateRouter from './hotelEstimate';
 
 const apiPrefix = '/api/v1';
 
@@ -46,7 +47,8 @@ const routes = [
   departmentRouter,
   bamboohrRouter,
   travelRegionsRouter,
-  countriesRouter
+  countriesRouter,
+  hotelEstimateRouter
 ];
 export default (app) => {
   routes.forEach(route => app.use(apiPrefix, route));

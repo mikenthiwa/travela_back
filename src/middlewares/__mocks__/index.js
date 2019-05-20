@@ -176,7 +176,13 @@ const middleware = {
     regionExistsValidation: jest.fn(invokeNextMiddleware),
     inputValidation: jest.fn(invokeNextMiddleware),
     countryExistsValidation: jest.fn(invokeNextMiddleware),
-  }
+  },
+  HotelEstimateValidator: {
+    validateNewEstimate: jest.fn(invokeNextMiddleware),
+    searchForRegion: jest.fn(invokeNextMiddleware),
+    searchForCountry: jest.fn(invokeNextMiddleware),
+    checkLocation: jest.fn(invokeNextMiddleware)
+  },
 };
 
 export default middleware;

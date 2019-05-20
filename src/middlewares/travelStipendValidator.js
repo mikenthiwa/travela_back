@@ -67,9 +67,15 @@ export default class TravelStipendValidator {
   }
 
   static async validateUpdateParams(req, res, next) {
+    let id;
+    if (req.url.toLowerCase().includes('estimate')) {
+      id = 'estimateId';
+    } else {
+      id = 'stipendId';
+    }
     req.checkParams('id')
       .isInt()
-      .withMessage('stipendId should be an integer');
+      .withMessage(`${id} should be an integer`);
 
     TravelStipendValidator.checkValidationErrors(req, res, next);
   }

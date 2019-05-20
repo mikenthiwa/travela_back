@@ -1,5 +1,7 @@
 import models from '../../database/models';
 import Error from '../../helpers/Error';
+import getSearchQuery from './countriesUtils';
+import Pagination from '../../helpers/Pagination';
 
 export default class countriesController {
   static async addCountry(req, res) {
@@ -24,15 +26,40 @@ export default class countriesController {
   }
 
   static async getCountries(req, res) {
+    const { searchQuery } = req.query;
+    const query = searchQuery ? await getSearchQuery(searchQuery) : {};
+    query.regionId = req.params.regionId;
     try {
+      const count = await models.Country.count({
+        where: query
+      });
+      const { pageCount, currentPage, initialPage } = Pagination
+        .getPaginationParams(req, count);
       const fetchCountries = await models.Country.findAll({
-        where: { regionId: req.params.regionId },
+        where: query,
+        ...initialPage,
         order: [['id', 'DESC']]
       });
-      return res.status(200).json({
-        success: true,
-        message: 'Successfully retrieved countries',
-        countries: fetchCountries
+      if (fetchCountries.length) {
+        return res.status(200).json({
+          success: true,
+          message: 'Successfully retrieved countries',
+          countries: fetchCountries,
+          meta: {
+            count,
+            pageCount,
+            currentPage,
+          }
+        });
+      } if (searchQuery && !fetchCountries.length) {
+        return res.status(404).json({
+          success: false,
+          message: 'No results found for the searched country'
+        });
+      }
+      return res.status(404).json({
+        success: false,
+        message: 'No country records found'
       });
     } catch (error) {
       /* istanbul ignore next */

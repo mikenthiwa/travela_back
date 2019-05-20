@@ -25,7 +25,11 @@ class CountryValidator {
 
   static async inputValidation(req, res, next) {
     req
-      .checkBody('countries', 'Country field is required')
+      .checkBody('countries.*', 'Country field is required')
+      .trim()
+      .notEmpty();
+    req
+      .checkBody('countries', 'countries cannot be empty')
       .trim()
       .notEmpty();
     const errors = req.validationErrors();

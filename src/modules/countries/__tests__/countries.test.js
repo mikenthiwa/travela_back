@@ -9,7 +9,8 @@ import {
   user,
   validCountryData,
   emptyCountryData,
-  travelRegion
+  travelRegion,
+  travelRegion2
 } from './mocks/mockData';
 
 const request = supertest(app);
@@ -27,6 +28,7 @@ describe('Countries controller tests', () => {
     await models.Role.bulkCreate(role);
     await models.UserRole.bulkCreate(userRole);
     await models.TravelRegions.create(travelRegion);
+    await models.TravelRegions.create(travelRegion2);
   });
   it('should add country to region successfully', (done) => {
     request
@@ -88,6 +90,39 @@ describe('Countries controller tests', () => {
         done();
       });
   });
+  it('should return a friendly message when there are no countries', (done) => {
+    request
+      .get('/api/v1/regions/2/countries')
+      .set('authorization', token)
+      .end((err, res) => {
+        if (err) return done(err);
+        expect(res.status).toBe(404);
+        expect(res.body.message).toEqual('No country records found');
+        done();
+      });
+  });
+  it('should get the list of countries and filter down data when a searchTerm is provided',
+    (done) => {
+      request
+        .get(`${url}?searchQuery=Kenya`)
+        .set('authorization', token)
+        .end((err, res) => {
+          expect(res.status).toBe(200);
+          expect(res.body.countries[0].country).toEqual('Kenya');
+          done();
+        });
+    });
+  it('should return friendly message when there are no search results',
+    (done) => {
+      request
+        .get(`${url}?searchQuery=noCountry`)
+        .set('authorization', token)
+        .end((err, res) => {
+          expect(res.status).toBe(404);
+          expect(res.body.message).toEqual('No results found for the searched country');
+          done();
+        });
+    });
   it('should return an error is a region does not exists when fetching', (done) => {
     request
       .get('/api/v1/regions/89965/countries')

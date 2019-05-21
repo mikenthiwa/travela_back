@@ -125,4 +125,18 @@ describe('Notification Engine', () => {
     expect(NotificationEngine.dispatchEmail).toBeCalled();
     done();
   });
+
+  it('should throw an error if link has no redirect', (done) => {
+    try {
+      NotificationEngine.verifyRedirectLink('http://localhost:3000/request');
+    } catch (error) {
+      expect(error.message).toBe(`Redirect link should match "${process.env.REDIRECT_URL}/redirect/*"`);
+      done();
+    }
+  });
+
+  it('should not throw an error if link has redirect', (done) => {
+    expect(() => NotificationEngine.verifyRedirectLink(`${process.env.REDIRECT_URL}/redirect/request`)).not.toThrow();
+    done();
+  });
 });

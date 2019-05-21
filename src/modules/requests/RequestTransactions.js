@@ -51,7 +51,7 @@ export default class RequestTransactions {
   static sendNotification(req, res, request, trips) {
     const message = 'created a new travel request';
     const { id } = request;
-    const link = `${process.env.REDIRECT_URL}/requests/${id}`;
+    const link = `${process.env.REDIRECT_URL}/redirect/requests/${id}`;
     RequestsController.sendNotificationToManager(
       req,
       res,
@@ -176,7 +176,7 @@ export default class RequestTransactions {
 
   static async sendNotificationOnDelete(req, res, request, trips) {
     const notificationMessage = 'deleted a travel request';
-    const link = `${process.env.REDIRECT_URL}/requests/my-verifications`;
+    const link = `${process.env.REDIRECT_URL}/redirect/requests/my-verifications`;
     const deadLink = '/#';
     RequestsController.sendNotificationToManager(
       req,

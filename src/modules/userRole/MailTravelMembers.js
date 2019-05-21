@@ -63,7 +63,7 @@ class MailTravelMembers {
     const mailBody = {
       recipient: { name: recipient.fullName, email: recipient.email },
       sender: ['Travela', requester, destination],
-      redirectLink: `${env.REDIRECT_URL}/dashboard#travel-readiness`,
+      redirectLink: `${env.REDIRECT_URL}/redirect/dashboard#travel-readiness`,
       topic,
       type,
     };

@@ -13,7 +13,7 @@ class TravelReadinessUtils {
       type,
       details,
       requestId: details.id,
-      redirectLink: `${process.env.REDIRECT_URL}/travel_readiness?id=${
+      redirectLink: `${process.env.REDIRECT_URL}/redirect/travel_readiness?id=${
         details.id
       }&type=${details.type}`
     };

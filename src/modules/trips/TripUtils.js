@@ -36,7 +36,7 @@ class TripUtils {
       type,
       requestId: request.id,
       redirectLink:
-        `${process.env.REDIRECT_URL}/requests/${request.id}`
+        `${process.env.REDIRECT_URL}/redirect/requests/${request.id}`
     };
     return mailBody;
   }

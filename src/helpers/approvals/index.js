@@ -131,7 +131,7 @@ export const getTravelTeamEmailData = async (
       topic,
       type,
       details: { requestId: id, requesterName: name },
-      redirectLink: `${process.env.REDIRECT_URL}/requests/my-verifications/${id}`
+      redirectLink: `${process.env.REDIRECT_URL}/redirect/requests/my-verifications/${id}`
     };
     return travelAdmins.length ? { travelAdmins, data } : null;
   }

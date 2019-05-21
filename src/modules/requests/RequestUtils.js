@@ -104,7 +104,7 @@ export default class RequestUtils {
       details: {
         requesterName,
       },
-      redirectLink: `${process.env.REDIRECT_URL}/requests/my-verifications/${id}`
+      redirectLink: `${process.env.REDIRECT_URL}/redirect/requests/my-verifications/${id}`
     };
 
     const {

@@ -256,7 +256,7 @@ export default class TravelReadinessController {
     const topic = 'Travel Document Edit';
     const type = 'Edit Travel Document';
     const { id, type: documentType } = document;
-    const redirectLink = `${process.env.REDIRECT_URL}/travel-readiness/${user.id}?id=${id}&type=${documentType}`;
+    const redirectLink = `${process.env.REDIRECT_URL}/redirect/travel-readiness/${user.id}?id=${id}&type=${documentType}`;
     const details = { user };
     const data = {
       topic, type, redirectLink, details

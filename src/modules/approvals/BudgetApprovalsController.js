@@ -44,7 +44,7 @@ export default class BudgetApprovalsController {
           topic: 'Travel Request Approval',
           type: 'Notify budget checker',
           details: { RequesterManager: manager, id },
-          redirectLink: `${process.env.REDIRECT_URL}/requests/budgets/${id}`
+          redirectLink: `${process.env.REDIRECT_URL}/redirect/requests/budgets/${id}`
         };
         const managerDetails = await UserRoleController.getRecipient(manager, null);
 

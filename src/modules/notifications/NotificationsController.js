@@ -121,12 +121,12 @@ class NotificationController {
       const sender = await UserRoleController.getRecipient(null, senderId);
       const commentData = NotificationController.getCommentData(sender, requestId, comment);
       const newComment = await models.Comment.create(commentData);
-      let redirectLink = `/requests/my-approvals/${requestId}`;
+      let redirectLink = `/redirect/requests/my-approvals/${requestId}`;
       const userRole = await models.UserRole.findOne({
         where: { userId: sender.id }
       });
       if (userRole.roleId === 53019) {
-        redirectLink = `/requests/${requestId}`;
+        redirectLink = `/redirect/requests/${requestId}`;
       }
       const newNotificationDetail = {
         senderId,

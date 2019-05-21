@@ -436,7 +436,7 @@ class UserRoleController {
       recipient: { name: fullName, email },
       topic: 'Assignment of new role',
       type: 'Send role assignment email notification',
-      redirectLink: `${process.env.REDIRECT_URL}`,
+      redirectLink: `${process.env.REDIRECT_URL}/redirect`,
       details: { role: roleName, assignerName: name }
     };
     NotificationEngine.sendMail(data);

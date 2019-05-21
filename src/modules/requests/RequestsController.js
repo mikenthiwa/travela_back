@@ -409,7 +409,7 @@ class RequestsController {
         RequesterName: request.name,
         id: request.id
       },
-      redirectLink: `${process.env.REDIRECT_URL}/requests/budgets/${id}`
+      redirectLink: `${process.env.REDIRECT_URL}/redirect/requests/budgets/${id}`
     };
 
     const notificationData = {

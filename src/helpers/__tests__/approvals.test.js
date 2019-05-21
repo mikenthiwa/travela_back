@@ -69,7 +69,7 @@ describe('Travel Team Email', () => {
       {
         data: {
           details: { requestId: 20 },
-          redirectLink: `${process.env.REDIRECT_URL}/requests/my-verifications/20`,
+          redirectLink: `${process.env.REDIRECT_URL}/redirect/requests/my-verifications/20`,
           sender: 'Moses Gitau',
           topic: 'Manager Approval',
           type: 'Notify Travel Admins of Manager Approval'

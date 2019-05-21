@@ -51,6 +51,15 @@ export default class NotificationEngine {
     }
     return false;
   }
+  
+  static verifyRedirectLink(redirectLink) {
+    if (redirectLink) {
+      const redirectLinkRegex = `${process.env.REDIRECT_URL}/redirect/*`;
+      if (!new RegExp(redirectLinkRegex).test(redirectLink)) {
+        throw new Error(`Redirect link should match "${redirectLinkRegex}"`);
+      }
+    }
+  }
 
   static sendMail({
     recipient,
@@ -63,6 +72,7 @@ export default class NotificationEngine {
     details,
     picture
   }) {
+    NotificationEngine.verifyRedirectLink(redirectLink);
     const data = {
       from: `Travela <${process.env.MAIL_SENDER}>`,
       to: `${recipient.email}`,
@@ -97,6 +107,7 @@ export default class NotificationEngine {
     const { emails, recipientVars } = NotificationEngine.prepareMultipleReceipients(recipients);
 
     const destination = '';
+    NotificationEngine.verifyRedirectLink(data.redirectLink);
     const mailData = {
       from: `Travela <${process.env.MAIL_SENDER}>`,
       to: emails,

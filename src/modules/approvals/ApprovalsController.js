@@ -316,7 +316,7 @@ class ApprovalsController {
       sender: name,
       topic: msg,
       type: request.status,
-      redirectLink: `${process.env.REDIRECT_URL}/requests/${request.id}`,
+      redirectLink: `${process.env.REDIRECT_URL}/redirect/requests/${request.id}`,
       requestId: request.id,
       details: { checker: checkersFullName }
     };
@@ -332,7 +332,7 @@ class ApprovalsController {
       sender: name,
       topic: msg,
       type: 'Budget Rejected',
-      redirectLink: `${process.env.REDIRECT_URL}/requests/${request.id}`,
+      redirectLink: `${process.env.REDIRECT_URL}/redirect/requests/${request.id}`,
       requestId: request.id
     };
   }
@@ -364,7 +364,7 @@ class ApprovalsController {
         topic: `Successful Budget Check for ${requesterName}'s Trip`,
         type: 'Notify finance team',
         details: { requesterName, budgetCheckerName, id },
-        redirectLink: `${process.env.REDIRECT_URL}/requests/budgets/${id}`
+        redirectLink: `${process.env.REDIRECT_URL}/redirect/requests/budgets/${id}`
       };
 
       // 4.Test this

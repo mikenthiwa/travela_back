@@ -92,7 +92,7 @@ class CommentsController {
     }
     if (commentType === 'Document') {
       const { type: documentType } = request;
-      redirectLink = `${process.env.REDIRECT_URL}/travel-readiness/${userId}?id=${id}&type=${documentType}`;
+      redirectLink = `${process.env.REDIRECT_URL}/redirect/travel-readiness/${userId}?id=${id}&type=${documentType}`;
     }
     /* istanbul ignore next */
     CommentsController.sendEmail(

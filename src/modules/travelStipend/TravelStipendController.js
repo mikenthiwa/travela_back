@@ -1,26 +1,27 @@
 import models from '../../database/models';
 import CustomError from '../../helpers/Error';
+import TravelStipend from '../../helpers/travelStipend';
 
 export default class TravelStipendController {
   static async createTravelStipend(req, res) {
     try {
-      const { stipend, center } = req.body;
+      const { stipend, center: country } = req.body;
       const { UserInfo: { id: createdBy } } = req.user;
-      const { id: centerId, dataValues: { location } } = await models.Center.find({
+      const { country: countryName } = await models.Country.find({
         where: {
-          location: center
+          country
         }
       });
       const newStipend = await models.TravelStipends.create(
         {
           amount: stipend,
-          centerId,
+          country: countryName,
           createdBy
         }
       );
       return res.status(201).json({
         success: true,
-        message: `Successfully created a new travel stipend for ${location}`,
+        message: `Successfully created a new travel stipend for ${country}`,
         stipend: newStipend
       });
     } catch (error) { /* istanbul ignore next */
@@ -31,19 +32,18 @@ export default class TravelStipendController {
   static async getAllTravelStipends(req, res) {
     try {
       const stipends = await models.TravelStipends.findAll({
-        
         include: [{
           model: models.User,
           as: 'creator',
           attributes: ['fullName', 'id']
-        },
-        {
-          model: models.Center,
-          as: 'center',
-          attributes: ['location']
         }],
-        attributes: ['id', 'amount']
+        attributes: ['id', 'amount', 'country'],
+        order: [
+          ['createdAt', 'ASC']
+        ]
       });
+      stipends.sort((a, b) => b.country === 'Default');
+
       return res.status(200).json({
         success: true,
         message: 'Travel Stipends retrieved successfully',
@@ -61,7 +61,11 @@ export default class TravelStipendController {
       if (Number.isNaN(travelStipendId)) {
         return CustomError.handleError('Stipend id should be an integer', 400, res);
       }
+
       const foundTravelStipendId = await models.TravelStipends.findById(travelStipendId);
+      if (foundTravelStipendId && foundTravelStipendId.country === 'Default') {
+        return CustomError.handleError('Default Stipend should not be deleted', 400, res);
+      }
       if (!foundTravelStipendId) {
         return CustomError.handleError('Travel stipend does not exist', 404, res);
       }
@@ -80,18 +84,7 @@ export default class TravelStipendController {
     try {
       const { params: { id } } = req;
 
-      const travelStipend = await models.TravelStipends.findById(id, {
-        include: [
-          {
-            model: models.User,
-            as: 'creator',
-            attributes: [
-              'id', 'fullName', 'email',
-              'department'
-            ]
-          }
-        ]
-      });
+      const travelStipend = await TravelStipend.findStipendById(id);
 
       if (!travelStipend) {
         return res.status(404).json({
@@ -112,21 +105,13 @@ export default class TravelStipendController {
   static async updateTravelStipend(req, res) {
     try {
       const { params: { id } } = req;
-
-      const { center, stipend } = req.body;
+      const { center: country, stipend } = req.body;
 
       const sanitizedStipend = Math.abs(Number(
         stipend
       ));
 
-      const travelStipend = await models.TravelStipends.findById(id, {
-        returning: true,
-        include: [{
-          model: models.User,
-          as: 'creator',
-          attributes: ['id', 'fullName', 'email', 'department']
-        }]
-      });
+      const travelStipend = await TravelStipend.findStipendById(id);
 
       if (!travelStipend) {
         return res.status(404).json({
@@ -134,19 +119,43 @@ export default class TravelStipendController {
           error: 'Travel stipend does not exist'
         });
       }
-      const { id: centerId } = await models.Center.find({
-        where: {
-          location: center
-        }
-      });
 
-      await travelStipend.update({ centerId, amount: sanitizedStipend });
+      await travelStipend.update({ country, amount: sanitizedStipend });
 
       return res.status(200).json({
         success: true,
         message: 'Travel stipend updated successfully',
         travelStipend
       });
+    } catch (error) {
+      /* istanbul ignore next */
+      CustomError.handleError(error.message, 500, res);
+    }
+  }
+
+  static async getTravelStipendsByLocation(req, res) {
+    const { locations } = req.query;
+    const tripDestinations = locations.map((location) => {
+      const parsedLocation = typeof location === 'string' ? JSON.parse(location) : location;
+      return parsedLocation.destination.split(', ')[1];
+    });
+    try {
+      const foundStipends = await TravelStipend.getStipendsByLocation(tripDestinations);
+      const stipends = await TravelStipend.checkTravelStipend(foundStipends, tripDestinations);
+
+      if (stipends.length) {
+        return res.status(200).json({
+          success: true,
+          message: 'Stipends for locations found',
+          stipends
+        });
+      }
+      if (!stipends.length) {
+        return res.status(404).json({
+          success: true,
+          message: 'There was no stipends found for specified location(s)',
+        });
+      }
     } catch (error) {
       /* istanbul ignore next */
       CustomError.handleError(error.message, 500, res);

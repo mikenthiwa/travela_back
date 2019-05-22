@@ -57,7 +57,7 @@ const userRole = [{
 
 const travelStipend = {
   stipend: 300,
-  center: 'Nairobi'
+  center: 'Kenya'
 };
 
 const updatedTravelStipend = {
@@ -66,12 +66,20 @@ const updatedTravelStipend = {
 
 const listOfStipends = [
   {
+    id: 1,
+    amount: 30,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    createdBy: '-MUyHJmKrxA90lPNQ1FOLNm',
+    country: 'Default'
+  },
+  {
     id: 100,
     amount: 75,
     createdAt: new Date(),
     updatedAt: new Date(),
     createdBy: '-MUyHJmKrxA90lPNQ1FOLNm',
-    centerId: 12345
+    country: 'Kenya'
   },
   {
     id: 200,
@@ -79,7 +87,7 @@ const listOfStipends = [
     createdAt: new Date(),
     updatedAt: new Date(),
     createdBy: '-MUyHJmKrxA90lPNQ1FOLNm',
-    centerId: 23456
+    country: 'Nigeria'
   }
 ];
 const centers = [
@@ -104,6 +112,16 @@ const centers = [
   },
 ];
 
+const regions = [
+  {
+    id: '9999',
+    region: 'Default Region',
+    description: 'Fallback Region for countries that don\'t have regions yet',
+    createdAt: '2019-10-05T09:38:11.170Z',
+    updatedAt: '2019-10-05T09:38:11.170Z',
+  }
+];
+
 export default {
   user,
   payload,
@@ -113,4 +131,5 @@ export default {
   payloadNotAdmin,
   travelStipend,
   updatedTravelStipend,
+  regions
 };

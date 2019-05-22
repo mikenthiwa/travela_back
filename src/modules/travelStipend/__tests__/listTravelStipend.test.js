@@ -82,7 +82,7 @@ describe('list TravelStipends', () => {
       .end((err, response) => {
         if (err) done(err);
         expect(response.statusCode).toEqual(200);
-        expect(response.body.stipends).toHaveLength(2);
+        expect(response.body.stipends).toHaveLength(3);
         done();
       });
   });

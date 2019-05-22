@@ -54,5 +54,12 @@ TravelStipendRouter.put(
   TravelStipendValidator.checkCenter,
   TravelStipendController.updateTravelStipend
 );
-  
+
+TravelStipendRouter.get(
+  '/travelStipends/location',
+  authenticate,
+  TravelStipendValidator.validateTravelStipendsLocations,
+  TravelStipendController.getTravelStipendsByLocation
+);
+
 export default TravelStipendRouter;

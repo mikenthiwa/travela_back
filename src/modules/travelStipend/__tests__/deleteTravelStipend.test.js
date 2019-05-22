@@ -1,39 +1,26 @@
 import supertest from 'supertest';
 import app from '../../../app';
-import models from '../../../database/models';
-import { role } from '../../userRole/__tests__/mocks/mockData';
 import mockData from './__mocks__/travelStipendMock';
 import Utils from '../../../helpers/Utils';
+import TestSetup from './helper';
 
 const request = supertest(app);
 const url = '/api/v1/travelStipend';
 const {
-  user, payload, userRole, centers, listOfStipends,
-  payloadNotAdmin,
+  payload, listOfStipends,
+  payloadNotAdmin
 } = mockData;
 const token = Utils.generateTestToken(payload);
 const nonAdminToken = Utils.generateTestToken(payloadNotAdmin);
 
 describe('TravelStipends', () => {
-  const prepareTables = async () => {
-    await models.TravelStipends.destroy({ force: true, truncate: { cascade: true } });
-    await models.UserRole.destroy({ force: true, truncate: { cascade: true } });
-    await models.Center.destroy({ truncate: true, cascade: true });
-    await models.Role.destroy({ truncate: { cascade: true }, force: true });
-    await models.User.destroy({ truncate: { cascade: true }, force: true });
-  };
-
   beforeAll(async () => {
-    await prepareTables();
-    await models.User.bulkCreate(user);
-    await models.Role.bulkCreate(role);
-    await models.Center.bulkCreate(centers);
-    await models.UserRole.bulkCreate(userRole);
-    await models.TravelStipends.bulkCreate(listOfStipends);
+    await TestSetup.destoryTables();
+    await TestSetup.createTables();
   });
 
   afterAll(async () => {
-    await prepareTables();
+    await TestSetup.destoryTables();
   });
 
   describe('Delete Travel Stipend: DELETE /api/v1/travelStipend/:id', () => {
@@ -71,9 +58,27 @@ describe('TravelStipends', () => {
           });
       });
 
-    it('should throw 200 if the stipend is successfully deleted',
+    it('should throw 400 if default stipend is to be deleted',
       (done) => {
         const travelStipendId = listOfStipends[0].id;
+        const expectedResponse = {
+          success: false,
+          error: 'Default Stipend should not be deleted'
+        };
+        request
+          .delete(`${url}/${travelStipendId}`)
+          .set('authorization', token)
+          .end((err, res) => {
+            if (err) done(err);
+            expect(res.statusCode).toEqual(400);
+            expect(res.body).toEqual(expectedResponse);
+            done();
+          });
+      });
+
+    it('should throw 200 if the stipend is successfully deleted',
+      (done) => {
+        const travelStipendId = listOfStipends[1].id;
         const expectedResponse = {
           success: true,
           message: 'Travel Stipend deleted successfully'
@@ -91,7 +96,7 @@ describe('TravelStipends', () => {
 
     it('should throw 404 error if stipend is already deleted',
       (done) => {
-        const travelStipendId = listOfStipends[0].id;
+        const travelStipendId = listOfStipends[1].id;
         const expectedResponse = {
           success: false,
           error: 'Travel stipend does not exist'

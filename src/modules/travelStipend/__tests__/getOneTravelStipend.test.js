@@ -13,7 +13,7 @@ const expectedResponseBody = {
   success: false,
   error: 'Please provide a token'
 };
-  
+
 const expectedResponse = {
   status: 401,
   body: expectedResponseBody
@@ -23,7 +23,7 @@ const { payload, payloadNotAdmin } = mockData;
 const superAdminToken = Utils.generateTestToken(payload);
 const requesterToken = Utils.generateTestToken(payloadNotAdmin);
 
-  
+
 const getOneTravelStipend = (id, done, expected, bodyField = null, token = superAdminToken) => {
   const api = request(app)
     .get(`${URI}/${id}`);
@@ -77,7 +77,7 @@ describe('Fetch One Travel Stipend', () => {
 
     it('should ensure provided token is valid', (done) => {
       const invalidToken = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySW5';
-     
+
 
       getOneTravelStipend(
         stipendId,
@@ -132,5 +132,84 @@ describe('Fetch One Travel Stipend', () => {
           done();
         });
     });
+  });
+});
+
+
+describe('GET /travelStipends/location', () => {
+  beforeAll(async () => {
+    await TestSetup.destoryTables();
+    await TestSetup.createTables();
+  });
+
+  afterAll(async () => {
+    await TestSetup.destoryTables();
+  });
+
+  it('should require a valid token', (done) => {
+    request(app)
+      .get('/api/v1/travelStipends/location')
+      .query(
+        {
+          origin: 'Lagos',
+          destination: 'Nairobi'
+        }
+      )
+      .end((err, res) => {
+        expect(res.status).toEqual(401);
+        expect(res.body.success).toEqual(false);
+        expect(res.body.error).toEqual('Please provide a token');
+        done();
+      });
+  });
+  it('should require a location property in query params', (done) => {
+    request(app)
+      .get('/api/v1/travelStipends/location')
+      .set('Authorization', requesterToken)
+      .query(
+        {
+          origin: 'Lagos',
+          destination: 'Nairobi'
+        }
+      )
+      .end((err, res) => {
+        expect(res.status).toEqual(422);
+        expect(res.body.success).toEqual(false);
+        expect(res.body.errors[0].message).toEqual('one or more locations must be sent');
+        expect(res.body.errors[0].name).toEqual('locations');
+        done();
+      });
+  });
+  it('should get stipends for specified locations', (done) => {
+    const queryParams = 'locations[]=%7B%22origin%22:%22Lagos%22,%22destination%22:%22Nairobi,+Kenya%22%7D';
+    request(app)
+      .get(
+        `/api/v1/travelStipends/location?${queryParams}`
+      )
+      .set('Authorization', requesterToken)
+      .end((err, res) => {
+        expect(res.status).toEqual(200);
+        expect(res.body.success).toEqual(true);
+        expect(res.body.message).toEqual('Stipends for locations found');
+        expect(res.body.stipends[0]).toHaveProperty('amount');
+        expect(res.body.stipends[0]).toHaveProperty('country');
+        done();
+      });
+  });
+  it('should retrun default stipends for counties with no stipend', (done) => {
+    const queryParams = 'locations[]=%7B%22origin%22:%22Abuja%22,%22destination%22:%22Congosto,+Spain%22%7D';
+    const expected = [{ amount: 30, country: 'Spain', id: 1 }];
+    request(app)
+      .get(
+        `/api/v1/travelStipends/location?${queryParams}`
+      )
+      .set('Authorization', requesterToken)
+      .end((err, res) => {
+        expect(res.status).toEqual(200);
+        expect(res.body.success).toEqual(true);
+        expect(res.body.message).toEqual('Stipends for locations found');
+        expect(res.body.stipends).toEqual(expected);
+        done();
+      });
   });
 });

@@ -16,6 +16,10 @@ module.exports = (sequelize, DataTypes) => {
       },
       deletedAt: {
         type: DataTypes.DATE
+      },
+      country: {
+        type: DataTypes.STRING,
+        allowNull: false
       }
     }, { paranoid: true });
   TravelStipends.associate = (models) => {
@@ -23,11 +27,6 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'createdBy',
       as: 'creator',
       targetKey: 'userId'
-    });
-    TravelStipends.belongsTo(models.Center, {
-      foreignKey: 'centerId',
-      as: 'center',
-      targetKey: 'id'
     });
   };
   return TravelStipends;

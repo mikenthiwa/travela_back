@@ -7,7 +7,7 @@ export default class TravelStipendValidator {
       .isInt({ gt: -1 });
     req.checkBody('stipend', 'stipend must not be more than 1000 dollars')
       .isInt({ lt: 1001 });
-    req.checkBody('center', 'center is required').notEmpty();
+    req.checkBody('center', 'country is required').notEmpty();
     const errors = req.validationErrors();
     if (errors.length) {
       return Validator.errorHandler(res, errors, next);
@@ -18,20 +18,22 @@ export default class TravelStipendValidator {
   static async checkCenter(req, res, next) {
     const { body: { center, stipend }, route: { methods: { put } } } = req;
     const action = put;
-    await models.Center.findOrCreate({
-      where: {
-        location: center
-      }
-    });
+
+    if (center !== 'Default') {
+      await models.Country.findOrCreate({
+        where: {
+          country: center
+        },
+        defaults: { regionId: 9999 }
+      });
+    }
+
     const foundStipend = await models.TravelStipends
       .find(
         {
-          include: [{
-            association: 'center',
-            where: {
-              location: center
-            }
-          }]
+          where: {
+            country: center
+          }
         }
       );
     TravelStipendValidator.conditionalValidation(res, foundStipend, action, stipend, next);
@@ -42,13 +44,13 @@ export default class TravelStipendValidator {
       if (!action) {
         return res.status(409).json({
           success: false,
-          message: 'A travel stipend already exists for this center'
+          message: 'A travel stipend already exists for this country'
         });
       }
       if (action && (foundStipend.dataValues.amount === Number(stipend))) {
         return res.status(409).json({
           success: false,
-          message: 'A travel stipend already exists for this center'
+          message: 'A travel stipend already exists for this country'
         });
       }
     }
@@ -77,6 +79,11 @@ export default class TravelStipendValidator {
       .isInt()
       .withMessage(`${id} should be an integer`);
 
+    TravelStipendValidator.checkValidationErrors(req, res, next);
+  }
+
+  static async validateTravelStipendsLocations(req, res, next) {
+    req.checkQuery('locations', 'one or more locations must be sent').notEmpty();
     TravelStipendValidator.checkValidationErrors(req, res, next);
   }
 }

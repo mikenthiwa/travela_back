@@ -3,7 +3,7 @@ import { role } from '../../userRole/__tests__/mocks/mockData';
 import mockData from './__mocks__/travelStipendMock';
 
 const {
-  user, userRole, centers, listOfStipends
+  user, userRole, centers, listOfStipends, regions
 } = mockData;
 
 export default class TestSetup {
@@ -11,6 +11,7 @@ export default class TestSetup {
     await models.User.bulkCreate(user);
     await models.Role.bulkCreate(role);
     await models.Center.bulkCreate(centers);
+    await models.TravelRegions.bulkCreate(regions);
     await models.UserRole.bulkCreate(userRole);
     await models.TravelStipends.bulkCreate(listOfStipends);
   }
@@ -21,5 +22,6 @@ export default class TestSetup {
     await models.Center.destroy({ truncate: true, cascade: true });
     await models.Role.destroy({ truncate: { cascade: true }, force: true });
     await models.User.destroy({ truncate: { cascade: true }, force: true });
+    await models.TravelRegions.destroy({ truncate: true, cascade: true });
   }
 }

@@ -23,7 +23,7 @@ describe('TravelStipends', () => {
   const token = Utils.generateTestToken(payload);
 
   describe('Create Travel Stipends: POST /api/v1/travelStipend', () => {
-    it('should throw 422 error if the user does not provide a stipend and a location',
+    it('should throw 422 error if the user does not provide a stipend and a country',
       (done) => {
         const expectedResponse = {
           success: false,
@@ -38,7 +38,7 @@ describe('TravelStipends', () => {
               name: 'stipend'
             },
             {
-              message: 'center is required',
+              message: 'country is required',
               name: 'center'
             }
           ]
@@ -69,7 +69,7 @@ describe('TravelStipends', () => {
                 name: 'stipend'
               },
               {
-                message: 'center is required',
+                message: 'country is required',
                 name: 'center'
               }
             ]
@@ -92,14 +92,14 @@ describe('TravelStipends', () => {
           .post(url)
           .set('authorization', token)
           .send({
-            center: 'Lagos',
+            center: 'Kenya',
             stipend: 455
           })
           .expect(409)
           .end((err, res) => {
             if (err) done(err);
             expect(res.body.success).toEqual(false);
-            expect(res.body.message).toEqual('A travel stipend already exists for this center');
+            expect(res.body.message).toEqual('A travel stipend already exists for this country');
             done();
           });
       });
@@ -110,7 +110,7 @@ describe('TravelStipends', () => {
           .set('authorization', token)
           .send(
             {
-              center: 'Nairobi',
+              center: 'Rwanda',
               stipend: 75
             }
           )
@@ -118,7 +118,7 @@ describe('TravelStipends', () => {
           .end((err, res) => {
             if (err) return done(err);
             expect(res.body.success).toEqual(true);
-            expect(res.body.message).toEqual('Successfully created a new travel stipend for Nairobi');
+            expect(res.body.message).toEqual('Successfully created a new travel stipend for Rwanda');
             done();
           });
       });

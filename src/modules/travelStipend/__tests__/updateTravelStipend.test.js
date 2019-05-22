@@ -12,7 +12,7 @@ const expectedResponseBody = {
   success: false,
   error: 'Please provide a token'
 };
-    
+
 const expectedResponse = {
   status: 401,
   body: expectedResponseBody
@@ -51,7 +51,7 @@ describe('Update Travel Stipend', () => {
     await TestSetup.destoryTables();
     await TestSetup.createTables();
   });
-  
+
   beforeEach(async () => {
     await models.TravelStipends.destroy({ force: true, truncate: { cascade: true } });
     const response = await request(app)
@@ -60,7 +60,7 @@ describe('Update Travel Stipend', () => {
       .send(travelStipend);
     stipendId = response.body.stipend.id;
   });
-  
+
   afterAll(async () => {
     await TestSetup.destoryTables();
   });
@@ -113,7 +113,7 @@ describe('Update Travel Stipend', () => {
     it('should ensure travel stipend exists', (done) => {
       updateTravelStipend(
         {
-          center: 'Lagos',
+          center: 'Nigeria',
           stipend: 100
         },
         999,
@@ -130,7 +130,7 @@ describe('Update Travel Stipend', () => {
     it('should successfully update the center and stipend', (done) => {
       updateTravelStipend(
         {
-          center: 'Lagos',
+          center: 'Nigeria',
           stipend: 100
         },
         stipendId,
@@ -148,14 +148,14 @@ describe('Update Travel Stipend', () => {
       await TestSetup.createTables();
       updateTravelStipend(
         {
-          center: 'Lagos',
+          center: 'Nigeria',
           stipend: 75
         },
         100,
         done,
         {
           status: 409,
-          message: 'A travel stipend already exists for this center'
+          message: 'A travel stipend already exists for this country'
         },
         'message',
         superAdminToken
@@ -165,7 +165,7 @@ describe('Update Travel Stipend', () => {
     it('should not update if given center only', (done) => {
       updateTravelStipend(
         {
-          center: 'Nairobi'
+          center: 'Kenya'
         },
         stipendId,
         done,

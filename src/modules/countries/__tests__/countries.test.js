@@ -55,7 +55,7 @@ describe('Countries controller tests', () => {
         done();
       });
   });
-  it('should throw error when input is empty', (done) => {
+  it('should throw error when the input is empty', (done) => {
     request
       .post(url)
       .set('authorization', token)
@@ -90,13 +90,13 @@ describe('Countries controller tests', () => {
         done();
       });
   });
-  it('should return a friendly message when there are no countries', (done) => {
+  it('should return a friendly message when there are no any countries', (done) => {
     request
       .get('/api/v1/regions/2/countries')
       .set('authorization', token)
       .end((err, res) => {
         if (err) return done(err);
-        expect(res.status).toBe(404);
+        expect(res.status).toBe(200);
         expect(res.body.message).toEqual('No country records found');
         done();
       });
@@ -118,7 +118,7 @@ describe('Countries controller tests', () => {
         .get(`${url}?searchQuery=noCountry`)
         .set('authorization', token)
         .end((err, res) => {
-          expect(res.status).toBe(404);
+          expect(res.status).toBe(200);
           expect(res.body.message).toEqual('No results found for the searched country');
           done();
         });

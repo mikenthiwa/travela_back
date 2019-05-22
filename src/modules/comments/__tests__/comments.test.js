@@ -5,6 +5,7 @@ import Utils from '../../../helpers/Utils';
 import mockData from './mocks/mocksData';
 import { role } from '../../userRole/__tests__/mocks/mockData';
 import CommentsController from '../CommentsController';
+import NotificationEngine from '../../notifications/NotificationEngine';
 
 global.io = {
   sockets: {
@@ -173,6 +174,50 @@ describe('Comments controller', () => {
           });
       });
 
+      it('returns data when tagNotificationData is called', () => {
+        const tagData = CommentsController.tagNotificationData('Ada', '-ss60B42oZ-a');
+        expect(tagData).toHaveProperty('topic');
+        expect(tagData).toHaveProperty('sender');
+        expect(tagData).toHaveProperty('type');
+        expect(tagData).toHaveProperty('redirectLink');
+      });
+
+      it('returns 201 and creates a new comment if the comment has tagged users', (done) => {
+        NotificationEngine.sendMailToMany = jest.fn();
+        NotificationEngine.notifyMany = jest.fn();
+        const getTaggedUsersSpy = jest.spyOn(CommentsController, 'getTaggedUsers');
+
+        const expectedResponse = {
+          success: true,
+          message: 'Comment created successfully',
+          comment: {
+            comment: "I thought we agreed you'd spend only two weeks, @captan.ameria@andela.com , @captan2.ameria@andela.com",
+            requestId: '-ss60B42oZ-a',
+            userId: 10
+          }
+        };
+        request
+          .post('/api/v1/comments')
+          .set('authorization', token)
+          .send({
+            comment: "I thought we agreed you'd spend only two weeks, @captan.ameria@andela.com , @captan2.ameria@andela.com",
+            requestId: '-ss60B42oZ-a',
+            name: 'Oluebube Egbuna'
+          })
+          .end((err, res) => {
+            if (err) done(err);
+            const {
+              comment, requestId,
+            } = res.body.comment;
+            expect(res.statusCode).toEqual(201);
+            expect(res.body.success).toBe(true);
+            expect(res.body.message).toEqual(expectedResponse.message);
+            expect(comment).toEqual(expectedResponse.comment.comment);
+            expect(requestId).toEqual(expectedResponse.comment.requestId);
+            expect(getTaggedUsersSpy).toHaveBeenCalled();
+            done();
+          });
+      });
       it('returns 201 and creates a new comment for a document', (done) => {
         const expectedResponse = {
           success: true,

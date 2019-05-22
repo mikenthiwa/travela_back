@@ -49,4 +49,8 @@ describe('Switch Button helper', () => {
     expect(switchButtonText('Notify Destination Tavel Team On Request Deletion')).toEqual('View Notification');
     done();
   });
+  it('should show View Comment button in case of tagged user', (done) => {
+    expect(switchButtonText('You were mentioned in a comment')).toEqual('View Comment');
+    done();
+  });
 });

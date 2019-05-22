@@ -7,13 +7,29 @@ import UserRoleController from '../userRole/UserRoleController';
 class CommentsController {
   static async createComment(req, res) {
     try {
-      const { requestId, documentId } = req.body;
+      const { requestId, documentId, comment } = req.body;
       const userIdInteger = await UserRoleController.getRecipient(null, req.user.UserInfo.id);
+      const { name, picture, id: senderId } = req.user.UserInfo;
+      
       const commentData = {
         ...req.body,
         id: Utils.generateUniqueId(),
         userId: userIdInteger.id
       };
+
+      const userEmails = CommentsController.getEmailsFromComment(commentData.comment) || [];
+      const taggedUsers = await CommentsController.getTaggedUsers(userEmails);
+
+      if (taggedUsers.length > 0) {
+        const message = `You were mentioned in a comment click here to view 
+        <a href=${process.env.REDIRECT_URL}/redirect/requests/${requestId}>${requestId}</a> `;
+        NotificationEngine.notifyMany({
+          users: taggedUsers, senderId, name, picture, message, id: requestId
+        });
+        const data = CommentsController.tagNotificationData(name, requestId, picture, comment);
+        NotificationEngine.sendMailToMany(taggedUsers, data);
+      }
+      
       let commentType;
       let request;
       if (requestId) {
@@ -30,6 +46,35 @@ class CommentsController {
     } catch (error) { /* istanbul ignore next */
       return Error.handleError('Server Error', 500, res);
     }
+  }
+
+  static async getTaggedUsers(userEmails) {
+    const taggedUsers = await models.User.findAll({ where: { email: userEmails } }) || [];
+    return taggedUsers;
+  }
+
+  static tagNotificationData(name, requestId, picture, comment) {
+    const data = {
+      topic: 'You were mentioned in a comment',
+      sender: name,
+      type: 'You were mentioned in a comment',
+      redirectLink: `${process.env.REDIRECT_URL}/redirect/requests/${requestId}`,
+      details: {
+        requesterName: name,
+        id: requestId
+      },
+      picture,
+      comment,
+      id: requestId
+    };
+    return data;
+  }
+
+  static getEmailsFromComment(comment) {
+    const regularExpression = /@[\S]*.@andela.com\b/g;
+    const matchedStrings = comment.match(regularExpression);
+    const uniqueMatches = [...new Set(matchedStrings)];
+    return uniqueMatches.map(email => email.slice(1));
   }
 
   static async getReferenceIdFromTable(request, commentData, req, res, commentType) {

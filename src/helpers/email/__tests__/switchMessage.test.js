@@ -165,6 +165,21 @@ describe('switchMessage helper', () => {
     expect(verifiedMessage.split(' ')).toContain('<b>AnotherTester</b>', 'completed', 'We342');
     done();
   });
+
+  it(`should return appropriate message when
+   you are mentioned in a comment`, (done) => {
+    const verifiedMessage = switchMessage({
+      type: 'You were mentioned in a comment',
+      senderName: 'AnotherTester',
+      details: {
+        requestId: 'We342',
+        requesterName: 'Ebube Egbuna'
+      }
+    });
+    expect(verifiedMessage.split(' ')).toContain('Ebube', 'Egbuna', 'mentioned');
+    done();
+  });
+
   it('should return budget approval message for the approved budget', (done) => {
     const budgetApprovalMsg = switchMessage({
       type: 'Budget Approval'

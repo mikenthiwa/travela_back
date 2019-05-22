@@ -124,7 +124,8 @@ export default class NotificationEngine {
         durationOfStay: data.durationOfStay,
         destination,
         checkoutTime: data.checkoutTime,
-        details: data.details
+        details: data.details,
+        picture: data.picture
       }),
       'recipient-variables': recipientVars
     };

@@ -198,6 +198,27 @@ of budget for this trip.`;
       This is to inform you that <b> ${msgDetail.details.requesterName}</b> has just deleted the <b>${msgDetail.details.tripType}</b>
       travel request <b>${msgDetail.details.requestId}</b>  to your center <b>${msgDetail.details.location}</b> . Please cancel all initial plans for this trip.
       `;
+    case 'You were mentioned in a comment':
+      return `
+      This is to inform you that <b> ${msgDetail.details.requesterName}</b> has just mentioned you in a comment .
+      <table
+      style ='width: 80%;
+              background-color: #F8F8F8;
+              margin: auto;
+              margin-bottom: 10px;
+              text-align: left;
+              '>
+      <tbody >
+        <tr >
+        <td width='20%' ><img src=${msgDetail.picture}
+        style='border-radius: 50%; width: 50px; height: 50px;'
+        /></td>
+        <td width='80%'>
+          <i>${msgDetail.comment}</i></td>
+        </tr>
+        </tbody>
+        </table>
+      `;
 
     default:
       return '';

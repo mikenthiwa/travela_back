@@ -32,6 +32,8 @@ const switchButtonText = (type) => {
       return 'View Notification';
     case 'Notify Destination Tavel Team On Request Deletion':
       return 'View Notification';
+    case 'You were mentioned in a comment':
+      return 'View Comment';
     default:
       return 'View Request';
   }

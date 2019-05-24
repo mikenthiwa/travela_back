@@ -261,6 +261,7 @@ describe('Hotel Estimate', () => {
         done();
       });
   });
+  
   it('should not create an estimate that already exists for a country', (done) => {
     request
       .post(url)

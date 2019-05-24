@@ -182,7 +182,10 @@ const middleware = {
     validateNewEstimate: jest.fn(invokeNextMiddleware),
     searchForRegion: jest.fn(invokeNextMiddleware),
     searchForCountry: jest.fn(invokeNextMiddleware),
-    checkLocation: jest.fn(invokeNextMiddleware)
+    checkLocation: jest.fn(invokeNextMiddleware),
+    validateEditEstimate: jest.fn(invokeNextMiddleware),
+    checkHotelEstimate: jest.fn(invokeNextMiddleware)
+
   },
 };
 

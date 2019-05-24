@@ -33,6 +33,27 @@ export default class HotelEstimateValidator {
     return Validator.errorHandler(res, req.validationErrors(), next);
   }
 
+  static async validateEditEstimate(req, res, next) {
+    req.checkBody('estimate', 'amount is required and must be a positive number').isInt({ gt: 0 });
+    req.checkBody('estimate', 'amount must not be more than 1000 dollars').isInt({ lt: 1001 });
+
+    return Validator.errorHandler(res, req.validationErrors(), next);
+  }
+
+  static async checkHotelEstimate(req, res, next) {
+    const {
+      params: { id }
+    } = req;
+    const hotelEstimate = await models.HotelEstimate.findById(id);
+    if (!hotelEstimate) {
+      return res.status(404).json({
+        success: false,
+        error: 'Hotel Estimate does not exist'
+      });
+    }
+    next();
+  }
+
   static async searchForRegion(res, travelRegion, next) {
     await models.TravelRegions.findOrCreate({
       where: {

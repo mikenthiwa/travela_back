@@ -1,6 +1,7 @@
 import { Op } from 'sequelize';
 import models from '../../database/models';
 import CustomError from '../../helpers/Error';
+import fetchOneHotelEstimate from '../../helpers/hotelEstimate';
 
 export default class HotelEstimateController {
   static async createHotelEstimate(req, res) {
@@ -12,7 +13,7 @@ export default class HotelEstimateController {
       const userInformation = await models.User.findOne({
         where: { userId: createdBy }
       });
-      
+
       const regionValue = await HotelEstimateController.getRegionId(travelRegion);
       const countryValue = await HotelEstimateController.getCountryId(country);
 
@@ -131,23 +132,7 @@ export default class HotelEstimateController {
       const {
         params: { id }
       } = req;
-
-      const hotelEstimate = await models.HotelEstimate.findById(id, {
-        include: [
-          {
-            model: models.User,
-            as: 'creator',
-            attributes: ['id', 'fullName']
-          }
-        ]
-      });
-
-      if (!hotelEstimate) {
-        return res.status(404).json({
-          success: false,
-          error: 'Hotel Estimate does not exist'
-        });
-      }
+      const hotelEstimate = await fetchOneHotelEstimate(id);
       return res.status(200).json({
         success: true,
         hotelEstimate
@@ -237,6 +222,44 @@ export default class HotelEstimateController {
         success: true,
         message: returnMessage(),
         estimates: estimatesResponse
+      });
+    } catch (error) {
+      /* istanbul ignore next */
+      CustomError.handleError(error.message, 500, res);
+    }
+  }
+
+  static async updateHotelEstimate(req, res) {
+    try {
+      const {
+        params: { id }
+      } = req;
+      const { estimate } = req.body;
+      const hotelEstimate = await fetchOneHotelEstimate(id);
+      await hotelEstimate.update({
+        amount: estimate
+      });
+      return res.status(200).json({
+        success: true,
+        message: 'Hotel estimate updated successfully',
+        hotelEstimate
+      });
+    } catch (error) {
+      /* istanbul ignore next */
+      CustomError.handleError(error.message, 500, res);
+    }
+  }
+
+  static async deleteOneHotelEstimate(req, res) {
+    try {
+      const {
+        params: { id }
+      } = req;
+      const hotelEstimate = await models.HotelEstimate.findById(id);
+      await hotelEstimate.destroy();
+      return res.status(200).json({
+        success: true,
+        message: 'Hotel Estimates deleted successfully'
       });
     } catch (error) {
       /* istanbul ignore next */

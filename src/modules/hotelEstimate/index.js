@@ -42,7 +42,35 @@ HotelEstimateRouter.get(
     'Travel Team Member'
   ]),
   TravelStipendValidator.validateUpdateParams,
+  HotelEstimateValidator.checkHotelEstimate,
   HotelEstimateController.getOneHotelEstimate
+);
+
+HotelEstimateRouter.delete(
+  '/hotelEstimate/:id',
+  authenticate,
+  RoleValidator.checkUserRole([
+    'Super Administrator',
+    'Travel Administrator',
+    'Travel Team Member'
+  ]),
+  TravelStipendValidator.validateUpdateParams,
+  HotelEstimateValidator.checkHotelEstimate,
+  HotelEstimateController.deleteOneHotelEstimate
+);
+
+HotelEstimateRouter.put(
+  '/hotelEstimate/:id',
+  authenticate,
+  HotelEstimateValidator.validateEditEstimate,
+  RoleValidator.checkUserRole([
+    'Super Administrator',
+    'Travel Administrator',
+    'Travel Team Member'
+  ]),
+  TravelStipendValidator.validateUpdateParams,
+  HotelEstimateValidator.checkHotelEstimate,
+  HotelEstimateController.updateHotelEstimate
 );
 
 export default HotelEstimateRouter;

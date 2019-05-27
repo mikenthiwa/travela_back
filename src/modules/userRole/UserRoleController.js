@@ -7,6 +7,8 @@ import UserHelper from '../../helpers/user';
 import NotificationEngine from '../notifications/NotificationEngine';
 import UserRoleUtils from './UserRoleUtils';
 import DepartmentController from '../department/DepartmentController';
+import Utils from '../../helpers/Utils';
+
 
 dotenv.config();
 
@@ -107,9 +109,19 @@ class UserRoleController {
   static async addUser(req, res) {
     try {
       const userData = UserHelper.decodeToken(req.body.token);
-      const result = await models.User.find({
+      const userId = Utils.generateUniqueId();
+      const [result] = await models.User.findOrCreate({
         where: {
           email: { ilike: userData.email }
+        },
+        defaults: {
+          email: userData.email,
+          userId,
+          fullName: userData.name,
+          passportName: userData.name,
+          picture: userData.picture,
+          manager: null,
+          location: 'Nairobi'
         },
         include: [
           {
@@ -127,7 +139,7 @@ class UserRoleController {
         ]
       });
       await result.addRole(401938);
-      if (result.dataValues.manager === null) {
+      if (result.dataValues.gender && result.dataValues.manager === null) {
         const userOnBamboo = await UserHelper.getUserOnBamboo(result.bambooHrId);
         const manager = await models.User.find({
           where: {
@@ -215,7 +227,6 @@ class UserRoleController {
       });
       const error = 'User already has this role';
       if (hasRole) return CustomError.handleError(error, 409, res);
-
       await UserRoleController.addMuftiCenter(centerId, user, roleId);
       if (roleId === 60000) {
         dept = await DepartmentController.assignDepartments(departments, user);

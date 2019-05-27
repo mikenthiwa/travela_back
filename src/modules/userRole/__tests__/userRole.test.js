@@ -48,7 +48,6 @@ const payload4 = {
   },
 };
 
-
 const updateRoleData = {
   id: 10948,
   roleName: 'Super Administrator',

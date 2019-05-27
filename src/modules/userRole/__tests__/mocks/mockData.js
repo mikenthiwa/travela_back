@@ -188,6 +188,7 @@ export const userMock = [
     email: 'wilson.gaturu@andela.com',
     userId: '333',
     bambooHrId: '333',
+    gender: 'Male',
     location: 'Nairobi',
     createdAt: '2018-08-16 012:11:52.181+01',
     updatedAt: '2018-08-16 012:11:52.181+01'

@@ -212,4 +212,18 @@ describe('GET /travelStipends/location', () => {
         done();
       });
   });
+
+  it('should return message if no stipends are found', async (done) => {
+    await models.TravelStipends.destroy({ force: true, truncate: { cascade: true } });
+    const queryParams = 'locations[]=%7B%22origin%22:%22Lagos%22,%22destination%22:%22Nairobi,+Kenya%22%7D';
+    request(app)
+      .get(`/api/v1/travelStipends/location?${queryParams}`)
+      .set('Authorization', requesterToken)
+      .end((err, res) => {
+        expect(res.status).toEqual(404);
+        expect(res.body.success).toEqual(true);
+        expect(res.body.message).toEqual('There was no stipends found for specified location(s)');
+        done();
+      });
+  });
 });

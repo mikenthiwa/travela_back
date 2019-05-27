@@ -4,6 +4,7 @@ import models from '../../../database/models';
 import app from '../../../app';
 import Utils from '../../../helpers/Utils';
 import { role } from '../../userRole/__tests__/mocks/mockData';
+import BudgetApprovalsController from '../BudgetApprovalsController';
 
 global.io = {
   sockets: {
@@ -583,5 +584,10 @@ describe('Should allow the budget checker to view requests by budget status', ()
         expect(res.body.message).toEqual('Approvals retrieved successfully');
         done();
       });
+  });
+  it('should return response message', (done) => {
+    const res = BudgetApprovalsController.responseMesssage(0);
+    expect(res).toEqual('You have no approvals at the moment');
+    done();
   });
 });

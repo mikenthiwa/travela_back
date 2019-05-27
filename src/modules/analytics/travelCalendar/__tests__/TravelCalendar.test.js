@@ -18,7 +18,9 @@ import {
   role,
 } from '../../../userRole/__tests__/mocks/mockData';
 import Utils from '../../../../helpers/Utils';
+import CalendarController from '../TravelCalendar';
 
+const { Op } = models.Sequelize;
 const requesterToken = Utils.generateTestToken(requesterPayload);
 const travelAdminToken = Utils.generateTestToken(travelAdminPayload);
 
@@ -204,5 +206,19 @@ describe('Test Suite for Travel Calendar Analytics', () => {
         if (err) return done(err);
         done();
       });
+  });
+
+  it('should return the date query', (done) => {
+    const dateFrom = '2019-05-01';
+    const dateTo = '2019-05-31';
+    const dateQuery = {};
+    const res = CalendarController.dateQuery(dateFrom, dateTo);
+    dateQuery[Op.or] = {
+      [Op.or]: [dateFrom, dateTo],
+      [Op.between]: [dateFrom, dateTo]
+    };
+ 
+    expect(res).toEqual(dateQuery);
+    done();
   });
 });

@@ -17,6 +17,7 @@
     "db:seed:unittest": "node_modules/.bin/sequelize db:seed:all $* --seeders-path src/database/seeders/unittesting",
     "db:seed:e2e": "node_modules/.bin/sequelize db:seed:all $* --seeders-path src/database/seeders/e2e",
     "db:migrate": "node_modules/.bin/sequelize db:migrate",
+    "db:migrate:undo": "node_modules/.bin/sequelize db:migrate:undo",
     "db:rollback": "node_modules/.bin/sequelize db:migrate:undo:all",
     "db:rollmigrate": "yarn db:rollback && yarn db:migrate && yarn db:seed"
   },

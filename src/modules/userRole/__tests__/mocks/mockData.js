@@ -61,14 +61,14 @@ export const profile = {
     department: 'Talent development',
     occupation: 'software developer',
     gender: 'Male',
-    manager: 'samuel kubai'
+    manager: 20200
   },
   profile2: {
     passportName: 'Collins Muru',
     department: 'Talent development',
     occupation: 'software developer',
     gender: 'males',
-    manager: 'samuel kubai'
+    manager: 20200
   }
 };
 

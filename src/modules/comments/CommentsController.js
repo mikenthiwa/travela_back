@@ -99,7 +99,7 @@ class CommentsController {
       const { id, userId, type: documentType } = request;
       const manager = request.manager || name;
       const requesterDetails = await UserRoleController.getRecipient(null, userId);
-      const managerDetail = await UserRoleController.getRecipient(manager);
+      const managerDetail = await UserRoleController.getRecipient(null, null, manager);
       const linkType = commentType === 'Document'
         ? `/travel-readiness/${userId}?id=${id}&type=${documentType}`
         : `/requests/${id}`;

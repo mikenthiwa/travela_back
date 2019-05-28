@@ -562,12 +562,25 @@ describe('Notifications Controller', () => {
 
     const token = Utils.generateTestToken(payload);
     beforeAll(async () => {
+      const newUser = {
+        fullName: 'Bolton Otieno',
+        passportName: 'Bolton Otieno',
+        department: 'TDD',
+        occupation: 'Software Developer',
+        email: 'bolton@andela.com',
+        userId: 123,
+        location: 'Kenya',
+        manager: 123,
+        gender: 'Male',
+        roleId: 70001,
+        id: 123
+      };
       const newRequest = {
         "name": "Alice Doe",
         "origin": "Kampala",
         "destination": "New yorker",
         "gender": "Male",
-        "manager": "Ademola Ariya",
+        "manager": 123,
         "department": "TDD",
         "status": "Open",
         "role": "Senior Consultant",
@@ -587,6 +600,7 @@ describe('Notifications Controller', () => {
         "userId": "alice-doe-id",
         "picture": "picture.jpg"
       };
+      await models.User.create(newUser);
       await models.Request.create(newRequest);
       await models.Notification.create(notification);
     });
@@ -594,6 +608,7 @@ describe('Notifications Controller', () => {
     afterAll(async () => {
       await models.Notification.sync({ force: true });
       await models.Request.sync({ force: true });
+      await models.User.sync({ force: true });
     });
 
     it('should return 401 for unathorized users', async () => {

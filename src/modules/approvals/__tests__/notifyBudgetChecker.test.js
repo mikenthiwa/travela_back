@@ -16,7 +16,7 @@ global.io = {
 
 const payload = {
   UserInfo: {
-    id: '-LTI9_PM3tV39gffhUIE',
+    id: 1,
     first_name: 'Moses',
     last_name: 'Gitau',
     firstName: 'Moses',
@@ -33,7 +33,7 @@ const mockRequest = [
     id: '3mzyo5PeA',
     name: 'Moses Gitau',
     tripType: 'return',
-    manager: 'Moses Gitau',
+    manager: 1,
     gender: 'Male',
     department: 'Fellowship-Programs',
     role: 'Technical Team Lead',
@@ -86,7 +86,7 @@ const userMock = {
   passportName: 'Moses Gitau',
   department: 'Fellowship-Programs',
   occupation: 'Technical Team Lead',
-  manager: 'Moses Gitau',
+  manager: 1,
   gender: 'Male',
   picture: 'fake.png',
   location: 'Nairobi',
@@ -105,7 +105,7 @@ const mockApproval = [
     id: 1,
     requestId: '3mzyo5PeA',
     status: 'Open',
-    approverId: 'Peter Paul',
+    approverId: 1,
     createdAt: '2018-09-26T15:47:47.582Z',
     updatedAt: '2018-09-26T15:47:47.582Z',
     deletedAt: null,
@@ -208,7 +208,7 @@ describe('Budget checker', () => {
     jest.spyOn(ApprovalsController, 'sendEmailTofinanceMembers');
     UserRoleController.getRecipient = jest
       .fn()
-      .mockReturnValue({ fullName: 'Moses Gitaul' }, { userId: null });
+      .mockReturnValue({ fullName: null }, { userId: null }, { id: 1 });
     NotificationEngine.notify = jest.fn();
     request(app)
       .put('/api/v1/approvals/budgetStatus/3mzyo5PeA')

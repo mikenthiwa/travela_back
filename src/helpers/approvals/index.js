@@ -53,7 +53,7 @@ export function createApprovalSubquery({
   const { verified } = req.query;
   let status = req.query.status ? req.query.status : '';
 
-  const userName = req.travelaUser.fullName;
+  const userId = req.travelaUser.id;
   const { location } = req.user;
   // tripWhereExtended
   const { requestWhereExtended, tripWhereExtended } = createExtendedClause(
@@ -81,7 +81,7 @@ export function createApprovalSubquery({
   }
 
   const subQuery = {
-    where: (verified) ? {} : { approverId: userName },
+    where: (verified) ? {} : { approverId: userId },
     include: [{
       model: models.Request,
       as: `${models.Request.name}`,

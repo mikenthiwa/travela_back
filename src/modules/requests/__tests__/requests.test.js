@@ -35,7 +35,7 @@ const mockManager = generateMock.user(
     picture: 'picture.png',
     email: 'saved.manager@andela.com',
     roleId: 53019,
-    manager: null
+    manager: 2
   },
 );
 
@@ -51,7 +51,7 @@ const mockTravelAdmin = generateMock.user(
     location: 'Central City, Wakanda2',
     centerId: mockAndelaDestination.id,
     gender: 'Female',
-    manager: null,
+    manager: 2,
     id: 3
   }
 );
@@ -65,7 +65,7 @@ const mockTravelTeamMember = generateMock.user({
   userId: 'travel-team-member',
   location: mockAndelaOrigin.location,
   centerId: mockAndelaOrigin.id,
-  manager: null,
+  manager: 2,
   gender: 'Female',
   roleId: 339458,
   id: 4
@@ -80,13 +80,13 @@ const mockFinanceTeamMember = generateMock.user({
   userId: 'finance-team-member',
   location: mockAndelaOrigin.location,
   centerId: mockAndelaOrigin.id,
-  manager: null,
+  manager: 2,
   gender: 'Female',
   roleId: 70001,
   id: 5
 });
 
-const mockRequester = generateMock.user({ manager: mockManager.fullName });
+const mockRequester = generateMock.user({ manager: mockManager.id });
 
 const mockNewRequest = generateMock.request(
   {
@@ -1898,7 +1898,7 @@ describe('Requests Controller', () => {
           requestId: mockApprovedRequest.id,
           status: 'Verified',
           budgetStatus: 'Approved',
-          approverId: mockTravelTeamMember.fullName,
+          approverId: mockTravelTeamMember.id,
         });
 
         request(app)

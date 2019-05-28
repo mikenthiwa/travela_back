@@ -36,7 +36,7 @@ class ApprovalsController {
 
   static setParameters(req) {
     params = retrieveParams(req);
-    params.userName = req.travelaUser.fullName;
+    params.userName = req.travelaUser.id;
     params.parameters = {
       req,
       limit: params.limit,
@@ -223,8 +223,7 @@ class ApprovalsController {
     const budgetCheckerMembers = await BudgetApprovalsController.findBudgetCheckerDepartment(
       department
     );
-
-    if (budgetCheckerMembers) {
+    if (budgetCheckerMembers.length) {
       let chekerFullName;
       if (budgetCheckerMembers.length === 1) {
         chekerFullName = `checker <b>${budgetCheckerMembers[0].dataValues.fullName}</b>`;

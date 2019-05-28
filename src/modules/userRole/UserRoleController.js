@@ -88,6 +88,7 @@ class UserRoleController {
         userId: req.params.id
       }
     });
+
     if (!user) {
       const message = [400, 'User does not exist', false];
       return UserRoleController.response(res, message);
@@ -100,11 +101,11 @@ class UserRoleController {
       gender: gender || user.gender,
       location: location || user.location
     });
+
     if (department) await DepartmentController.createDepartmentFromEndpoint(department);
     const message = [200, 'Profile updated successfully', true];
     UserRoleController.response(res, message, result);
   }
-  
 
   static async addUser(req, res) {
     try {
@@ -148,7 +149,7 @@ class UserRoleController {
         });
         if (manager) {
           await manager.addRole(53019);
-          await result.update({ manager: manager.dataValues.fullName });
+          await result.update({ manager: manager.dataValues.id });
         }
       }
       await result.update({ picture: userData.picture });
@@ -399,10 +400,10 @@ class UserRoleController {
     }
   }
 
-  static async getRecipient(recipientName, recipientId) {
+  static async getRecipient(recipientName, recipientUserId, recipientId) {
     const recipient = await models.User.findOne({
       where: {
-        $or: [{ fullName: recipientName }, { userId: recipientId }]
+        $or: [{ fullName: recipientName }, { userId: recipientUserId }, { id: recipientId }]
       }
     });
     return recipient;

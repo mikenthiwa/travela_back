@@ -158,7 +158,7 @@ class RequestsController {
     const allAdmins = await getTravelTeams(trips);
     const { picture, id: senderId } = req.user.UserInfo;
     const { id, name, tripType } = request;
-    
+
     if (allAdmins) {
       allAdmins.forEach((admin, index) => {
         const originEmailData = {
@@ -170,7 +170,7 @@ class RequestsController {
           },
           redirectLink: link
         };
-  
+
         const destinationEmailData = {
           sender: name,
           topic: Emailtopic,
@@ -180,13 +180,12 @@ class RequestsController {
           },
           redirectLink: link
         };
-        
+
         [originType, destinationType].forEach((locationType, i) => this.inAppTravelAdmin(
           trips[index].destination, admin[i], name, id, locationType, picture, senderId, deadlink, tripType
         ));
-
-        NotificationEngine.sendMailToMany(admin[0], originEmailData);
-        NotificationEngine.sendMailToMany(admin[1], destinationEmailData);
+        if (admin[0].length) NotificationEngine.sendMailToMany(admin[0], originEmailData);
+        if (admin[1].length) NotificationEngine.sendMailToMany(admin[1], destinationEmailData);
       });
     }
   }
@@ -337,7 +336,8 @@ class RequestsController {
             requestId
           }
         });
-        const approverImage = await UserRoleController.getRecipient(approver.approverId, null);
+
+        const approverImage = await UserRoleController.getRecipient(null, null, approver.approverId);
         requestData.dataValues.approver = approver.approverId;
         requestData.dataValues.timeApproved = approver.updatedAt;
         requestData.dataValues.approverImage = approverImage.picture;
@@ -450,7 +450,7 @@ class RequestsController {
         const travelAdmins = await Users.getDestinationTravelAdmin(centerIds);
         const message = `This is to inform you that ${request.name}'s request ${
           request.id
-        } to visit 
+        } to visit
           your centre has just been verified by the local travel team.
           Please be aware of this request and plan for the traveller.`;
         NotificationEngine.notifyMany({

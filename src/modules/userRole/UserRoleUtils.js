@@ -72,9 +72,10 @@ class UserRoleUtils {
     return false;
   }
 
-  static async getUser(email) {
+  static async getUser(email, id) {
+    const where = email ? { email } : { id };
     const user = await models.User.findOne({
-      where: { email },
+      where,
       attributes: ['email', 'fullName', 'userId', 'id']
     });
     return user;

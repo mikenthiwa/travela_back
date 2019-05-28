@@ -11,7 +11,7 @@ const validateDirectReport = async (req, res, next) => {
   }
 
   // FIX: replace name with Id
-  if (travelaUser.fullName !== request.manager) {
+  if (travelaUser.id !== parseInt(request.manager, 10)) {
     return res.status(403).json({
       success: false,
       error: 'Permission denied, you are not requesters manager',

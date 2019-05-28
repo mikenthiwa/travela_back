@@ -5,6 +5,8 @@ import RequestsController from './RequestsController';
 import Error from '../../helpers/Error';
 import RequestUtils from './RequestUtils';
 import UserRoleController from '../userRole/UserRoleController';
+import UserRoleUtils from '../userRole/UserRoleUtils';
+
 
 const { Op } = models.Sequelize;
 
@@ -48,7 +50,9 @@ export default class RequestTransactions {
     });
   }
 
-  static sendNotification(req, res, request, trips) {
+  static async sendNotification(req, res, request, trips) {
+    const manager = await UserRoleUtils.getUser(null, request.manager);
+    request.manager = manager.dataValues.fullName;
     const message = 'created a new travel request';
     const { id } = request;
     const link = `${process.env.REDIRECT_URL}/redirect/requests/${id}`;
@@ -135,6 +139,8 @@ export default class RequestTransactions {
         return Error.handleError(error, 404, res);
       }
       await requestToApprove.update({ approverId: req.body.manager });
+      const manager = await UserRoleUtils.getUser(null, request.manager);
+      request.manager = manager.dataValues.fullName;
       RequestsController.sendNotificationToManager(
         req,
         res,
@@ -178,6 +184,8 @@ export default class RequestTransactions {
     const notificationMessage = 'deleted a travel request';
     const link = `${process.env.REDIRECT_URL}/redirect/requests/my-verifications`;
     const deadLink = '/#';
+    const manager = await UserRoleUtils.getUser(null, request.dataValues.manager);
+    request.manager = manager.dataValues.fullName;
     RequestsController.sendNotificationToManager(
       req,
       res,

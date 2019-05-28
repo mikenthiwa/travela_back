@@ -1,5 +1,6 @@
 import Centers from '../centers';
 import models from '../../database/models';
+import UserHelper from '../user';
 
 const centers = [
   {
@@ -29,5 +30,16 @@ describe('get center id', () => {
     const data = await Centers.getCenterId([''], ['']);
 
     expect(data).toEqual([[undefined, undefined]]);
+  });
+});
+
+describe('getUserLocation test', () => {
+  it('Should return city given a country', () => {
+    const response = UserHelper.getUserLocation('Kenya');
+    expect(response).toEqual('Nairobi');
+  });
+  it('Should return country if country not found', () => {
+    const response = UserHelper.getUserLocation('Ethiopia');
+    expect(response).toEqual('Ethiopia');
   });
 });

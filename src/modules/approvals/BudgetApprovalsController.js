@@ -38,15 +38,15 @@ export default class BudgetApprovalsController {
         department
       );
 
+      const managerDetails = await UserRoleController.getRecipient(null, null, manager);
       if (budgetCheckerMembers.length > 0) {
         const data = {
           sender: name,
           topic: 'Travel Request Approval',
           type: 'Notify budget checker',
-          details: { RequesterManager: manager, id },
+          details: { RequesterManager: managerDetails.fullName, id },
           redirectLink: `${process.env.REDIRECT_URL}/redirect/requests/budgets/${id}`
         };
-        const managerDetails = await UserRoleController.getRecipient(manager, null);
 
         budgetCheckerMembers.forEach((budgetChecker) => {
           const notificationData = {
@@ -228,7 +228,7 @@ export default class BudgetApprovalsController {
     const { id, budgetStatus } = updatedRequest;
     const senderDetails = await validateBudgetChecker(req);
     const { manager } = senderDetails;
-    const managerDetails = await UserRoleController.getRecipient(manager, null);
+    const managerDetails = await UserRoleController.getRecipient(null, null, manager);
     const managerId = managerDetails.userId;
     const notificationData = {
       senderId: req.user.UserInfo.id,

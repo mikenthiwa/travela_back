@@ -49,7 +49,7 @@ export default (sequelize, DataTypes) => {
         defaultValue: 0
       }
     },
-    {}
+    { paranoid: true }
   );
   User.associate = (models) => {
     User.belongsToMany(models.Role, {

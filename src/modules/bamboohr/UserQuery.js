@@ -13,6 +13,7 @@ class UserQuery {
       firstName,
       lastName,
       department,
+      jobTitle: occupation,
       supervisor: manager,
       gender,
       location
@@ -21,8 +22,10 @@ class UserQuery {
       bambooHrId: bamboohrId,
       email,
       fullName: `${firstName} ${lastName}`,
+      passportName: `${firstName} ${lastName}`,
       department,
       manager,
+      occupation,
       userId: bamboohrId,
       gender,
       location
@@ -40,10 +43,10 @@ class UserQuery {
     return dbResponse;
   }
 
-  static async getUser(bambooHrId) {
+  static async getUser(email) {
     const dbResponse = await User.findOne({
       where: {
-        bambooHrId
+        email
       }
     });
     return dbResponse;
@@ -52,22 +55,52 @@ class UserQuery {
   static async updateUser(userData) {
     const {
       id: bambooHrId,
+      workEmail: email,
       department,
       supervisor: manager,
       gender,
-      location
+      location,
+      jobTitle: occupation
     } = userData;
     const dbResponse = await User.update({
       department,
       manager,
       gender,
-      location
+      location,
+      occupation,
+      bambooHrId,
+      userId: bambooHrId
     },
     {
+      where: {
+        email
+      }
+    });
+    return dbResponse;
+  }
+
+  static async flagDeletedUser(userData) {
+    const {
+      id: bambooHrId,
+    } = userData;
+    const dbResponse = await User.destroy({
       where: {
         bambooHrId
       }
     });
+    return dbResponse;
+  }
+
+  static async createOrUpdate(userData) {
+    const {
+      workEmail: email
+    } = userData;
+    let dbResponse;
+    const user = await UserQuery.getUser(email);
+    if (user) {
+      dbResponse = await UserQuery.updateUser(userData);
+    }
+    dbResponse = await UserQuery.createUser(userData);
     return dbResponse;
   }
 }

@@ -54,12 +54,12 @@ describe('Comments controller', () => {
       });
   });
   afterAll(async () => {
-    await models.Role.destroy({ truncate: true, cascade: true });
-    await models.User.destroy({ truncate: true, cascade: true });
-    await models.Request.destroy({ truncate: true, cascade: true });
-    await models.UserRole.destroy({ truncate: true, cascade: true });
-    await models.Comment.destroy({ truncate: true, cascade: true });
-    await models.TravelReadinessDocuments.destroy({ truncate: true, cascade: true });
+    await models.Request.destroy({ truncate: true, force: true, cascade: true });
+    await models.Comment.destroy({ truncate: true, force: true, cascade: true });
+    await models.TravelReadinessDocuments.destroy({ truncate: true, force: true, cascade: true });
+    await models.UserRole.destroy({ truncate: true, force: true, cascade: true });
+    await models.User.destroy({ truncate: true, force: true, cascade: true });
+    await models.Role.destroy({ truncate: true, force: true, cascade: true });
   });
   describe('Unauthenticated user', () => {
     it('should throw 401 error if the user does not provide a token',

@@ -17,6 +17,7 @@ module.exports = {
         location: 'Nairobi',
         createdAt: '2018-08-16 012:11:52.181+01',
         updatedAt: '2018-08-16 012:11:52.181+01',
+        
       },
       {
         id: 1200,
@@ -31,6 +32,7 @@ module.exports = {
         location: 'Lagos',
         createdAt: '2018-08-16 012:11:52.181+01',
         updatedAt: '2018-08-16 012:11:52.181+01',
+        
       }
     ],
     {},

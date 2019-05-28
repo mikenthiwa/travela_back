@@ -72,11 +72,11 @@ class BambooWebhookValidator {
     let existingUsers = [];
     try {
       existingUsers = bambooUsersData.map(async (bambooUserData) => {
-        const userExists = await UserQuery.getUser(bambooUserData.id);
+        const userExists = await UserQuery.getUser(bambooUserData.workEmail);
         if (userExists) return bambooUserData;
       });
       newUsers = bambooUsersData.map(async (bambooUserData) => {
-        const userExists = await UserQuery.getUser(bambooUserData.id);
+        const userExists = await UserQuery.getUser(bambooUserData.workEmail);
         if (!userExists) return bambooUserData;
       });
 

@@ -10,6 +10,7 @@ import modules from './modules';
 import MailTravelMembers from './modules/userRole/MailTravelMembers';
 import CloudinaryDeletion from './modules/travelChecklist/CloudinaryDeletion';
 import ReminderEmails from './modules/reminders/reminderEmails';
+import updateUserCron from './modules/bamboohr/updateUserCron';
 
 const app = express();
 
@@ -40,6 +41,7 @@ app.use(passport.initialize());
 
 MailTravelMembers.sendMail();
 ReminderEmails.sendMail();
+updateUserCron.userUpdate();
 
 
 CloudinaryDeletion.executeResourceDelete();

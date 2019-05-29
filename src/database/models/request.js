@@ -127,6 +127,14 @@ export default (sequelize, DataTypes) => {
       foreignKey: 'requestId',
       as: 'changedRooms',
     });
+    Request.hasMany(models.TripModification, {
+      foreignKey: 'requestId',
+      as: 'modifications'
+    });
+    Request.belongsTo(models.TripModification, {
+      foreignKey: 'tripModificationId',
+      as: 'currentModification'
+    });
   };
   return Request;
 };

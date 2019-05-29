@@ -96,6 +96,10 @@ export default (sequelize, DataTypes) => {
       as: 'budgetCheckerDepartments',
       through: models.UsersDepartments
     });
+    User.hasMany(models.TripModification, {
+      foreignKey: 'approverId',
+      as: 'modifications',
+    });
   };
   return User;
 };

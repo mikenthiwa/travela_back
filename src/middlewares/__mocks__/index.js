@@ -18,6 +18,7 @@ const mockGetUserId = (req, res, next) => {
   next();
 };
 
+
 const middleware = {
   authenticate: jest.fn(mockAuthenticate),
   Validator: {
@@ -185,8 +186,15 @@ const middleware = {
     checkLocation: jest.fn(invokeNextMiddleware),
     validateEditEstimate: jest.fn(invokeNextMiddleware),
     checkHotelEstimate: jest.fn(invokeNextMiddleware)
-
   },
+  TripModificationValidator: {
+    checkExistingRequest: jest.fn(invokeNextMiddleware),
+    checkExistingModification: jest.fn(invokeNextMiddleware),
+    validateModification: jest.fn(invokeNextMiddleware),
+    validateRequest: jest.fn(invokeNextMiddleware),
+    validateApproval: jest.fn(invokeNextMiddleware),
+    validateDuplicateModification: jest.fn(invokeNextMiddleware)
+  }
 };
 
 export default middleware;

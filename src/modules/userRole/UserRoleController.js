@@ -107,6 +107,7 @@ class UserRoleController {
     UserRoleController.response(res, message, result);
   }
 
+
   static async addUser(req, res) {
     try {
       const userData = UserHelper.decodeToken(req.body.token);

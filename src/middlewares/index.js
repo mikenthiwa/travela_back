@@ -1,3 +1,4 @@
+import TripModificationValidator from './tripModificationsValidator';
 import authenticate from './authenticate';
 import Validator from './Validator';
 import validateDirectReport from './validateDirectReport';
@@ -36,6 +37,7 @@ const middleware = {
   ReminderEmailTemplateValidator,
   TravelReasonsValidator,
   TravelStipendValidator,
+  TripModificationValidator,
   DepartmentValidation,
   BambooWebhookValidator,
   TravelRegionsValidator,

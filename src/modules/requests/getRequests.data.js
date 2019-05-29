@@ -3,6 +3,16 @@ const getRequests = (requestId, models) => models.Request.find({
   where: { id: requestId },
   include: [
     {
+      model: models.TripModification,
+      as: 'modifications',
+      required: false,
+    },
+    {
+      model: models.TripModification,
+      as: 'currentModification',
+      required: false
+    },
+    {
       model: models.Comment,
       as: 'comments',
       include: [{
@@ -32,8 +42,8 @@ const getRequests = (requestId, models) => models.Request.find({
         }]
     }],
   order: [
-    [
-      { model: models.Trip, as: 'trips' }, 'returnDate', 'ASC']
+    [{ model: models.Trip, as: 'trips' }, 'returnDate', 'ASC'],
+    [{ model: models.TripModification, as: 'modifications' }, 'id', 'DESC']
   ]
 });
 

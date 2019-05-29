@@ -20,6 +20,7 @@ import departmentRouter from './department';
 import bamboohrRouter from './bamboohr';
 import travelRegionsRouter from './travelRegions';
 import countriesRouter from './countries';
+import tripModificationsRouter from './tripModifications';
 import hotelEstimateRouter from './hotelEstimate';
 
 const apiPrefix = '/api/v1';
@@ -48,6 +49,7 @@ const routes = [
   bamboohrRouter,
   travelRegionsRouter,
   countriesRouter,
+  tripModificationsRouter,
   hotelEstimateRouter
 ];
 export default (app) => {

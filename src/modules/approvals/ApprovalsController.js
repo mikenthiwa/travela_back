@@ -71,6 +71,20 @@ class ApprovalsController {
     return count;
   }
 
+  static async calculateTravelCompletion(approvals, req, res) {
+    return Promise.all(
+      approvals.map(async (request) => {
+        const travelCompletion = await TravelChecklistController.checkListPercentage(
+          req,
+          res,
+          request.id
+        );
+        request.dataValues.travelCompletion = travelCompletion;
+        return request;
+      })
+    );
+  }
+
   static async sendResult(req, res, result) {
     const count = await ApprovalsController.getStatusCount(req, res);
     const pagination = Pagination.getPaginationData(
@@ -84,17 +98,7 @@ class ApprovalsController {
       ? noResult
       : Utils.getResponseMessage(pagination, params.status, 'Approval');
     const approvals = result.rows.map(fillWithRequestData);
-    const newRequest = await Promise.all(
-      approvals.map(async (request) => {
-        const travelCompletion = await TravelChecklistController.checkListPercentage(
-          req,
-          res,
-          request.id
-        );
-        request.dataValues.travelCompletion = travelCompletion;
-        return request;
-      })
-    );
+    const newRequest = await ApprovalsController.calculateTravelCompletion(approvals, req, res);
     return res.status(200).json({
       success: true,
       message,

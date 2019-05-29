@@ -92,7 +92,6 @@ export default class TravelReadinessController {
   static async getAllUsersReadiness(req, res) {
     const { searchQuery, withDocuments } = req.query;
     const query = searchQuery ? await getSearchQuery(searchQuery) : {};
-    query.location = req.user.location;
     try {
       const count = await models.User.count({
         where: query,

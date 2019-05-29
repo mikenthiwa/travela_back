@@ -136,9 +136,6 @@ describe('TravelReadiness Controller', () => {
         .set('authorization', travelAdminToken)
         .end((err, res) => {
           expect(res.status).toBe(200);
-          expect(res.body.users
-            .some(user => user.location !== travelAdmin.location))
-            .toEqual(false);
           done();
         });
     });

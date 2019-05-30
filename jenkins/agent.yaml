@@ -9,11 +9,11 @@ spec:
     image: eu.gcr.io/jenkins-apprenticeship/jenkins-travela-backend
     resources:
       requests:
-        cpu: "2000m"
-        memory: "2Gi"
+        cpu: "3000m"
+        memory: "3Gi"
       limits:
-        cpu: "2000m"
-        memory: "2Gi"
+        cpu: "3000m"
+        memory: "3Gi"
     command:
     - cat
     tty: true

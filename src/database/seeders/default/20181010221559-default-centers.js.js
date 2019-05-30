@@ -4,46 +4,34 @@ module.exports = {
     [
       {
         id: 12345,
-        location: 'Lagos, Nigeria',
+        location: 'Nigeria',
         createdAt: '2018-08-16 012:11:52.181+01',
         updatedAt: '2018-08-16 012:11:52.181+01',
       },
       {
         id: 23456,
-        location: 'Nairobi, Kenya',
+        location: 'Kenya',
         createdAt: '2018-08-16 012:11:52.181+01',
         updatedAt: '2018-08-16 012:11:52.181+01',
       },
       {
         id: 34567,
-        location: 'Kigali, Rwanda',
+        location: 'Rwanda',
         createdAt: '2018-08-16 012:11:52.181+01',
         updatedAt: '2018-08-16 012:11:52.181+01',
       },
       {
         id: 45678,
-        location: 'New York, United States',
+        location: 'United States',
         createdAt: '2018-08-16 012:11:52.181+01',
         updatedAt: '2018-08-16 012:11:52.181+01',
       },
       {
         id: 56789,
-        location: 'Kampala, Uganda',
+        location: 'Uganda',
         createdAt: '2018-08-16 012:11:52.181+01',
         updatedAt: '2018-08-16 012:11:52.181+01',
-      },
-      {
-        id: 67890,
-        location: 'San Francisco, United States',
-        createdAt: '2018-08-16 012:11:52.181+01',
-        updatedAt: '2018-08-16 012:11:52.181+01',
-      },
-      {
-        id: 78901,
-        location: 'Austin, United States',
-        createdAt: '2018-08-16 012:11:52.181+01',
-        updatedAt: '2018-08-16 012:11:52.181+01',
-      },
+      }
     ],
     {},
   ),

@@ -205,6 +205,7 @@ export const postGuestHouse = {
   location: 'Lagos Nigeria',
   bathRooms: '1',
   imageUrl: 'https://www.lol.com',
+  genderPolicy: 'Unisex',
   rooms: [
     {
       roomName: 'big cutter',

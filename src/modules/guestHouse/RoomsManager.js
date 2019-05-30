@@ -21,6 +21,8 @@ class RoomsManager {
       location
     });
 
+    const genderPolicyRegex = (`.*${gender}|.*Unisex`);
+
     const unavailableBeds = []
       .concat(
         bookedBeds.map(bed => Object.values(bed)),
@@ -49,7 +51,10 @@ class RoomsManager {
               model: models.GuestHouse,
               where: {
                 location,
-                disabled: false
+                disabled: false,
+                genderPolicy: {
+                  [Op.iRegexp]: `${genderPolicyRegex}`
+                }
               }
             }
           ]

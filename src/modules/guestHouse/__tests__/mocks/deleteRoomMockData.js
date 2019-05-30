@@ -50,6 +50,7 @@ export const GuestHouseData = {
   location: 'Kampala, Uganda',
   bathRooms: '2',
   imageUrl: 'https://www.lol.com',
+  genderPolicy: 'Unisex',
   userId: '-dhsunwujnsnjjUbhwKNG2',
   createdAt: '2018-09-26T15:47:47.576Z',
   updatedAt: '2018-09-26T15:47:47.576Z',
@@ -107,6 +108,7 @@ export const userRequestData = {
   location: 'Kampala, Uganda',
   bathRooms: '5',
   imageUrl: 'https://www.lol.com',
+  genderPolicy: 'Unisex',
   rooms: [
     {
       id: 'sE3u6thdW',

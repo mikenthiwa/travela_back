@@ -23,6 +23,11 @@ export default (sequelize, DataTypes) => {
         allowNull: false,
         type: DataTypes.STRING
       },
+      genderPolicy: {
+        allowNull: false,
+        type: DataTypes.STRING,
+        defaultValue: 'Unisex'
+      },
       disabled: {
         allowNull: false,
         type: DataTypes.BOOLEAN,

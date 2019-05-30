@@ -1,7 +1,9 @@
 import request from 'supertest';
 import moxios from 'moxios';
 import app from '../../../app';
-import { postGuestHouse, postGuestHouse2 } from './mocks/guestHouseData';
+import {
+  postGuestHouse, postGuestHouse2, postGuestHouse3, postGuestHouse4
+} from './mocks/guestHouseData';
 import models from '../../../database/models';
 import Utils from '../../../helpers/Utils';
 import { role } from '../../userRole/__tests__/mocks/mockData';
@@ -126,6 +128,41 @@ describe('Guest Role Test', () => {
       .end((err, res) => {
         expect(res.body.success).toEqual(true);
         expect(res.body.message).toEqual('Guest House created successfully');
+        if (err) return done(err);
+        done();
+      });
+  });
+
+  it('should not add a new guest house to the database if genderPolicy is missing', (done) => {
+    request(app)
+      .post('/api/v1/guesthouses')
+      .set('Content-Type', 'application/json')
+      .set('authorization', token)
+      .send(postGuestHouse3)
+      .expect(422)
+      .end((err, res) => {
+        expect(res.body.success).toEqual(false);
+        expect(res.body.errors).toEqual([
+          {
+            message: 'Gender Policy is required',
+            name: 'genderPolicy'
+          }
+        ]);
+        if (err) return done(err);
+        done();
+      });
+  });
+
+  it('should not add a new guest house to the database if genderPolicy is not unisex, male or female', (done) => {
+    request(app)
+      .post('/api/v1/guesthouses')
+      .set('Content-Type', 'application/json')
+      .set('authorization', token)
+      .send(postGuestHouse4)
+      .expect(400)
+      .end((err, res) => {
+        expect(res.body.success).toEqual(false);
+        expect(res.body.message).toEqual('Gender policy should be either unisex, male or female');
         if (err) return done(err);
         done();
       });

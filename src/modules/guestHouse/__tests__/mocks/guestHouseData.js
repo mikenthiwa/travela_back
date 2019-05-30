@@ -3,6 +3,7 @@ export const postGuestHouse = {
   location: 'Lagos Nigeria',
   bathRooms: '1',
   imageUrl: 'https://www.lol.com',
+  genderPolicy: 'Unisex',
   rooms: [
     {
       roomName: 'big cutter',
@@ -22,6 +23,46 @@ export const postGuestHouse2 = {
   location: 'Lagos Nigeria',
   bathRooms: '1',
   imageUrl: 'ded',
+  genderPolicy: 'Unisex',
+  rooms: [
+    {
+      roomName: 'big cutter',
+      roomType: 'ensuited',
+      bedCount: '1'
+    },
+    {
+      roomName: 'small cutter',
+      roomType: 'non-ensuited',
+      bedCount: '1'
+    }
+  ]
+};
+
+export const postGuestHouse3 = {
+  houseName: 'Trauma energic house',
+  location: 'Lagos Nigeria',
+  bathRooms: '1',
+  imageUrl: 'https://www.lol.com',
+  rooms: [
+    {
+      roomName: 'big cutter',
+      roomType: 'ensuited',
+      bedCount: '1'
+    },
+    {
+      roomName: 'small cutter',
+      roomType: 'non-ensuited',
+      bedCount: '1'
+    }
+  ]
+};
+
+export const postGuestHouse4 = {
+  houseName: 'Agenda public house',
+  location: 'Lagos Nigeria',
+  bathRooms: '1',
+  imageUrl: 'https://www.lol.com',
+  genderPolicy: 'roofings',
   rooms: [
     {
       roomName: 'big cutter',
@@ -65,6 +106,7 @@ export const guestHouseResponse = {
     location: 'Lagos Nigeria',
     bathRooms: 1,
     imageUrl: 'https://www.lol.com',
+    genderPolicy: 'Unisex',
     id: 'qJ-G_C3TX',
     userId: '-LHJlGhZ9HiNldVt-jB-',
     updatedAt: '2018-09-26T15:47:47.563Z',
@@ -121,6 +163,7 @@ export const GuestHouseEpic = {
   location: 'Kampala, Uganda',
   bathRooms: '2',
   imageUrl: 'https://www.lol.com',
+  genderPolicy: 'Unisex',
   userId: '-TRUniplpknbbh',
   createdAt: '2018-09-26T15:47:47.576Z',
   updatedAt: '2018-09-26T15:47:47.576Z',
@@ -132,6 +175,7 @@ export const GuestHouse1 = {
   location: 'Kampala, Uganda',
   bathRooms: '2',
   imageUrl: 'https://www.lol.com',
+  genderPolicy: 'Unisex',
   userId: '-TRUniplpknbbh',
   createdAt: '2018-09-26T15:47:47.576Z',
   updatedAt: '2018-09-26T15:47:47.576Z',
@@ -186,6 +230,7 @@ export const editGuestHouseEpic = {
     location: 'Kampala, Uganda',
     bathRooms: '5',
     imageUrl: 'https://www.lol.com',
+    genderPolicy: 'Unisex',
     rooms: [
       {
         roomName: 'Victoria suite',
@@ -201,6 +246,7 @@ export const editGuestHouseEpic = {
     location: 'Kampala, Uganda',
     bathRooms: '5',
     imageUrl: 'https://www.lol.com',
+    genderPolicy: 'Unisex',
     rooms: [
       {
         roomName: 'Victoria suite',
@@ -216,6 +262,7 @@ export const editGuestHouseEpic = {
     location: 'Kampala, Uganda',
     bathRooms: '5',
     imageUrl: 'https://www.lol.com',
+    genderPolicy: 'Unisex',
     rooms: [
       {
         roomName: 'Victoria suite',
@@ -231,6 +278,7 @@ export const editGuestHouseEpic = {
     location: 'Kampala, Uganda',
     bathRooms: '5',
     imageUrl: 'https://www.lol.com',
+    genderPolicy: 'Unisex',
     rooms: [
       {
         roomName: 'Victoria suite',
@@ -251,6 +299,7 @@ export const editGuestHouseEpic = {
     location: 'Kampala, Uganda',
     bathRooms: '5',
     imageUrl: 'https://www.lol.com',
+    genderPolicy: 'Unisex',
     rooms: [
       {
         roomName: 'Victoria suite',
@@ -259,6 +308,35 @@ export const editGuestHouseEpic = {
       },
     ]
   },
+  editdata6: {
+    id: 'ND56thdW',
+    houseName: 'Rena Apartments',
+    location: 'Kampala, Uganda',
+    bathRooms: '5',
+    imageUrl: 'https://www.lol.com',
+    rooms: [
+      {
+        roomName: 'Victoria suite',
+        roomType: 'ensuited',
+        bedCount: '1',
+      },
+    ]
+  },
+  editdata7: {
+    id: 'ND56thdW',
+    houseName: 'Rena Apartments',
+    location: 'Kampala, Uganda',
+    bathRooms: '5',
+    imageUrl: 'https://www.lol.com',
+    genderPolicy: 'malet',
+    rooms: [
+      {
+        roomName: 'Victoria suite',
+        roomType: 'ensuited',
+        bedCount: '1',
+      },
+    ]
+  }
 };
 
 // edit data two
@@ -269,6 +347,7 @@ export const GuestHouseEpicData = {
   location: 'Kampala, Uganda',
   bathRooms: '2',
   imageUrl: 'https://www.lol.com',
+  genderPolicy: 'Unisex',
   userId: '-TRUniplpknbbh',
   createdAt: '2018-09-26T15:47:47.576Z',
   updatedAt: '2018-09-26T15:47:47.576Z',
@@ -310,6 +389,7 @@ export const editGuestHouseEpicData = {
     location: 'Kampala, Uganda',
     bathRooms: '5',
     imageUrl: 'https://www.lol.com',
+    genderPolicy: 'Unisex',
     rooms: [
       {
         roomName: 'Victoria',
@@ -330,6 +410,7 @@ export const GuestHouseEpicData3 = {
   location: 'Kampala, Uganda',
   bathRooms: '2',
   imageUrl: 'https://www.lol.com',
+  genderPolicy: 'Unisex',
   userId: '-TRUniplpknbbh',
   createdAt: '2018-09-26T15:47:47.576Z',
   updatedAt: '2018-09-26T15:47:47.576Z',
@@ -371,6 +452,7 @@ export const editGuestHouseEpicData3 = {
     location: 'Kampala, Uganda',
     bathRooms: '5',
     imageUrl: 'https://www.lol.com',
+    genderPolicy: 'Unisex',
     rooms: [
       {
         roomName: 'Victoria',
@@ -388,6 +470,7 @@ export const editGuestHouseEpicData4 = {
     location: 'Kampala, Uganda',
     bathRooms: '5',
     imageUrl: 'https://www.lol.com',
+    genderPolicy: 'Unisex',
     rooms: [
       {
         roomName: 'Victoria',
@@ -412,6 +495,7 @@ export const GuestHouseDetails = {
   bathRooms: '3',
   disabled: false,
   imageUrl: 'https://www.ihoui0i.com',
+  genderPolicy: 'Unisex',
   userId: '-TJN89injbboihi',
   createdAt: '2018-09-26T15:47:47.576Z',
   updatedAt: '2018-09-26T15:47:47.576Z',

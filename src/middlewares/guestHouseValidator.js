@@ -54,6 +54,7 @@ class GuestHouseValidator {
     req.checkBody('rooms.*.roomName', 'Room Name is required').notEmpty();
     req.checkBody('rooms.*.roomType', 'Room Type is required').notEmpty();
     req.checkBody('rooms.*.bedCount', 'Number of beds is required and must be a number').isInt();
+    req.checkBody('genderPolicy', 'Gender Policy is required').trim().notEmpty();
     const errors = req.validationErrors();
     Validator.errorHandler(res, errors, next);
   }
@@ -116,6 +117,18 @@ class GuestHouseValidator {
       return res.status(400).json({
         success: false,
         message: 'Kindly use another name, this room name already exists for this guest house'
+      });
+    }
+    next();
+  }
+
+  static validateGenderPolicy(req, res, next) {
+    const { genderPolicy } = req.body;
+    const acceptedOptions = ['unisex', 'male', 'female'];
+    if (!acceptedOptions.includes(genderPolicy.toLowerCase())) {
+      return res.status(400).json({
+        success: false,
+        message: 'Gender policy should be either unisex, male or female'
       });
     }
     next();

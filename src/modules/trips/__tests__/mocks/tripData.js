@@ -173,6 +173,7 @@ export const tripsResponse = {
             location: 'Lagos Nigeria',
             bathRooms: 1,
             imageUrl: 'https://www.lol.com',
+            genderPolicy: 'Unisex',
             createdAt: '2018-09-29T18:56:49.002Z',
             updatedAt: '2018-09-29T18:56:49.002Z',
             userId: '-MUyHJmKrxA90lPNQ1FOLNm'
@@ -201,6 +202,7 @@ export const postGuestHouse = {
   location: 'Lagos Nigeria',
   bathRooms: '1',
   imageUrl: 'https://www.lol.com',
+  genderPolicy: 'Unisex',
   rooms: [
     {
       roomName: 'big cutter',

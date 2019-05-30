@@ -13,6 +13,8 @@ dotenv.config();
 class GuestHouseController {
   static async postGuestHouse(req, res) {
     const { rooms, ...data } = req.body;
+    data.genderPolicy = data.genderPolicy.charAt(0).toUpperCase()
+      + data.genderPolicy.slice(1);
     const generateId = Utils.generateUniqueId();
     const user = req.user.UserInfo.id;
     const guestHouse = { ...data, userId: user, id: generateId };
@@ -193,10 +195,10 @@ class GuestHouseController {
   static async editGuestHouse(req, res) {
     try {
       const {
-        houseName, location, bathRooms, imageUrl, rooms
+        houseName, location, bathRooms, imageUrl, genderPolicy, rooms
       } = req.body;
       await GuestHouseTransactions.editGustHouseTransaction(
-        req, res, houseName, location, bathRooms, imageUrl, rooms
+        req, res, houseName, location, bathRooms, imageUrl, genderPolicy, rooms
       );
     } catch (error) {
       /* istanbul ignore next */

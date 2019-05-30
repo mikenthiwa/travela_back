@@ -37,7 +37,7 @@ export default class GuestHouseTransactions {
   }
 
   static async editGustHouseTransaction(
-    req, res, houseName, location, bathRooms, imageUrl, rooms
+    req, res, houseName, location, bathRooms, imageUrl, genderPolicy, rooms
   ) {
     await models.sequelize.transaction(async () => {
       const foundGuestHouse = await models.GuestHouse.findOne({
@@ -50,7 +50,7 @@ export default class GuestHouseTransactions {
         return Error.handleError('Guest house does not exist', 404, res);
       }
       const updatedGuestHouse = await foundGuestHouse.update({
-        houseName, location, bathRooms, imageUrl,
+        houseName, location, bathRooms, imageUrl, genderPolicy
       });
       const updatedRooms = await EditGuestHouseHelper.updateRooms(rooms, guestHouseId);
       const newUpdatedRoomsId = updatedRooms.map(updatedRoom => (updatedRoom.id));

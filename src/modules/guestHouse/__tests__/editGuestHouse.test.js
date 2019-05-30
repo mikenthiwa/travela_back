@@ -253,6 +253,89 @@ describe('Update Guest Houses', () => {
               done();
             });
         });
+
+        describe('Guest Rooms - GET', () => {
+          it('should not get bed if gender is not provided', (done) => {
+            request(app)
+              .get('/api/v1/availablerooms?location=Lagos&departureDate=2018-12-12')
+              .set('authorization', token)
+              .expect(422)
+              .end((err, res) => {
+                expect(res.body.success).toEqual(false);
+                expect(res.body.errors)
+                  .toEqual([
+                    {
+                      message: 'The gender is required',
+                      name: 'gender'
+                    },
+                    {
+                      message: 'The arrival date is required',
+                      name: 'arrivalDate'
+                    },
+                  ]);
+                if (err) return done(err);
+                done();
+              });
+          });
+
+          it('should not get bed if location is not provided', (done) => {
+            request(app)
+              .get('/api/v1/availablerooms?gender=Male&departureDate=2018-12-12')
+              .set('authorization', token)
+              .expect(422)
+              .end((err, res) => {
+                expect(res.body.success).toEqual(false);
+                expect(res.body.errors)
+                  .toEqual([
+                    {
+                      message: 'The location is required',
+                      name: 'location'
+                    },
+                    {
+                      message: 'The arrival date is required',
+                      name: 'arrivalDate'
+                    },
+                  ]);
+                if (err) return done(err);
+                done();
+              });
+          });
+
+          it('should not add a new guest house to the database if genderPolicy is missing', (done) => {
+            request(app)
+              .post('/api/v1/guesthouses')
+              .set('Content-Type', 'application/json')
+              .set('authorization', token)
+              .send(editGuestHouseEpic.editdata6)
+              .expect(422)
+              .end((err, res) => {
+                expect(res.body.success).toEqual(false);
+                expect(res.body.errors).toEqual([
+                  {
+                    message: 'Gender Policy is required',
+                    name: 'genderPolicy'
+                  }
+                ]);
+                if (err) return done(err);
+                done();
+              });
+          });
+
+          it('should not add a new guest house to the database if genderPolicy is not unisex, male or female', (done) => {
+            request(app)
+              .post('/api/v1/guesthouses')
+              .set('Content-Type', 'application/json')
+              .set('authorization', token)
+              .send(editGuestHouseEpic.editdata7)
+              .expect(400)
+              .end((err, res) => {
+                expect(res.body.success).toEqual(false);
+                expect(res.body.message).toEqual('Gender policy should be either unisex, male or female');
+                if (err) return done(err);
+                done();
+              });
+          });
+        });
       });
     });
   });

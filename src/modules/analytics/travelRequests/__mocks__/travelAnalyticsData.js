@@ -112,6 +112,7 @@ export const postGuestHouse = {
   location: 'Nairobi, Kenya',
   bathRooms: '1',
   imageUrl: 'https://www.picture.com',
+  genderPolicy: 'Unisex',
   rooms: [
     {
       roomName: 'master view',

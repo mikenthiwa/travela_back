@@ -78,7 +78,7 @@ export default class HotelEstimateController {
         {
           model: models.TravelRegions,
           as: 'travelRegions',
-          attributes: ['region']
+          attributes: ['region', 'id']
         }
       ],
       where:
@@ -101,6 +101,7 @@ export default class HotelEstimateController {
         };
         if (estimate.country === null) {
           oneEstimateObject.region = estimate.travelRegions.region;
+          oneEstimateObject.regionId = estimate.travelRegions.id;
           return oneEstimateObject;
         }
         if (estimate.travelRegions === null) {
@@ -200,12 +201,15 @@ export default class HotelEstimateController {
 
       await estimates.map((estimate) => {
         const userDetails = { id: estimate.creator.id, name: estimate.creator.fullName };
+        const travelRegionId = parseInt(id, 10);
 
         const oneEstimateObject = {
           id: estimate.id,
           amount: estimate.amount,
-          countryName: estimate.country.country,
+          country: estimate.country.country,
           countryId: estimate.countryId,
+          regionId: travelRegionId,
+          regionName: existingRegion.region,
           createdBy: userDetails
         };
         return estimatesResponse.push(oneEstimateObject);

@@ -1,9 +1,9 @@
+import dotenv from 'dotenv';
+import axios from 'axios';
+
 import jwtDecode from 'jwt-decode';
 import jwt from 'jsonwebtoken';
 import models from '../../database/models';
-
-const dotenv = require('dotenv');
-const axios = require('axios');
 
 dotenv.config();
 
@@ -62,4 +62,4 @@ class UserHelper {
     return token;
   }
 }
-module.exports = UserHelper;
+export default UserHelper;

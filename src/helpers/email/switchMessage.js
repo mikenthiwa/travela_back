@@ -220,6 +220,10 @@ of budget for this trip.`;
         </table>
       `;
 
+    case 'Notify Travel Administrator of Trip Modification Origin':
+      return `This is to inform you that <b>${msgDetail.details.requesterName}</b>, has just requested you to allow them to modify their <b>${msgDetail.details.tripType}</b> trip <b>${msgDetail.details.requestId}</b> to <b>${msgDetail.details.destination}</b> because <b>${msgDetail.details.tripModificationReason}</b>.`;
+    case 'Notify Travel Administrator of Trip Modification Destination':
+      return `This is to inform you that <b>${msgDetail.details.requesterName}</b>, has just requested their local travel team to allow them to modify their <b>${msgDetail.details.tripType}</b> trip <b>${msgDetail.details.requestId}</b> to <b>your centre</b> because <b>${msgDetail.details.tripModificationReason}</b>.`;
     default:
       return '';
   }

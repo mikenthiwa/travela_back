@@ -34,6 +34,10 @@ const switchButtonText = (type) => {
       return 'View Notification';
     case 'You were mentioned in a comment':
       return 'View Comment';
+    case 'Notify Travel Administrator of Trip Modification Origin':
+      return 'Modify Trip';
+    case 'Notify Travel Administrator of Trip Modification Destination':
+      return 'View Request';
     default:
       return 'View Request';
   }

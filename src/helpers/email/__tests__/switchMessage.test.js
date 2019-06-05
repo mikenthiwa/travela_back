@@ -244,4 +244,34 @@ describe('switchMessage helper', () => {
     expect(emailMsg).toContain('has');
     done();
   });
+
+  it('should return Trip modification notification local Admin', (done) => {
+    const emailMsg = switchMessage({
+      type: 'Notify Travel Administrator of Trip Modification Origin',
+      details: {
+        requesterName: 'Adeniyi Adeyokunnu',
+        requestId: 5,
+        destination: 'Kenya',
+        tripModificationReason: 'I need to reschedule for personal reasons',
+        tripType: 'multi'
+      },
+    });
+    expect(emailMsg.split(' ')).toContain('This', 'Kenya', 'reason');
+    done();
+  });
+
+  it('should return Trip modification notification destination Admin', (done) => {
+    const emailMsg = switchMessage({
+      type: 'Notify Travel Administrator of Trip Modification Destination',
+      details: {
+        requesterName: 'Adeniyi Adeyokunnu',
+        requestId: 5,
+        destination: 'Kenya',
+        tripModificationReason: 'I need to reschedule for personal reasons',
+        tripType: 'multi'
+      },
+    });
+    expect(emailMsg.split(' ')).toContain('This', 'center', 'reason');
+    done();
+  });
 });

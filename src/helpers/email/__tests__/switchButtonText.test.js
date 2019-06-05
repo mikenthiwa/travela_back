@@ -5,6 +5,10 @@ describe('Switch Button helper', () => {
     expect(switchButtonText('New Request')).toEqual('View Request');
     done();
   });
+  it('should show Login to Travela in case of new requester request', (done) => {
+    expect(switchButtonText('New Requester Request')).toEqual('Login to Travela');
+    done();
+  });
   it('should show View Document in case of new comment on a doucment', (done) => {
     expect(switchButtonText('Document')).toEqual('View Document');
     done();
@@ -51,6 +55,31 @@ describe('Switch Button helper', () => {
   });
   it('should show View Comment button in case of tagged user', (done) => {
     expect(switchButtonText('You were mentioned in a comment')).toEqual('View Comment');
+    done();
+  });
+  it('should show Modify Request button in case of modify trips local admin', (done) => {
+    expect(switchButtonText('Notify Travel Administrator of Trip Modification Origin')).toEqual('Modify Trip');
+    done();
+  });
+  it('should show View Request button in case of modify trips destination admin', (done) => {
+    expect(switchButtonText('Notify Travel Administrator of Trip Modification Destination'))
+      .toEqual('View Request');
+    done();
+  });
+  it('should show Login in case of Role assignment notification', (done) => {
+    expect(switchButtonText('Send role assignment email notification')).toEqual('Login');
+    done();
+  });
+  it('should show View Request Status in case of Approval', (done) => {
+    expect(switchButtonText('Approved')).toEqual('View request status');
+    done();
+  });
+  it('should show Fill Checklist in case of Budget Approval', (done) => {
+    expect(switchButtonText('Budget Approval')).toEqual('Fill Checklist');
+    done();
+  });
+  it('should show Verify in case of Notify Travel Admins Checklist Completion', (done) => {
+    expect(switchButtonText('Notify Travel Admins Checklist Completion')).toEqual('Verify');
     done();
   });
 });

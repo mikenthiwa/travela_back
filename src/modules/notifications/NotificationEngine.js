@@ -92,7 +92,7 @@ export default class NotificationEngine {
     NotificationEngine.dispatchEmail(data);
   }
 
-  static prepareMultipleReceipients(recipients) {
+  static prepareMultipleRecipients(recipients) {
     const recipientVars = {};
     const emails = recipients.map((recipient) => {
       recipientVars[recipient.email] = {
@@ -104,8 +104,9 @@ export default class NotificationEngine {
   }
 
   static sendMailToMany(recipients, data) {
-    const { emails, recipientVars } = NotificationEngine.prepareMultipleReceipients(recipients);
+    const { emails, recipientVars } = NotificationEngine.prepareMultipleRecipients(recipients);
 
+    console.log(recipients, recipientVars);
     const destination = '';
     NotificationEngine.verifyRedirectLink(data.redirectLink);
     const mailData = {

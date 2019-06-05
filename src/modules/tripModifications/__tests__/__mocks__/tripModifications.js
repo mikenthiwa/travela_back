@@ -38,6 +38,20 @@ const request = (requester = user(), overrides) => ({
   ...overrides
 });
 
+const approval = (requester = user(), overrides) => ({
+  id: '000101010',
+  requestId: '0001111',
+  status: 'Approved',
+  createdAt: '2019-03-25 18:19:46.763+03',
+  updatedAt: '2019-03-25 18:19:46.763+03',
+  deletedAt: null,
+  budgetStatus: 'Open',
+  budgetApprover: null,
+  budgetApprovedAt: null,
+  approverId: requester.id,
+  ...overrides
+});
+
 const trip = ({ id }, overrides) => ({
   id: '00002',
   requestId: id,
@@ -64,6 +78,34 @@ const users = [
     userId: 'moffat-gitau',
     passportName: 'Moffat Gitau',
     roleId: 29187,
+  }),
+  user({
+    id: 81110999,
+    fullName: 'Adeyemi Adeyokunnu',
+    email: 'adeyemi.adeyokunnu@andela.com',
+    userId: 'adeyemi-adeyokunnu',
+    passportName: 'Adeyemi Adeyokunnu',
+    location: 'Kenya',
+  }),
+  user({
+    id: 8111089,
+    fullName: 'Adeniyi Adeyokunnu',
+    email: 'adeniyi.adeyokunnu@andela.com',
+    userId: 'adeniyi-adeyokunnu',
+    passportName: 'Adeniyi Adeyokunnu',
+    location: 'Kenya',
+    roleId: 29187,
+    centerId: 23456
+  }),
+  user({
+    id: 9791089,
+    fullName: 'Funmbi Adeniyi',
+    email: 'funmbi.adeniyi@andela.com',
+    userId: 'funmbi-Adeniyi',
+    passportName: 'Funmbi Adeniyi',
+    location: 'Rwanda',
+    roleId: 29187,
+    centerId: 34567
   })
 ];
 
@@ -77,7 +119,17 @@ const requests = [
       id: `9873${index}`,
       status: 'Approved'
     })
+  ),
+  ...Array(4).fill(0).map(
+    (a, index) => request(users[2], {
+      id: `000111${index}`,
+      status: 'Approved'
+    })
   )
+];
+
+const approvalsList = [
+  approval(users[7])
 ];
 
 const trips = requests.map((req, index) => (
@@ -101,14 +153,38 @@ const tokens = users.map(_user => (
 const userRoles = users.map(_user => (
   {
     userId: _user.id,
-    roleId: _user.roleId
+    roleId: _user.roleId,
+    centerId: _user.centerId,
   }
 ));
+
+const centers = [
+  {
+    id: 12345,
+    location: 'Nigeria',
+    createdAt: '2019-02-12',
+    updatedAt: '2019-02-12'
+  },
+  {
+    id: 23456,
+    location: 'Kenya',
+    createdAt: '2019-02-12',
+    updatedAt: '2019-02-12'
+  },
+  {
+    id: 34567,
+    location: 'Rwanda',
+    createdAt: '2019-02-12',
+    updatedAt: '2019-02-12'
+  }
+];
 
 export default {
   users,
   requests,
   trips,
   userRoles,
-  tokens
+  tokens,
+  approvalsList,
+  centers
 };

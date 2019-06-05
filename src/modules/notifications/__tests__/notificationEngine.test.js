@@ -77,7 +77,7 @@ describe('Notification Engine', () => {
         fullName: 'Emeka Ugwueze',
       }
     ];
-    const { emails, recipientVars } = NotificationEngine.prepareMultipleReceipients(users);
+    const { emails, recipientVars } = NotificationEngine.prepareMultipleRecipients(users);
     expect(emails.length).toBe(2);
     expect(Object.keys(recipientVars).includes('victor@andela.com')).toBe(true);
     done();

@@ -52,7 +52,7 @@ class TravelReadinessUtils {
           [Op.in]: userLocation instanceof Array ? userLocation : [userLocation]
         }
       },
-      attributes: ['fullName', 'email'],
+      attributes: ['fullName', 'email', 'userId'],
       raw: true
     });
     return availableRoleMembers;

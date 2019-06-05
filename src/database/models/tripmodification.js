@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
     type: {
       type: DataTypes.ENUM('Delete', 'Modify Dates'),
       allowNull: false,
-    },
+    }
   }, { });
   TripModification.associate = ({ User, Request }) => {
     TripModification.belongsTo(User, {

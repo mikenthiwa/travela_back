@@ -47,4 +47,5 @@ Router.put('/requests/modifications/:id',
   TripModificationValidator.checkExistingModification,
   TripModificationValidator.validateApproval,
   TripModificationController.updateModificationStatus);
+
 export default Router;

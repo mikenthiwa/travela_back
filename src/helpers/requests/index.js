@@ -3,7 +3,6 @@ import Error from '../Error';
 import Pagination from '../Pagination';
 import Centers from '../centers';
 
-
 const { Op } = models.Sequelize;
 const { sequelize } = models;
 
@@ -213,7 +212,6 @@ export const getTravelTeams = async (trips) => {
     const originTravelAdmins = (await getUserbyCenter(tripCenters, ['29187', '339458'])) || [];
     return originTravelAdmins;
   }
-
   return null;
 };
 
@@ -223,7 +221,7 @@ export const switchInAppMessage = (messageType, id, name, tripLocation, tripType
       return `This is to inform you that ${name} has just submitted 
       a ${tripType} travel request ${id} to ${tripLocation}. You will be notified once the request
       has been approved by the budget holder of his/her department`;
-   
+ 
     case 'Request created to visit destination Travel Admin':
       return `This is to inform you that ${name} has just submitted
       a ${tripType} travel request  ${id} to visit your centre ${tripLocation}.

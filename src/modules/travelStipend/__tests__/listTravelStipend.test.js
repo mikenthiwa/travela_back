@@ -67,8 +67,8 @@ describe('list TravelStipends', () => {
       });
   });
   
-  it('retrieves non-existent travel stipends', (done) => {
-    models.TravelStipends.destroy({ force: true, truncate: { cascade: true } });
+  it('retrieves non-existent travel stipends', async (done) => {
+    await models.TravelStipends.destroy({ force: true, truncate: { cascade: true } });
     listAllStipends(token)
       .end((err, response) => {
         if (err) done(err);

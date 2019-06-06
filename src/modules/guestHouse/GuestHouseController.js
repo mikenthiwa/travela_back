@@ -4,10 +4,11 @@ import models from '../../database/models';
 import Error from '../../helpers/Error';
 import RoomsManager from './RoomsManager';
 import {
-  BedName, GuestHouseIncludeHelper
+  GuestHouseIncludeHelper
 } from '../../helpers/guestHouse/index';
 import GuestHouseTransactions from './GuestHouseTransactions';
 import { srcRequestWhereClause } from '../../helpers/requests/index';
+import GuestHouseUtils from './GuestHouseUtils';
 
 dotenv.config();
 class GuestHouseController {
@@ -157,38 +158,7 @@ class GuestHouseController {
 
 
   static async updateBeds(rooms, res) {
-    const updatedBeds = await Promise.all(
-      rooms.map(async (room) => {
-        let availableBedNames;
-        const roomId = room.id;
-        const newBedNumbers = Number(room.bedCount);
-        const BookedBeds = await models.Bed.findAll({ where: { roomId, booked: true }, raw: true });
-        if (BookedBeds.length > newBedNumbers) {
-          return Error.handleError(`There are currently ${BookedBeds.length} booked beds, 
-          unable to update bed numbers`, 409, res);
-        }
-        const foundBeds = await models.Bed.findAll({ where: { roomId }, raw: true });
-        if (newBedNumbers === foundBeds.length) { return foundBeds; }
-        let numberOfBedsToCreate;
-        if (newBedNumbers > foundBeds.length) {
-          numberOfBedsToCreate = Math.abs(newBedNumbers - foundBeds.length);
-          availableBedNames = BedName.getAvailableBedNames(newBedNumbers, foundBeds);
-        } else {
-          await models.Bed.destroy({ where: { roomId, booked: false } });
-          availableBedNames = (BookedBeds.length)
-            ? BedName.getAvailableBedNames(foundBeds.length, BookedBeds) : [];
-          numberOfBedsToCreate = Math.abs(newBedNumbers - BookedBeds.length);
-        }
-        const newBeds = [];
-        for (let i = 0; i < numberOfBedsToCreate; i += 1) {
-          const newBed = { roomId, bedName: availableBedNames[i] || `bed ${i + 1}` };
-          newBeds.push(newBed);
-        }
-        await models.Bed.bulkCreate(newBeds);
-        const createdBeds = await models.Bed.findAll({ where: { roomId } });
-        return createdBeds;
-      })
-    );
+    const updatedBeds = await GuestHouseUtils.updateBedsSql(rooms, res);
     return updatedBeds;
   }
 

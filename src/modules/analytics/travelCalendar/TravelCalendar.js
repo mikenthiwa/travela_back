@@ -90,35 +90,51 @@ class CalendarController {
   }
 
   static async getTravelCalendarAnalytics(req, res) {
-    const {
-      type, location, dateFrom, dateTo, page
-    } = req.query;
-    let { limit } = req.query;
-    limit = limit || 3;
-
-    const { regex, centers } = await HelperUtils.checkAdminCenter(req, location);
-
     try {
-      const requestDetails = await CalendarController.getRequestDetails(regex, dateFrom, dateTo);
-      const allData = CalendarController.getTravelDetails(centers, requestDetails.rows);
-      const pagination = Pagination.getPaginationData(page, limit, allData.length);
-      pagination.limit = limit;
-      pagination.nextPage = pagination.currentPage + 1;
-      pagination.prevPage = pagination.currentPage - 1;
-      const data = Utils.handlePagination(allData, limit, page);
+      const {
+        type, location, dateFrom, dateTo, page, limit
+      } = req.query;
+      const setLimit = limit || 3;
+  
+      const { regex, centers } = await HelperUtils.checkAdminCenter(req, location);
 
-      if (data.length) {
-        const response = { data, pagination };
-        await CalendarController.convertTocsvFile(res, response, type);
-      } else {
-        throw new TravelCalendarError('No records found', 404);
-      }
+      const { data, pagination } = await CalendarController.getDataAndPagination({
+        setLimit, regex, dateFrom, dateTo, page, centers
+      });
+
+      await CalendarController.checkData({
+        data, pagination, res, type
+      });
     } catch (error) {
       if (error instanceof TravelCalendarError) {
         return Error.handleError(error.message, error.status, res);
       }
       /* istanbul ignore next */
       return Error.handleError(error, 500, res);
+    }
+  }
+
+  static async getDataAndPagination({
+    setLimit, regex, dateFrom, dateTo, page, centers
+  }) {
+    const requestDetails = await CalendarController.getRequestDetails(regex, dateFrom, dateTo);
+    const allData = CalendarController.getTravelDetails(centers, requestDetails.rows);
+    const pagination = Pagination.getPaginationData(page, setLimit, allData.length);
+    pagination.limit = setLimit;
+    pagination.nextPage = pagination.currentPage + 1;
+    pagination.prevPage = pagination.currentPage - 1;
+    const data = Utils.handlePagination(allData, setLimit, page);
+    return { data, pagination };
+  }
+
+  static async checkData({
+    data, pagination, res, type
+  }) {
+    if (data.length) {
+      const response = { data, pagination };
+      await CalendarController.convertTocsvFile(res, response, type);
+    } else {
+      throw new TravelCalendarError('No records found', 404);
     }
   }
 }

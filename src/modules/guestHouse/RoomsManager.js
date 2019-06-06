@@ -1,24 +1,18 @@
 import models from '../../database/models';
+import GuestHouseUtils from './GuestHouseUtils';
 
 const { Op } = models.Sequelize;
 class RoomsManager {
   static async fetchAvailableRooms({
-    arrivalDate,
-    departureDate,
-    location,
-    gender
+    arrivalDate, departureDate, location, gender
   }) {
     const bookedBeds = await RoomsManager.fetchBookedRooms({
-      arrivalDate,
-      departureDate,
-      location
+      arrivalDate, departureDate, location
     });
     const faultyBeds = await RoomsManager.fetchFaultyBeds(departureDate, arrivalDate);
+
     const oppositeGenderBeds = await RoomsManager.fetchOppositeGenderBeds({
-      arrivalDate,
-      departureDate,
-      gender,
-      location
+      arrivalDate, departureDate, gender, location
     });
 
     const genderPolicyRegex = (`.*${gender}|.*Unisex`);
@@ -33,18 +27,14 @@ class RoomsManager {
 
     return models.Bed.findAll({
       where: {
-        id: {
-          [Op.notIn]: unavailableBeds
-        }
+        id: { [Op.notIn]: unavailableBeds }
       },
       include: [
         {
           as: 'rooms',
           model: models.Room,
           required: true,
-          where: {
-            isDeleted: false
-          },
+          where: { isDeleted: false },
           include: [
             {
               as: 'guestHouses',
@@ -52,14 +42,10 @@ class RoomsManager {
               where: {
                 location,
                 disabled: false,
-                genderPolicy: {
-                  [Op.iRegexp]: `${genderPolicyRegex}`
-                }
+                genderPolicy: { [Op.iRegexp]: `${genderPolicyRegex}` }
               }
-            }
-          ]
-        }
-      ]
+            }]
+        }]
     });
   }
 
@@ -135,30 +121,19 @@ class RoomsManager {
               as: 'maintainances',
               model: models.Maintainance,
               where: {
-                
+
                 [Op.or]: {
                   start: {
-                    [Op.and]: {
-                      [Op.gte]: new Date(departureDate),
-                      [Op.lte]: new Date(arrivalDate)
-                    }
+                    [Op.and]: { [Op.gte]: new Date(departureDate), [Op.lte]: new Date(arrivalDate) }
                   },
                   end: {
-                    [Op.and]: {
-                      [Op.gte]: new Date(departureDate),
-                      [Op.lte]: new Date(arrivalDate)
-                    }
+                    [Op.and]: { [Op.gte]: new Date(departureDate), [Op.lte]: new Date(arrivalDate) }
                   },
-                  [Op.and]: {
-                    start: { [Op.lte]: departureDate },
-                    end: { [Op.gte]: arrivalDate },
-                  }
+                  [Op.and]: { start: { [Op.lte]: departureDate }, end: { [Op.gte]: arrivalDate }, }
                 }
               }
-            }
-          ]
-        }
-      ],
+            }]
+        }],
       raw: true
     });
     return faultyBeds;
@@ -169,22 +144,9 @@ class RoomsManager {
    * the alloted timeframe.
    */
   static async fetchOppositeGenderBeds({
-    arrivalDate,
-    departureDate,
-    location,
-    gender
+    arrivalDate, departureDate, location, gender
   }) {
-    const oppositeRequestSql = models.sequelize.dialect.QueryGenerator.selectQuery(
-      'Requests',
-      {
-        attributes: ['id'],
-        where: {
-          gender: {
-            [Op.ne]: gender
-          }
-        }
-      }
-    ).slice(0, -1);
+    const oppositeRequestSql = await GuestHouseUtils.getOppositRequestSql(gender);
 
     const oppositeBedIDSql = models.sequelize.dialect.QueryGenerator.selectQuery(
       'Trips',
@@ -203,28 +165,15 @@ class RoomsManager {
       }
     ).slice(0, -1);
 
-    const oppositeRoomIDSql = models.sequelize.dialect.QueryGenerator.selectQuery(
-      'Beds',
-      {
-        attributes: ['roomId'],
-        where: {
-          id: {
-            [Op.in]: models.sequelize.literal(`(${oppositeBedIDSql})`)
-          }
-        }
-      }
-    ).slice(0, -1);
+    const oppositeRoomIDSql = await GuestHouseUtils.getOppositeRoomId(oppositeBedIDSql);
 
     const oppositeBeds = await models.Bed.findAll({
       attributes: ['id'],
       where: {
-        roomId: {
-          [Op.in]: models.sequelize.literal(`(${oppositeRoomIDSql})`)
-        }
+        roomId: { [Op.in]: models.sequelize.literal(`(${oppositeRoomIDSql})`) }
       },
       raw: true
     });
-
     return oppositeBeds;
   }
 }

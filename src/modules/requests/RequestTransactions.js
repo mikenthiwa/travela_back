@@ -11,7 +11,9 @@ import UserRoleUtils from '../userRole/UserRoleUtils';
 const { Op } = models.Sequelize;
 
 export default class RequestTransactions {
-  static async createRequestTransaction(req, res, requestData, trips, comments) {
+  static async createRequestTransaction({
+    req, res, requestData, trips, comments
+  }) {
     let request;
     await models.sequelize.transaction(async () => {
       request = await models.Request.create(requestData);
@@ -22,7 +24,6 @@ export default class RequestTransactions {
           id: Utils.generateUniqueId()
         }))
       );
-
       // create a comment submitted with the request
       if (comments.comment) {
         const userIdInteger = await UserRoleController.getRecipient(null, req.user.UserInfo.id);

@@ -3,6 +3,7 @@ import _ from 'lodash';
 import { Op } from 'sequelize';
 import models from '../../database/models';
 import TripsController from '../../modules/trips/TripsController';
+import TravelChecklistController from '../../modules/travelChecklist/TravelChecklistController';
 import CustomError from '../Error';
 import { getTravelDocument } from '../../modules/travelReadinessDocuments/getTravelDocument.data';
 
@@ -182,6 +183,59 @@ class TravelChecklistHelper {
     const document = await getTravelDocument(documentId, models);
     const retrievedDoc = document ? document.dataValues.data : null;
     return retrievedDoc;
+  }
+
+  static async getDeletedChecklist(req) {
+    const { destinationName } = req.query;
+    const andelaCenters = await TravelChecklistHelper.getAndelaCenters();
+    const ChecklistItems = await models.ChecklistItem
+      .findAll({
+        paranoid: false,
+        where: {
+          deletedAt: {
+            [Op.ne]: null
+          },
+          destinationName: andelaCenters[`${destinationName}`]
+        },
+        include: {
+          model: models.ChecklistItemResource,
+          as: 'resources',
+          paranoid: false,
+          attributes: ['id', 'label', 'link', 'checklistItemId']
+        }
+      });
+    if (ChecklistItems.length) return { deletedTravelChecklists: ChecklistItems };
+    const errorMsg = 'There are currently no deleted travel checklist items for your location'; // eslint-disable-line
+    return { error: { msg: errorMsg, status: 404 } };
+  }
+
+  static async getTravelSubmissions(requestId, res) {
+    const request = await TravelChecklistController
+      .getApprovedRequest('Approved', requestId, res);
+    let where = {};
+    let submissions = [];
+    const trips = await TripsController.getTripsByRequestId(requestId, res);
+    const tripsId = trips.map(trip => trip.id);
+    where = {
+      tripId: { [Op.in]: tripsId }
+    };
+
+    if (request) {
+      submissions = await models.ChecklistSubmission.findAll({
+        where,
+        include: [{
+          model: models.ChecklistItem,
+          as: 'checklistSubmissions',
+          attributes: ['id']
+        },
+        {
+          model: models.TravelReadinessDocuments,
+          as: 'documentSubmission',
+          attributes: ['id', 'data']
+        }]
+      });
+    }
+    return submissions;
   }
 }
 

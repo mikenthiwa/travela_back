@@ -7,16 +7,11 @@ import RoomsManager from '../guestHouse/RoomsManager';
 import TravelReadinessUtils from '../travelReadinessDocuments/TravelReadinessUtils';
 import UserRoleController from '../userRole/UserRoleController';
 import NotificationEngine from '../notifications/NotificationEngine';
+import Users from '../../helpers/user';
+import getRequests from './getRequests.data';
 
 const { Op } = models.Sequelize;
 export default class RequestUtils {
-  /**
-   * Validate the trip dates provided in the request by the user
-   * @param userId -> the user's id in the database
-   * @param trips -> the trips sent in the request body
-   * @param requestId -> the request id of the request being updated
-   * @return {Promise<void>}
-   */
   static async validateTripDates(userId, trips, requestId) {
     // order the incoming trips by their departure dates then select the first and last trips
     const orderedTrips = _.orderBy(trips, ['departureDate'], ['asc']);
@@ -71,7 +66,6 @@ export default class RequestUtils {
     };
   }
   
-
   static async getRequest(requestId, userId) {
     const request = await models.Request.find({
       where: { userId, id: requestId },
@@ -86,7 +80,6 @@ export default class RequestUtils {
     return trips;
   }
   
-  // Finance team email notification
   static async sendEmailToFinanceTeam(request) {
     const {
       userId: requesterId, name: requesterName, id
@@ -96,7 +89,7 @@ export default class RequestUtils {
         userId: requesterId
       }
     });
-    
+
     const data = {
       requestId: id,
       topic: `Successful Travel Readiness Verification for ${requesterName}'s Trip`,
@@ -119,5 +112,137 @@ export default class RequestUtils {
     if (financeTeam.length) {
       NotificationEngine.sendMailToMany(financeTeam, data);
     }
+  }
+
+  static async findVerifiedRequests({
+    dept, today, currentUserId
+  }) {
+    const requests = await models.Request.findAll({
+      where: { department: dept, status: 'Verified', userId: { [Op.ne]: currentUserId } },
+      order: [[{ model: models.Trip, as: 'trips' }, 'departureDate', 'asc']],
+      include: [
+        {
+          model: models.Trip,
+          as: 'trips',
+          where: { departureDate: { [Op.gte]: today } }
+        }
+      ]
+    });
+    return requests;
+  }
+
+  static async getMultipleRoomsData({ trips, requestData, requestDetails }) {
+    const multipleRoomsData = trips.map(trip => ({
+      arrivalDate: (requestData.tripType === 'oneWay'
+      || (requestData.tripType === 'multi' && !trip.returnDate))
+        ? trip.departureDate : trip.returnDate,
+      departureDate: trip.departureDate,
+      location: trip.destination,
+      gender: requestDetails.gender,
+      travelReasons: trip.travelReasons,
+      otherTravelReasons: trip.otherTravelReasons
+    }));
+    return multipleRoomsData;
+  }
+
+  static notificationMessages(senderId, name, request, picture, userId, id) {
+    const travelAdminEmailData = {
+      topic: 'Travel Request Verified',
+      sender: name,
+      type: 'Travel Request Verified',
+      details: {
+        RequesterName: request.name,
+        id: request.id
+      },
+      redirectLink: `${process.env.REDIRECT_URL}/redirect/requests/budgets/${id}`
+    };
+
+    const notificationData = {
+      senderId,
+      senderName: name,
+      senderImage: picture,
+      recipientId: userId,
+      notificationType: 'general',
+      requestId: id,
+      message: `Hi ${request.name}, Congratulations, your request ${id} has been verified by the travel team.
+      You are now ready for this trip. Do have a safe trip.`,
+      notificationLink: `/requests/${id}`
+    };
+    return {
+      travelAdminEmailData,
+      notificationData
+    };
+  }
+  
+  static async notifyTravelAdmins({
+    centerIds, request, senderId, name, picture, userId, id
+  }) {
+    const travelAdmins = await Users.getDestinationTravelAdmin(centerIds);
+    const message = `This is to inform you that ${request.name}'s request ${request.id} to visit 
+      your centre has just been verified by the local travel team. Please be aware of this request and plan for the traveller.`;
+    NotificationEngine.notifyMany({
+      users: travelAdmins, senderId, name, picture, id, message
+    });
+    NotificationEngine.sendMailToMany(
+      travelAdmins,
+      RequestUtils.notificationMessages(senderId, name, request, picture, userId, id).travelAdminEmailData
+    );
+  }
+
+  static async notifyRequester({
+    name, request, recipient, senderId, picture, userId, id
+  }) {
+    const emailRequest = { name, manager: request.name, id: request.id };
+    const emailData = RequestUtils.getMailData(
+      emailRequest,
+      recipient,
+      'Travel Request Verified',
+      'Verified',
+      `/redirect/requests/${emailRequest.id}`
+    );
+    NotificationEngine.notify(
+      RequestUtils.notificationMessages(senderId, name, request, picture, userId, id)
+        .notificationData
+    );
+    NotificationEngine.sendMail(emailData);
+  }
+
+  static async setRoundTripAccomodation(req) {
+    let { trips } = req.body;
+    // eslint-disable-next-line
+    trips = trips.map(trip => {
+      if (trip.bedId < 1) {
+        // eslint-disable-next-line
+        trip.accommodationType = trip.bedId == -1 ? 'Hotel Booking' : 'Not Required';
+        // eslint-disable-next-line
+        trip.bedId = null;
+      } else {
+        // eslint-disable-next-line
+        trip.accommodationType = 'Residence';
+      }
+      return trip;
+    });
+    return trips;
+  }
+
+  static async getRequestData(res, requestId) {
+    const requestData = await getRequests(requestId, models);
+    if (!requestData) {
+      return { error: { msg: `Request with id ${requestId} does not exist`, status: 404 } };
+    }
+    if (requestData.status !== 'Open') {
+      const approver = await models.Approval.findOne({ where: { requestId } });
+      const approverImage = await UserRoleController.getRecipient(null, null, approver.approverId);
+      requestData.dataValues.approver = approver.approverId;
+      requestData.dataValues.timeApproved = approver.updatedAt;
+      requestData.dataValues.approverImage = approverImage.picture;
+      requestData.dataValues.budgetApprovedBy = approver.budgetApprover;
+      requestData.dataValues.budgetApprovedAt = approver.budgetApprovedAt;
+    }
+    requestData.dataValues.stipend = requestData.dataValues.stipendBreakdown
+      ? JSON.parse(requestData.dataValues.stipendBreakdown)
+      : requestData.dataValues.stipend;
+    delete requestData.dataValues.stipendBreakdown;
+    return { requestData };
   }
 }

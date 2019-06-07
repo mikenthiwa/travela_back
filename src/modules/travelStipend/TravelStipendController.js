@@ -42,8 +42,10 @@ export default class TravelStipendController {
           ['createdAt', 'ASC']
         ]
       });
-      stipends.sort((a, b) => b.country === 'Default');
-
+      stipends.sort((a) => {
+        const sort = a.country === 'Default' ? -1 : 1;
+        return sort;
+      });
       return res.status(200).json({
         success: true,
         message: 'Travel Stipends retrieved successfully',

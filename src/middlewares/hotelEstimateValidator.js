@@ -84,14 +84,15 @@ export default class HotelEstimateValidator {
     next();
   }
 
-  static async searchForCountry(res, country, next) {
+  static async searchForCountry(res, country, travelRegionId, next) {
+    const regionId = travelRegionId || 9999;
     await models.Country.findOrCreate({
       where: {
         country: {
           [Op.iLike]: country
         }
       },
-      defaults: { regionId: 9999, country }
+      defaults: { regionId, country }
     });
     const foundCountryEstimate = await models.HotelEstimate.find({
       include: [
@@ -116,14 +117,14 @@ export default class HotelEstimateValidator {
 
   static async checkLocation(req, res, next) {
     const {
-      body: { travelRegion, country }
+      body: { travelRegion, country, travelRegionId }
     } = req;
 
     if (travelRegion) {
       return HotelEstimateValidator.searchForRegion(res, travelRegion, next);
     }
     if (country) {
-      return HotelEstimateValidator.searchForCountry(res, country, next);
+      return HotelEstimateValidator.searchForCountry(res, country, travelRegionId, next);
     }
     /* istanbul ignore next */
     next();

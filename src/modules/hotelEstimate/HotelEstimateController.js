@@ -93,6 +93,11 @@ export default class HotelEstimateController {
     try {
       const { country } = req.query;
       const estimates = await HotelEstimateController.getEstimates(country);
+      const allCountriesEstimates = await HotelEstimateController.getEstimates('true');
+      const allCountries = allCountriesEstimates.map((estimate) => {
+        const countryName = estimate.country.country;
+        return countryName;
+      });
       const estimatesResponse = estimates.map((estimate) => {
         const userDetails = { id: estimate.creator.id, name: estimate.creator.fullName };
         const oneEstimateObject = {
@@ -118,10 +123,15 @@ export default class HotelEstimateController {
         }
         return 'Hotel Estimates retrieved successfully';
       };
+      estimatesResponse.sort((a) => {
+        const sort = a.region === 'Default Region' ? -1 : 1;
+        return sort;
+      });
       return res.status(200).json({
         success: true,
         message: returnMessage(),
-        estimates: estimatesResponse
+        estimates: estimatesResponse,
+        countriesWithEstimates: allCountries
       });
     } catch (error) {
       /* istanbul ignore next */
@@ -198,6 +208,12 @@ export default class HotelEstimateController {
         }
       });
 
+      const allCountriesEstimates = await HotelEstimateController.getEstimates('true');
+      const allCountries = allCountriesEstimates.map((estimate) => {
+        const countryName = estimate.country.country;
+        return countryName;
+      });
+
       const estimatesResponse = [];
 
       await estimates.map((estimate) => {
@@ -226,7 +242,8 @@ export default class HotelEstimateController {
       return res.status(200).json({
         success: true,
         message: returnMessage(),
-        estimates: estimatesResponse
+        estimates: estimatesResponse,
+        countriesWithEstimates: allCountries
       });
     } catch (error) {
       /* istanbul ignore next */

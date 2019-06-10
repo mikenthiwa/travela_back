@@ -11,7 +11,6 @@ export default (sequelize, DataTypes) => {
       type: DataTypes.STRING
     },
     description: {
-      allowNull: false,
       type: DataTypes.STRING
     },
     createdAt: {

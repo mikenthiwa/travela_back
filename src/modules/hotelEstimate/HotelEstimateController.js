@@ -2,6 +2,7 @@ import { Op } from 'sequelize';
 import models from '../../database/models';
 import CustomError from '../../helpers/Error';
 import fetchOneHotelEstimate from '../../helpers/hotelEstimate';
+import TravelCostsController from '../travelCosts/TravelCostsController';
 
 export default class HotelEstimateController {
   static async createHotelEstimate(req, res) {
@@ -269,5 +270,106 @@ export default class HotelEstimateController {
       /* istanbul ignore next */
       CustomError.handleError(error.message, 500, res);
     }
+  }
+  
+  static async getHotelEstimatesByLocationQuery(locations) {
+    const dbResponse = await models.HotelEstimate.findAll({
+      attributes: [
+        'id',
+        'amount',
+        'countryId'
+      ],
+      include: [
+        {
+          model: models.Country,
+          as: 'country',
+          where: {
+            country: locations
+          },
+          attributes: [
+            'country'
+          ]
+        },
+      ]
+    });
+    return dbResponse;
+  }
+
+  static async getHotelEstimatesByLocations(locations) {
+    const destinations = TravelCostsController.getLocationDestinations(locations);
+    let estimates = await HotelEstimateController.getHotelEstimatesByLocationQuery(destinations);
+    let noEstimateLocations;
+    if (destinations.length > estimates.length) {
+      noEstimateLocations = HotelEstimateController.getNoEstimateLocations(destinations, estimates);
+      const regionEstimates = await Promise
+        .all(
+          await HotelEstimateController
+            .getRegionEstimates(noEstimateLocations)
+        );
+      const addedRegionEstimates = regionEstimates.length ? regionEstimates
+        .map(({ estimate, country }) => ({
+          amount: estimate ? estimate.amount : null,
+          country: {
+            country
+          }
+        })) : [];
+      estimates = [
+        ...estimates,
+        ...addedRegionEstimates.filter(estimate => estimate.amount !== null)
+      ];
+    }
+    return estimates;
+  }
+
+  static getNoEstimateLocations(destinations, estimates) {
+    return destinations.filter((destination) => {
+      const hasEstimates = estimates.filter(
+        hotelEstimate => hotelEstimate.country.country === destination
+      );
+      if (hasEstimates.length === 0) return true;
+      return false;
+    });
+  }
+
+  static async getRegionEstimates(noEstimateLocations) {
+    const countryRegions = await models.Country.findAll({
+      where: {
+        country: noEstimateLocations
+      },
+      include: [
+        {
+          model: models.TravelRegions,
+          as: 'region',
+          attributes: [
+            'id',
+            'region'
+          ]
+        },
+      ]
+    });
+    if (countryRegions.length) {
+      const getRegionEstimate = await countryRegions.map(async (country) => {
+        const estimate = await models.HotelEstimate.findOne({
+          where: {
+            regionId: country.region.id
+          },
+          include: [
+            {
+              model: models.TravelRegions,
+              as: 'travelRegions',
+              attributes: [
+                'region'
+              ]
+            },
+          ]
+        });
+        return {
+          estimate,
+          country: country.country
+        };
+      });
+      return getRegionEstimate;
+    }
+    return [];
   }
 }

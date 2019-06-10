@@ -1,6 +1,7 @@
 import models from '../../database/models';
 import CustomError from '../../helpers/Error';
 import TravelStipend from '../../helpers/travelStipend';
+import TravelCostsController from '../travelCosts/TravelCostsController';
 
 export default class TravelStipendController {
   static async createTravelStipend(req, res) {
@@ -135,32 +136,18 @@ export default class TravelStipendController {
     }
   }
 
-  static async getTravelStipendsByLocation(req, res) {
-    const { locations } = req.query;
-    const tripDestinations = locations.map((location) => {
-      const parsedLocation = typeof location === 'string' ? JSON.parse(location) : location;
-      return parsedLocation.destination.split(', ')[1];
-    });
+  static async getTravelStipendsByLocation(locations) {
+    const tripDestinations = TravelCostsController.getLocationDestinations(locations);
     try {
       const foundStipends = await TravelStipend.getStipendsByLocation(tripDestinations);
       const stipends = await TravelStipend.checkTravelStipend(foundStipends, tripDestinations);
-
-      if (stipends.length) {
-        return res.status(200).json({
-          success: true,
-          message: 'Stipends for locations found',
-          stipends
-        });
-      }
-      if (!stipends.length) {
-        return res.status(404).json({
-          success: true,
-          message: 'There was no stipends found for specified location(s)',
-        });
-      }
+      if (stipends.length) return stipends;
     } catch (error) {
       /* istanbul ignore next */
-      CustomError.handleError(error.message, 500, res);
+      return {
+        message: 'There was an error getting stipends',
+        error
+      };
     }
   }
 }

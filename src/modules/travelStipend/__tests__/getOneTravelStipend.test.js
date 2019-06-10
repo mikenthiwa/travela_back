@@ -135,8 +135,7 @@ describe('Fetch One Travel Stipend', () => {
   });
 });
 
-
-describe('GET /travelStipends/location', () => {
+describe('GET /travelStipends', () => {
   beforeAll(async () => {
     await TestSetup.destoryTables();
     await TestSetup.createTables();
@@ -148,7 +147,7 @@ describe('GET /travelStipends/location', () => {
 
   it('should require a valid token', (done) => {
     request(app)
-      .get('/api/v1/travelStipends/location')
+      .get('/api/v1/travelCosts')
       .query(
         {
           origin: 'Lagos',
@@ -164,7 +163,7 @@ describe('GET /travelStipends/location', () => {
   });
   it('should require a location property in query params', (done) => {
     request(app)
-      .get('/api/v1/travelStipends/location')
+      .get('/api/v1/travelCosts')
       .set('Authorization', requesterToken)
       .query(
         {
@@ -181,48 +180,31 @@ describe('GET /travelStipends/location', () => {
       });
   });
   it('should get stipends for specified locations', (done) => {
-    const queryParams = 'locations[]=%7B%22origin%22:%22Lagos%22,%22destination%22:%22Nairobi,+Kenya%22%7D';
+    // const queryParams = 'locations[]=%7B%22origin%22:%22Lagos%22,%22destination%22:%22Nairobi,+Kenya%22%7D';
+    const queryParams = 'locations[]=%7B%22origin%22:%22Lagos,+Portugal%22,%22destination%22:%22Nairobi,+Kenya%22%7D';
     request(app)
       .get(
-        `/api/v1/travelStipends/location?${queryParams}`
+        `/api/v1/travelCosts?${queryParams}`
       )
       .set('Authorization', requesterToken)
       .end((err, res) => {
         expect(res.status).toEqual(200);
         expect(res.body.success).toEqual(true);
-        expect(res.body.message).toEqual('Stipends for locations found');
-        expect(res.body.stipends[0]).toHaveProperty('amount');
-        expect(res.body.stipends[0]).toHaveProperty('country');
+        expect(res.body.message).toEqual('Travel Costs retrieved successfully');
         done();
       });
   });
-  it('should retrun default stipends for counties with no stipend', (done) => {
+  it('should return default stipends for countries with no stipend', (done) => {
     const queryParams = 'locations[]=%7B%22origin%22:%22Abuja%22,%22destination%22:%22Congosto,+Spain%22%7D';
-    const expected = [{ amount: 30, country: 'Spain', id: 1 }];
     request(app)
       .get(
-        `/api/v1/travelStipends/location?${queryParams}`
+        `/api/v1/travelCosts?${queryParams}`
       )
       .set('Authorization', requesterToken)
       .end((err, res) => {
         expect(res.status).toEqual(200);
         expect(res.body.success).toEqual(true);
-        expect(res.body.message).toEqual('Stipends for locations found');
-        expect(res.body.stipends).toEqual(expected);
-        done();
-      });
-  });
-
-  it('should return message if no stipends are found', async (done) => {
-    await models.TravelStipends.destroy({ force: true, truncate: { cascade: true } });
-    const queryParams = 'locations[]=%7B%22origin%22:%22Lagos%22,%22destination%22:%22Nairobi,+Kenya%22%7D';
-    request(app)
-      .get(`/api/v1/travelStipends/location?${queryParams}`)
-      .set('Authorization', requesterToken)
-      .end((err, res) => {
-        expect(res.status).toEqual(404);
-        expect(res.body.success).toEqual(true);
-        expect(res.body.message).toEqual('There was no stipends found for specified location(s)');
+        expect(res.body.message).toEqual('Travel Costs retrieved successfully');
         done();
       });
   });

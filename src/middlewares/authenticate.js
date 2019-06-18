@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import models from '../database/models';
 
 const setPublicKey = (nodeEnv) => {
   switch (nodeEnv) {
@@ -7,6 +8,11 @@ const setPublicKey = (nodeEnv) => {
     default: /* istanbul ignore next */
       return process.env.JWT_PUBLIC_KEY;
   }
+};
+
+const updateLastLogin = async (req) => {
+  const { user: { UserInfo: { email } } } = req;
+  await models.User.update({ lastLogin: new Date() }, { where: { email } });
 };
 
 const authenticate = (req, res, next) => {
@@ -33,7 +39,7 @@ const authenticate = (req, res, next) => {
       }
       req.userToken = token;
       req.user = decodedToken;
-      return next();
+      updateLastLogin(req).then(next).catch(next);
     },
   );
 };

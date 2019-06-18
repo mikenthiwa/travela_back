@@ -1,5 +1,6 @@
 import request from 'supertest';
 import axios from 'axios';
+import moment from 'moment';
 import moxios from 'moxios';
 import app from '../../../app';
 import models from '../../../database/models';
@@ -232,6 +233,21 @@ describe('User Role Test', () => {
       .set('authorization', token)
       .expect(200)
       .end((err, res) => {
+        expect(res.body.success).toEqual(true);
+        if (err) return done(err);
+        done();
+      });
+  });
+
+  it('should update the last login of a user', (done) => {
+    request(app)
+      .get('/api/v1/user/-MUyHJmKrxA90lPNQ1FOLNm')
+      .set('Content-Type', 'application/json')
+      .set('authorization', token)
+      .expect(200)
+      .end((err, res) => {
+        expect(moment(res.body.result.lastLogin).toDate().toDateString())
+          .toEqual(new Date().toDateString());
         expect(res.body.success).toEqual(true);
         if (err) return done(err);
         done();

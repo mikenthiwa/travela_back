@@ -47,6 +47,11 @@ export default (sequelize, DataTypes) => {
         allowNull: false,
         type: DataTypes.INTEGER,
         defaultValue: 0
+      },
+      lastLogin: {
+        allowNull: true,
+        type: DataTypes.DATE,
+        defaultValue: null
       }
     },
     { paranoid: true }

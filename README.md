@@ -16,15 +16,21 @@ An application for managing travel in Andela.
 
 - [Documentation](#documentation)
 - [Setup](#setup)
+  - [Dependencies](#dependencies)
+  - [Getting Started](#getting-started)
+  - [Environment Variables](#environment-variables)
   - [Database and ORM](#database-and-orm)
+  - [Docker](#run-the-service-using-docker)
 - [Testing](#testing)
+- [Prototype](#prototype)
 - [Contribute](#contribute)
 - [Deployment](#deployment)
 - [License](#license)
+- [Technical Charts](#technical-charts)
 
 ## Documentation
 
-TODO - when endpoints are ready
+[Link to Documentation](https://documenter.getpostman.com/view/5772810/S1ZxbV12)
 
 ## Setup
 
@@ -59,18 +65,35 @@ Follow these steps to set up the project in development mode
   ```
   The application should now be running at `http://127.0.0.1:5000`
 
-#### Database and ORM
+### Environment Variables
+
+ Create your `.env` file in the root directory by following the `.env.example` below
+  ```
+  DATABASE_URL=postgres://user:password@domain:port/database_name
+  JWT_PUBLIC_KEY=input public token
+  PORT=your app port (optional, default 5000)
+  DEFAULT_ADMIN=someemail@andela.com
+  REMINDER_INTERVAL=15000
+  BUGSNAG_API_KEY=Bugsnag project api key
+  NODE_ENV=environment for putting the app in maintenance mode
+  SENDGRID_API_KEY=sendgrid api
+  REDIRECT_URL=frontend baseurl
+  APP_EMAIL=travela app email
+  MAILGUN_API_KEY=mailgun api key
+  MAILGUN_DOMAIN_NAME=mailgun domain name
+  MAIL_SENDER=travel sender mail
+  ANDELA_PROD_API=production url
+  BAMBOOHR_API=bamboohr api
+  DEFAULT_SUPER_USER_ID=default id
+  BAMBOOHRID_API=bamboohr directory
+  ```
+
+### Database and ORM
 
 - Create a database in `PostgreSQL` and name it `travel_tool`
-- Set the following environment variables in `.env`:
-
-  - `DATABASE_USERNAME` - this is the database username
-  - `DATABASE_PASSWORD` - this is the database password. Ignore if you don't have a database password
-  - `DATABASE_NAME` - set this to `travel_tool`
-
 - Run database migrations
   ```
-  yarn run db:migrate
+  yarn run db:migrate and yarn run db:user:migrate
   ```
 - Check the database and confirm that the `users` table has been created
 
@@ -132,6 +155,10 @@ To execute all tests, run the command
   yarn test or make test
 ```
 
+## Prototype
+
+The application is staged [here](https://travela-staging.andela.com/)
+
 ## Contribute
 
 Contributions to the project are welcome! Before contributing, look through the branch naming, commit message and pull request conventions [here](https://github.com/andela/engineering-playbook/tree/master/5.%20Developing/Conventions). When you are all done, follow the guidelines below to raise a pull request:
@@ -145,8 +172,18 @@ If the pull request is accepted by the owners of the repository, then it is merg
 
 ## Deployment
 
-TODO - add deployment commands
+Deployment in this project happens under two circumstances.
+- When a PR has been successfully merged to `develop`, the application is deployed to the `staging` environment.
+- When `QA` and `QC` tests have been successfully carried out and merged to `master`, the application is deployed to the `production` environment
+
+[Jenkins](https://jenkins.io/doc/) is used to hanlde support for automatating the implementation and integration of continuous delivery pipelines.
+
+The deployment scripts for the application are hosted [here](https://github.com/andela/travel_tool_deployment_scripts)
 
 ## License
 
 This application is licensed under the terms of the [MIT License](https://github.com/andela/travel_tool_back/blob/develop/LICENSE)
+
+## Technical Charts
+
+[Architectural Diagram](https://www.lucidchart.com/invitations/accept/777cc1cd-1e62-4ccc-867c-2d0c6f9e85ec)

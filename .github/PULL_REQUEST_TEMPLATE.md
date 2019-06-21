@@ -1,13 +1,9 @@
-#### What does this PR do?
+#### Description
 
-#### Description of Task to be completed?
+#### Type of change
 
-#### How should this be manually tested?
+#### How Has This Been Tested?
 
-#### Any background context you want to provide?
+#### Checklist:
 
-#### What are the relevant pivotal tracker stories?
-
-#### Screenshots (if appropriate)
-
-#### Questions:
+#### JIRA

@@ -19,10 +19,10 @@ const getSearchQuery = (query) => {
     [Op.and]: {
       [Op.or]: {
         fullName: {
-          $ilike: `${query}%`
+          $iLike: `%${query}%`
         },
         department: {
-          $ilike: `${query}%`
+          $iLike: `%${query}%`
         }
       }
     }

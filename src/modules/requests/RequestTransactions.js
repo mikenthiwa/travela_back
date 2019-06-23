@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import models from '../../database/models';
 import ApprovalsController from '../approvals/ApprovalsController';
 import Utils from '../../helpers/Utils';
@@ -6,6 +7,7 @@ import Error from '../../helpers/Error';
 import RequestUtils from './RequestUtils';
 import UserRoleController from '../userRole/UserRoleController';
 import UserRoleUtils from '../userRole/UserRoleUtils';
+import { notifyAndMailAdminsForTripModification } from '../../helpers/tripModifications/index';
 
 
 const { Op } = models.Sequelize;
@@ -24,6 +26,7 @@ export default class RequestTransactions {
           id: Utils.generateUniqueId()
         }))
       );
+
       // create a comment submitted with the request
       if (comments.comment) {
         const userIdInteger = await UserRoleController.getRecipient(null, req.user.UserInfo.id);
@@ -116,6 +119,7 @@ export default class RequestTransactions {
     await models.sequelize.transaction(async () => {
       const userId = req.user.UserInfo.id;
       const request = await RequestUtils.getRequest(requestId, userId);
+      const allTrips = await models.Trip.findAll({ where: { requestId } });
       if (!request) {
         return Error.handleError('Request was not found', 404, res);
       }
@@ -123,6 +127,23 @@ export default class RequestTransactions {
         const error = `Request could not be updated because it has been ${request.status.toLowerCase()}`;
         return Error.handleError(error, 409, res);
       }
+
+      //  Check if trip dates were changed and notify the admins involved if yes.
+      const [existingTripDetails, newTripDetails] = [[], []];
+
+      allTrips.map(eachTrip => existingTripDetails.push([eachTrip.departureDate, eachTrip.returnDate]));
+      requestDetails.trips.map(eachTrip => newTripDetails.push([eachTrip.departureDate, eachTrip.returnDate]));
+
+      if (!_.isEqual(existingTripDetails, newTripDetails)) {
+        const notificationData = {
+          requestId,
+          requesterId: userId,
+          requesterName: req.user.UserInfo.fullName,
+          picture: req.user.UserInfo.picture,
+        };
+        await notifyAndMailAdminsForTripModification(notificationData);
+      }
+
       const requestTrips = await Promise.all(
         trips.map(trip => RequestTransactions.updateRequestTrips(trips, trip, request.id))
       );

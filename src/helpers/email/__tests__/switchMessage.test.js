@@ -252,11 +252,10 @@ describe('switchMessage helper', () => {
         requesterName: 'Adeniyi Adeyokunnu',
         requestId: 5,
         destination: 'Kenya',
-        tripModificationReason: 'I need to reschedule for personal reasons',
         tripType: 'multi'
       },
     });
-    expect(emailMsg.split(' ')).toContain('This', 'Kenya', 'reason');
+    expect(emailMsg.split(' ')).toContain('This', 'Kenya');
     done();
   });
 
@@ -267,11 +266,10 @@ describe('switchMessage helper', () => {
         requesterName: 'Adeniyi Adeyokunnu',
         requestId: 5,
         destination: 'Kenya',
-        tripModificationReason: 'I need to reschedule for personal reasons',
         tripType: 'multi'
       },
     });
-    expect(emailMsg.split(' ')).toContain('This', 'center', 'reason');
+    expect(emailMsg.split(' ')).toContain('This', 'center');
     done();
   });
 });

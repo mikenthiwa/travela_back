@@ -1,10 +1,8 @@
 import supertest from 'supertest';
-import querystring from 'querystring';
 import models from '../../../database/models';
 import { role } from '../../userRole/__tests__/mocks/mockData';
 import mocks from './__mocks__/tripModifications';
 import app from '../../../app';
-import NotificationEngine from '../../notifications/NotificationEngine';
 
 const request = supertest(app);
 
@@ -21,11 +19,6 @@ const newModification = (overrides = {}) => ({
 const anotherModification = (overrides = {}) => ({
   reason: 'This is also a reason',
   type: 'Modify Dates',
-  ...overrides
-});
-
-const updateModification = (overrides = {}) => ({
-  status: 'Approved',
   ...overrides
 });
 
@@ -61,18 +54,9 @@ const createModification = (done, requestId, status, checkBody, data, token) => 
   testApi(done, 'post', `/requests/${requestId}/modifications`, status, checkBody, data, token);
 };
 
-
-const updateModificationAsync = (
-  id, data = updateModification(), token = tokens[1]
-) => api('put', `/requests/modifications/${id}`, token, data);
-
 const createModificationAsync = (
   requestId, data = newModification(), token = tokens[0]
 ) => api('post', `/requests/${requestId}/modifications`, token, data);
-
-
-const getModifications = query => api('get', `/tripModifications?${querystring.stringify(query)}`, tokens[1]);
-
 
 describe('TripModificationController', () => {
   const destroyTables = async () => {
@@ -108,11 +92,6 @@ describe('TripModificationController', () => {
     });
   });
 
-  it('should fetch all modifications when none has been created by the users', async () => {
-    const { body: { approvals } } = await getModifications();
-    expect(approvals.length).toEqual(0);
-  });
-
   it('should validate the trip modification request', (done) => {
     createModification(done, requests[0].id, 422, ({ errors }) => {
       expect(errors[0].message).toEqual(
@@ -142,47 +121,15 @@ describe('TripModificationController', () => {
     });
   });
 
-  it('should validate the approval of a modification request',
-    async (done) => {
-      const { body: { modification: { id } } } = await createModificationAsync(requests[5].id);
-
-      testApi(done, 'put', `/requests/modifications/${id}`, 422, ({ errors }) => {
-        expect(errors[0].message).toEqual('Approval status can either be "Approved" or "Rejected"');
-      }, { type: 'Cancel Trip' }, tokens[1]);
-    });
-
-  it('should ensure a modification can only be approved/rejected once', async () => {
-    const { body: { modification: { id } } } = await createModificationAsync(requests[7].id);
-    await updateModificationAsync(id, { status: 'Rejected' });
-    const { body: { message } } = await updateModificationAsync(id, { status: 'Approved' });
-
-    expect(message).toEqual('Trip modification request has already been approved/rejected');
-  });
-
-  it('should ensure a modification exists before updating', async () => {
-    const { body: { message } } = await updateModificationAsync(12323, { status: 'Approved' });
-    expect(message).toEqual('Trip modification with id 12323 does not exist');
-  });
-
   it('should create a successful modification request for modify dates type', (done) => {
-    createModification(done, requests[22].id, 201, ({ modification }) => {
+    createModification(done, '0001111', 200, ({ modification }) => {
       expect(modification).toMatchObject({
-        status: 'Open',
-        requestId: requests[22].id,
+        status: 'Approved',
+        requestId: '0001111',
         reason: 'This is also a reason',
         type: 'Modify Dates',
-        approverId: null
+        approverId: 81110999
       });
-    }, anotherModification(), tokens[2]);
-  });
-
-  it('should ensure a user cannot create a duplicate modification request', async (done) => {
-    NotificationEngine.notify = jest.fn();
-    NotificationEngine.sendMailToMany = jest.fn();
-
-    await createModificationAsync(requests[22].id, anotherModification(), tokens[2]);
-    createModification(done, requests[22].id, 400, ({ message }) => {
-      expect(message).toEqual('You already have a pending trip modification for this request');
     }, anotherModification(), tokens[2]);
   });
 
@@ -193,32 +140,19 @@ describe('TripModificationController', () => {
   });
 
   it('should return the list of modifications for a particular request', async (done) => {
+    console.log(requests[24], tokens[2]);
     await createModificationAsync(requests[24].id, anotherModification(), tokens[2]);
     testApi(done, 'get', `/requests/${requests[24].id}/modifications`, 200,
-      ({ pendingModification }) => {
-        expect(pendingModification).toMatchObject({
+      ({ pastModifications }) => {
+        expect(pastModifications[0]).toMatchObject({
           reason: 'This is also a reason',
-          status: 'Open',
+          status: 'Approved',
           type: 'Modify Dates',
           requestId: '0001112',
-          approverId: null,
-          approvedBy: null,
+          approverId: 81110999,
+          approvedBy: pastModifications[0].approvedBy,
           request: { id: '0001112' }
         });
       });
-  });
-
-  it('should allow the travel team to approve a modification request', async () => {
-    NotificationEngine.notify = jest.fn();
-    NotificationEngine.sendMailToMany = jest.fn();
-    
-    const { body: { modification: { id } } } = await createModificationAsync(requests[23].id, anotherModification(), tokens[2]);
-    const { body: { message } } = await updateModificationAsync(id, { status: 'Approved' });
-    expect(message).toEqual('Request 0001111\'s modification has been successfully approved');
-  });
-
-  it('should fetch all open modifications created by the users', async () => {
-    const { body: { approvals } } = await getModifications();
-    expect(approvals.length).toEqual(2);
   });
 });

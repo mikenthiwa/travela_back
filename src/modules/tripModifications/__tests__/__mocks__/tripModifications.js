@@ -14,7 +14,7 @@ const user = overrides => ({
   createdAt: '2019-03-25 18:19:46.763+03',
   updatedAt: '2019-03-25 18:19:46.763+03',
   bambooHrId: 0,
-  manager: 'Moses Gitau',
+  manager: 178912,
   ...overrides
 });
 
@@ -129,7 +129,8 @@ const requests = [
 ];
 
 const approvalsList = [
-  approval(users[7])
+  approval(users[0]),
+  approval(users[0], { id: '000004342', requestId: '0001112' })
 ];
 
 const trips = requests.map((req, index) => (

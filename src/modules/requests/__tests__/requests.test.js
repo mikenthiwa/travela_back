@@ -56,6 +56,23 @@ const mockTravelAdmin = generateMock.user(
   }
 );
 
+const mockOriginTravelAdmin = generateMock.user(
+  {
+    fullName: 'Origin Admin',
+    passportName: 'Origin Admin',
+    department: 'Guest Relations & Travel',
+    occupation: 'Travel Admin',
+    roleId: 29187,
+    email: 'origin.admin@andela.com',
+    userId: 'travel-admin-2',
+    location: 'Central City, Wakanda',
+    centerId: mockAndelaOrigin.id,
+    gender: 'male',
+    manager: 2,
+    id: 30
+  }
+);
+
 const mockTravelTeamMember = generateMock.user({
   fullName: 'Travel Team Member',
   passportName: 'Travel Team Member',
@@ -171,7 +188,7 @@ const nonRequestManagerToken = Utils.generateTestToken({ UserInfo: fakeManager }
 
 const invalidToken = 'eyJhbGciOiJSUzI1Ni6IkpXVCJ9.eyJVc2CI6Ii1MSEptS3J4';
 
-const allUsers = [mockRequester, mockManager, mockTravelAdmin, mockTravelTeamMember, mockFinanceTeamMember];
+const allUsers = [mockRequester, mockManager, mockTravelAdmin, mockOriginTravelAdmin, mockTravelTeamMember, mockFinanceTeamMember];
 const allUserRoles = allUsers.map(
   user => (
     {

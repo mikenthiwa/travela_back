@@ -32,10 +32,12 @@ class TravelChecklistHelper {
       const { destinationName } = checklist;
       const destinationTrip = uniqueTrips
         .find(trip => trip.destination.split(', ')[1] === destinationName);
-
-      return { ...checklist, tripId: destinationTrip.id, tripLocation: destinationTrip.destination };
+      return {
+        ...checklist, tripId: destinationTrip.id,
+        tripLocation: destinationTrip.destination,
+        tripOrigin: destinationTrip.origin.split(', ')[1]
+      };
     });
-
     return checklistWithTripId;
   }
 
@@ -110,8 +112,8 @@ class TravelChecklistHelper {
       if (reqId) {
         const trips = await TripsController.getTripsByRequestId(reqId, res);
         trips.forEach((trip) => {
-          const { id, destination } = trip;
-          tripsDestinationsWithId.push({ id, destination });
+          const { id, destination, origin } = trip;
+          tripsDestinationsWithId.push({ id, origin, destination });
           tripsDestination.push(destination.split(', ')[1]);
         });
         where = { destinationName: [...tripsDestination, 'Default'] };
@@ -188,6 +190,7 @@ class TravelChecklistHelper {
   static async getDeletedChecklist(req) {
     const { destinationName } = req.query;
     const andelaCenters = await TravelChecklistHelper.getAndelaCenters();
+    /* istanbul ignore next */
     const ChecklistItems = await models.ChecklistItem
       .findAll({
         paranoid: false,
@@ -202,8 +205,9 @@ class TravelChecklistHelper {
           as: 'resources',
           paranoid: false,
           attributes: ['id', 'label', 'link', 'checklistItemId']
-        }
+        }/* istanbul ignore next */
       });
+    /* istanbul ignore next */
     if (ChecklistItems.length) return { deletedTravelChecklists: ChecklistItems };
     const errorMsg = 'There are currently no deleted travel checklist items for your location'; // eslint-disable-line
     return { error: { msg: errorMsg, status: 404 } };

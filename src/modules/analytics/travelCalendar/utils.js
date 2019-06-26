@@ -91,7 +91,7 @@ class Utils {
         });
         return trips;
       }
-      const ticket = JSON.parse(trip['trips.submissions.value']);
+      const ticket = JSON.parse(trip['trips.submissions.userUpload']);
       const flight = Utils.handleDestinations(
         location, 'multi', trip['trips.origin'], trip['trips.destination'], ticket
       );
@@ -102,7 +102,7 @@ class Utils {
   }
 
   static getItenerary(location, trip) {
-    const ticket = JSON.parse(trip['trips.submissions.value']);
+    const ticket = JSON.parse(trip['trips.submissions.userUpload']);
     const data = Utils.handleDestinations(location, 'multi', trip['trips.origin'], trip['trips.destination'], ticket);
     return data;
   }

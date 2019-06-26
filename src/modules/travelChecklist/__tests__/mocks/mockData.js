@@ -12,12 +12,8 @@ export const dates = {
 
 export const checklistSubmission = {
   id: '1',
-  value: {
-    url: 'http://res.cloudinary.com/travela/raw/upload/v1540191551/w26o4c86mw4047ttwfld',
-    secureUrl: 'https://res.cloudinary.com/travela/raw/upload/v1540191551/w26o4c86mw4047ttwfld',
-    publicId: 'w26o4c86mw4047ttwfld',
-    fileName: 'airticket.pdf'
-  },
+  userResponse: 'yes',
+  userUpload: { url: 'http/img.png', fileName: 'img.png' },
   tripId: 'trip-12',
   checklistItemId: '46664'
 };
@@ -40,7 +36,7 @@ export const userData = {
   passportName: 'Mark Marcus',
   department: 'Success',
   occupation: 'software developer',
-  manager: 'Samuel Kubai',
+  manager: 1,
   gender: 'female',
   location: 'Kenya',
   roleId: '29187',
@@ -95,7 +91,7 @@ export const requestMock = [
   {
     id: '35678',
     name: 'Test user A',
-    manager: 'Samuel Kubai',
+    manager: 1,
     role: 'Software Developer',
     gender: 'Female',
     department: 'TDD',
@@ -107,7 +103,7 @@ export const requestMock = [
   {
     id: '99999',
     name: 'Test user A',
-    manager: 'Samuel Kubai',
+    manager: 1,
     role: 'Software Developer',
     gender: 'Female',
     department: 'TDD',

@@ -52,20 +52,14 @@ class TravelChecklistUtils {
     if (submissions.length > 0) {
       submissions = JSON.parse(JSON.stringify(submissions));
       submissions = submissions.map((submission) => {
-        let { value } = submission;
-        const { documentSubmission, documentId } = submission;
-        if (documentId) {
-          const { data: { imageName, cloudinaryUrl } } = documentSubmission;
-          value = { fileName: imageName, url: cloudinaryUrl };
-          value = JSON.stringify(value);
-        }
-        value = JSON.parse(value);
+        let { userUpload } = submission;
+        userUpload = JSON.parse(userUpload);
         // eslint-disable-next-line no-param-reassign
         delete submission.documentSubmission;
-        return { ...submission, value };
+        return { ...submission, userUpload };
       });
       percentageCompleted = await TravelChecklistController
-        .calcPercentage(checklists, submissions);
+        .calculatePercentage(checklists, submissions);
       success = true;
       message = 'Checklist with submissions retrieved successfully';
     }
@@ -81,15 +75,27 @@ class TravelChecklistUtils {
     if (!retrievedDoc && documentId) {
       return { error: { msg: `Document with id ${documentId} does not exist`, status: 404 } };
     }
-    const value = TravelChecklistHelper.generateChecklistValue(id, retrievedDoc, file);
+    let userResponse;
+    let userUpload;
+    const stringType = typeof (file) === 'string';
+    if (stringType) {
+      userResponse = file;
+      userUpload = {};
+    } else {
+      userResponse = null;
+      userUpload = file;
+    }
     const query = {
       where: { tripId, checklistItemId },
-      defaults: { value, id: Utils.generateUniqueId(), documentId: id },
+      defaults: {
+        userResponse, userUpload, id: Utils.generateUniqueId(), documentId: id
+      },
     };
     const submit = await models.ChecklistSubmission.findOrCreate(query);
     const [submission, created] = submit;
     if (!created) {
-      submission.value = file;
+      submission.userResponse = !stringType ? submission.userResponse : userResponse;
+      submission.userUpload = stringType ? JSON.parse(submission.userUpload) : userUpload;
       submission.documentId = id;
       await submission.save();
     }
@@ -97,6 +103,18 @@ class TravelChecklistUtils {
     const percentageCompleted = await TravelChecklistController
       .checkListPercentageNumber(req, res, requestId);
     return { percentageCompleted, submission };
+  }
+
+
+  static async sortChecklistSubmissions(checklists, requestId) {
+    const trips = await models.Trip.findAll({ where: { requestId } });
+    const sortedSubmission = [];
+    trips.forEach((trip) => {
+      checklists.forEach((checklist) => {
+        if (trip.id === checklist.tripId) { sortedSubmission.push(checklist); }
+      });
+    });
+    return sortedSubmission;
   }
 
   static async getTravelChecklistSubmissions(req, res) {
@@ -109,6 +127,17 @@ class TravelChecklistUtils {
 
     let checklists = await TravelChecklistHelper
       .getChecklists(req, res, requestId, location);
+      // the checklist needed for this trip
+    checklists = checklists.map(
+      (checklist) => {
+        const newChecklist = { ...checklist };
+        if (RegExp(userLocation.location).test(checklist.destinationName)) {
+          newChecklist.checklist = checklist.checklist
+            .filter(checklistItem => checklistItem.destinationName === 'Default');
+        }
+        return newChecklist;
+      }
+    );
 
     const {
       success, message, percentageCompleted, submissions
@@ -117,6 +146,7 @@ class TravelChecklistUtils {
     const lists = JSON.parse(JSON.stringify(checklists));
     checklists = TravelChecklistHelper
       .combineSubmittedChecklists(lists, submissions);
+    checklists = await TravelChecklistUtils.sortChecklistSubmissions(checklists, requestId);
 
     return {
       success, message, percentageCompleted, checklists
@@ -130,7 +160,6 @@ class TravelChecklistUtils {
       .checkListPercentageNumber(req, res, requestId);
     const { documentId } = file;
     const id = documentId || null;
-
     const { percentageCompleted, submission, error } = await TravelChecklistUtils.submitChecklistDocument({
       tripId, documentId, checklistItemId, file, id, req, res, requestId
     });
@@ -140,6 +169,7 @@ class TravelChecklistUtils {
       TravelChecklistUtils.notifyRequester(requestId, request);
       TravelChecklistController.sendEmailToTravelAdmin(request, req.user);
     }
+    
     return { percentageCompleted, submission, error };
   }
 
@@ -240,10 +270,18 @@ class TravelChecklistUtils {
         return newChecklist;
       }
     );
-    const submissions = await TravelChecklistController
+    
+    let submissions = await TravelChecklistController
       .getSubmissions(requestId, res);
+    submissions = JSON.parse(JSON.stringify(submissions));
+    submissions = submissions.map((submission) => {
+      let { userUpload } = submission;
+      userUpload = JSON.parse(userUpload);
+      return { ...submission, userUpload };
+    });
+    
     const percentage = TravelChecklistController
-      .calcPercentage(neededChecklist, submissions);
+      .calculatePercentage(neededChecklist, submissions);
     return percentage;
   }
 }

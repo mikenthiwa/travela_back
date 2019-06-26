@@ -3,7 +3,6 @@ import models from '../../../database/models';
 import app from '../../../app';
 import Utils from '../../../helpers/Utils';
 import {
-  requests,
   trips,
   checkListItems,
   checkListItemsResources,
@@ -30,6 +29,52 @@ const user = {
   updatedAt: '2018-08-16 012:11:52.181+01',
   location: 'Kigali, Rwanda'
 };
+
+
+const requests = [
+  {
+    id: 'request-id-6',
+    name: 'Samuel Kubai',
+    status: 'Open',
+    gender: 'Male',
+    manager: 3457,
+    department: 'TDD',
+    role: 'Senior Consultant',
+    tripType: 'multi',
+    picture: 'test.photo.test',
+    createdAt: '2018-08-16 012:11:52.181+01',
+    updatedAt: '2018-08-16 012:11:52.181+01',
+    userId: '-MUyHJmKrxA90lPNQ1FOLNm'
+  },
+  {
+    id: 'request-id-7',
+    name: 'Samuel Kubai',
+    status: 'Open',
+    gender: 'Male',
+    manager: 3457,
+    department: 'TDD',
+    role: 'Senior Consultant',
+    tripType: 'return',
+    picture: 'test.photo.test',
+    createdAt: '2018-08-16 012:11:52.181+01',
+    updatedAt: '2018-08-16 012:11:52.181+01',
+    userId: '-MUyHJmKrxA90lPNQ1FOLNm'
+  },
+  {
+    id: 'request-id-8',
+    name: 'Samuel Kubai',
+    status: 'Verified',
+    gender: 'Male',
+    manager: 3457,
+    department: 'TDD',
+    role: 'Senior Consultant',
+    tripType: 'return',
+    picture: 'test.photo.test',
+    createdAt: '2018-08-16 012:11:52.181+01',
+    updatedAt: '2018-08-16 012:11:52.181+01',
+    userId: '-MUyHJmKrxA90lPNQ1FOLNm'
+  },
+];
 
 const token = Utils.generateTestToken(payload);
 const request = supertest;
@@ -96,7 +141,7 @@ describe('Checklist Percentage', () => {
                 department: 'TDD',
                 gender: 'Male',
                 id: 'request-id-6',
-                manager: 'Ogooluwa Akinola',
+                manager: '3457',
                 name: 'Samuel Kubai',
                 picture: 'test.photo.test',
                 role: 'Senior Consultant',
@@ -126,7 +171,7 @@ describe('Checklist Percentage', () => {
                 name: 'Samuel Kubai',
                 status: 'Verified',
                 gender: 'Male',
-                manager: 'Ogooluwa Akinola',
+                manager: '3457',
                 department: 'TDD',
                 role: 'Senior Consultant',
                 tripType: 'return',
@@ -158,7 +203,7 @@ describe('Checklist Percentage', () => {
             done();
           });
       });
-    it('should get travechecklist percentage as 25 for approved and 100 for verified request',
+    it('should get travechecklist percentage as 0 for approved and 100 for verified request',
       async (done) => {
         const requestId = requests[0].id;
         try {
@@ -166,7 +211,6 @@ describe('Checklist Percentage', () => {
           await testRequest.update({
             status: 'Approved'
           });
-          await models.Trip.create(trips[2]);
         } catch (error) {
           return null;
         }
@@ -177,7 +221,7 @@ describe('Checklist Percentage', () => {
           .end((err, res) => {
             expect(res.body.requests.length).toEqual(2);
             expect(res.body.requests[0]).toHaveProperty('travelCompletion');
-            expect(res.body.requests[0].travelCompletion).toEqual('25% complete');
+            expect(res.body.requests[0].travelCompletion).toEqual('0% complete');
             expect(res.body.requests[1].travelCompletion).toEqual('100% complete');
             done();
           });

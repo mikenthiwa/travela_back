@@ -221,4 +221,12 @@ describe('Test Suite for Travel Calendar Analytics', () => {
     expect(res).toEqual(dateQuery);
     done();
   });
+
+  it('should return null if no data provided', (done) => {
+    const res = CalendarController.dateQuery();
+    const dateQuery = {};
+    dateQuery[Op.ne] = null;
+    expect(res).toEqual(dateQuery);
+    done();
+  });
 });

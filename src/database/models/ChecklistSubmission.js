@@ -5,7 +5,10 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
       type: DataTypes.STRING,
     },
-    value: {
+    userResponse: {
+      type: DataTypes.STRING,
+    },
+    userUpload: {
       type: DataTypes.JSON,
     },
     tripId: {

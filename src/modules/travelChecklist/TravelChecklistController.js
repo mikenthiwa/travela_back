@@ -16,7 +16,7 @@ export default class TravelChecklistController {
         error, createdChecklistItem
       } = await TravelChecklistUtils.createChecklistItem(req, res);
       if (error) return CustomError.handleError(error.msg, error.status, res);
-      
+
       return res.status(201).json({
         success: true,
         message: 'Check list item created successfully',
@@ -120,11 +120,39 @@ export default class TravelChecklistController {
     return percentage;
   }
 
-  static async calcPercentage(checklists, submissions) {
-    const reducer = (accumulator, item) => accumulator + item.checklist.length;
-    const checklistLength = checklists.reduce(reducer, 0);
+  static async calculatePercentage(checklists, submissions) {
+    let checklistLength = 0;
+    let submissionsLength = 0;
+    checklists.forEach(item => item.checklist.forEach((checklist) => {
+      let currentLength = (/visa|passport/.test(checklist.name.toLowerCase()) && checklist.requiresFiles) ? 2 : 1;
+      currentLength = /travel ticket details/.test(checklist.name.toLowerCase()) ? 4 : currentLength;
+      checklistLength += currentLength;
+    }));
+    if (submissions.length) {
+      checklists.forEach(item => item.checklist.forEach((checklist) => {
+        submissions.forEach((submission) => {
+          const checkItem = checklist.id === submission.checklistItemId
+                            && item.tripId === submission.tripId;
+          // eslint-disable-next-line
+          submission.userResponse = submission.userResponse || 'null';
+          if (checkItem) {
+            let currentLength = (submission.userResponse !== null
+                || submission.userUpload.fileName !== undefined) ? 1 : 0;
+            const duoField = (/visa|passport/.test(checklist.name.toLowerCase()) && checklist.requiresFiles);
+            currentLength = (duoField && !(/null|yes/).test(submission.userResponse.toLowerCase())) ? 2 : currentLength;
+            currentLength = (duoField && /yes/.test(submission.userResponse.toLowerCase())
+              && submission.userUpload.fileName !== undefined) ? 2 : currentLength;
+            if (checklist.name.toLowerCase() === 'travel ticket details') {
+              currentLength = submission.userUpload ? Object.keys(submission.userUpload).length : 0;
+              currentLength = currentLength > 4 ? 4 : currentLength;
+            }
+            submissionsLength += currentLength;
+          }
+        });
+      }));
+    }
     const percentage = Math
-      .floor((submissions.length / checklistLength) * 100);
+      .floor((submissionsLength / checklistLength) * 100);
     return percentage >= 100 ? 100 : percentage;
   }
 
@@ -135,8 +163,7 @@ export default class TravelChecklistController {
     const percentage = await TravelChecklistController
       .checkListPercentageNumber(req, res, requestId);
     if (status === 'Verified') return '100% complete';
-    const completedPercentage = `${isNaN(percentage) ? 0 : percentage}% complete`; // eslint-disable-line
-    return completedPercentage;
+    return `${isNaN(percentage) ? 0 : percentage}% complete`; // eslint-disable-line
   }
 
   static async updateResources(checklistItemId, resources) {
@@ -241,6 +268,7 @@ export default class TravelChecklistController {
       const {
         success, message, percentageCompleted, checklists
       } = await TravelChecklistUtils.getTravelChecklistSubmissions(req, res);
+
 
       return res.status(200).json({
         success, message, percentageCompleted,

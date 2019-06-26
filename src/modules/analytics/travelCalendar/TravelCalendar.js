@@ -52,7 +52,7 @@ class CalendarController {
           model: models.ChecklistSubmission,
           as: 'submissions',
           where: { checklistItemId: '1' },
-          attributes: ['value']
+          attributes: ['userUpload']
         }],
       }]
     };
@@ -68,7 +68,7 @@ class CalendarController {
         const {
           name, department, role, picture, tripType
         } = details;
-        const ticket = JSON.parse(details['trips.submissions.value']);
+        const ticket = JSON.parse(details['trips.submissions.userUpload']);
         const flight = Utils.handleDestinations(location, tripType, details['trips.origin'],
           details['trips.destination'], ticket);
         return {
@@ -106,6 +106,7 @@ class CalendarController {
         data, pagination, res, type
       });
     } catch (error) {
+      /* istanbul ignore next */
       if (error instanceof TravelCalendarError) {
         return Error.handleError(error.message, error.status, res);
       }

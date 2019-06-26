@@ -55,20 +55,21 @@ class ChecklistValidator {
 
   static async validateUniqueItem(req, res, next) {
     try {
-      const { fileName } = req.body.file;
-      const checklistItems = await models.ChecklistSubmission.findAll({
-        where: {
-          tripId: req.body.tripId
+      const { file } = req.body;
+      if (typeof file === 'object' && file.fileName) {
+        const { fileName } = file;
+        const checklistItems = await models.ChecklistSubmission.findAll({
+          where: {
+            tripId: req.body.tripId
+          }
+        });
+  
+        const filtered = checklistItems.map(item => JSON.parse(item.dataValues.userUpload).fileName);
+        
+        if (_.includes(filtered, fileName)) {
+          /* istanbul ignore next */
+          return CustomError.handleError('You seem to have added this file, kindly upload a different file', 400, res);
         }
-      });
-
-      const filtered = checklistItems
-        .filter(checklist => checklist.dataValues.value.includes('fileName'))
-        .map(item => JSON.parse(item.value).fileName);
-
-      if (_.includes(filtered, fileName)) {
-        /* istanbul ignore next */
-        return CustomError.handleError('You seem to have added this file, kindly upload a different file', 400, res);
       }
       next();
     } catch (error) { /* istanbul ignore next */

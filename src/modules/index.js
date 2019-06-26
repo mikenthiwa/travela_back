@@ -23,6 +23,7 @@ import countriesRouter from './countries';
 import tripModificationsRouter from './tripModifications';
 import hotelEstimateRouter from './hotelEstimate';
 import travelCostsRouter from './travelCosts';
+import helpResourcesRouter from './helpResources';
 
 const apiPrefix = '/api/v1';
 
@@ -52,7 +53,8 @@ const routes = [
   countriesRouter,
   tripModificationsRouter,
   hotelEstimateRouter,
-  travelCostsRouter
+  travelCostsRouter,
+  helpResourcesRouter
 ];
 export default (app) => {
   routes.forEach(route => app.use(apiPrefix, route));

@@ -1,10 +1,12 @@
-#!/bin/ash
+#!/bin/sh
 
 printf "\n\n======================================\n"
 printf "Making database migrations"
 printf "\n======================================\n\n"
 export NODE_ENV=development
 yarn db:migrate
+yarn db:seed
+yarn db:user:migrate
 
 printf "\n\n======================================\n"
 printf "Start the application"

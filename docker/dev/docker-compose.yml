@@ -22,9 +22,6 @@ services:
       DATABASE_URL: postgres://postgres:postgres@database/travela
     entrypoint:
       - /usr/app/docker/dev/entrypoint.sh
-    command:
-      - yarn
-      - start:dev
     depends_on:
       database:
         condition: service_healthy

@@ -89,7 +89,7 @@ ifeq ($(CONTAINER),)
 	$(call container_err)
 else
 	${INFO} "Open app container terminal"
-	@ docker-compose -f $(DOCKER_DEV_COMPOSE_FILE) exec app ash
+	@ docker-compose -f $(DOCKER_DEV_COMPOSE_FILE) exec app sh
 endif
 
 ## run migrations, the application needs to be running using make start

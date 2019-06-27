@@ -31,3 +31,6 @@ Analytics.zip
 Average Travel Duration.csv
 Average Travel Lead Time.csv
 Travel Analysis Report.csv
+
+# Failed migrations
+migrator/failedMigrations.json

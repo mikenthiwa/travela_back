@@ -1,3 +1,8 @@
+import moment from 'moment';
+import { convertIso3Code } from 'convert-country-codes';
+import * as child from 'child_process';
+import request from 'request';
+import fs from 'fs';
 import models from '../../database/models';
 import CustomError from '../../helpers/Error';
 import Utils from '../../helpers/Utils';
@@ -7,6 +12,9 @@ import Pagination from '../../helpers/Pagination';
 import UserRoleController from '../userRole/UserRoleController';
 import RoleValidator from '../../middlewares/RoleValidator';
 import { getTravelDocument, getSearchQuery } from './getTravelDocument.data';
+import countries from '../../helpers/isoConstants';
+import PassportOCR from '../../helpers/passportOcr';
+
 
 export default class TravelReadinessController {
   static getDocumentType(req) {
@@ -299,6 +307,163 @@ export default class TravelReadinessController {
         message: 'You are Unauthorized to delete this Document',
       });
     } catch (error) { /* istanbul ignore next */
+      CustomError.handleError(error.message, 500, res);
+    }
+  }
+
+  static async JsOCRSolution(imageLink, callback) {
+    let newObject = {};
+    try {
+      const filename = imageLink.split('/').pop();
+      const writeFile = fs.createWriteStream(filename);
+      await request(imageLink).pipe(writeFile).on('close', async () => {
+        await PassportOCR.runTesseractCommand(filename, (passportData) => {
+          if (passportData === 'null') {
+            return callback('null');
+          }
+          const {
+            country, dateOfBirth, expiryDate,
+            sex, names, surname, number,
+          } = passportData;
+
+          surname.replace(/</g, ' ');
+          let countryName = convertIso3Code(country);
+          let nationality = '';
+          if (countryName) {
+            const { iso2 } = countryName;
+            const [countryInfo] = countries.filter(nation => nation.Code === iso2);
+            nationality = countryInfo.Nationality;
+            countryName = countryInfo.Country;
+          } else {
+            countryName = country;
+          }
+          const expires = moment(expiryDate, 'YYMMDD').format('MM/DD/YYYY');
+          const dateOfIssue = moment(expires).subtract(10, 'year').format('MM/DD/YYYY');
+          const birthDay = moment(dateOfBirth, 'YYMMDD').format('MM/DD/YYYY');
+
+          const finalPassData = {
+            country: countryName,
+            names,
+            number,
+            birthDay,
+            expires,
+            dateOfIssue,
+            nationality,
+            sex,
+            surname,
+            imageLink,
+          };
+          newObject = finalPassData;
+          return callback(newObject);
+        });
+      });
+    } catch (error) {
+      /* istanbul ignore next */
+      return callback(error);
+    }
+  }
+
+  static async PythonOCRSolution(imageLink, callback) {
+    try {
+      let newObject = {};
+      const pythonProcess = await child.spawn('python3', [
+        `${__dirname}/passport.py`,
+        imageLink
+      ]);
+      await pythonProcess.stdout.on('data', (data) => {
+        let passportData = data.toString('utf-8');
+        passportData = ((((passportData.replace(/(\r\n|\n|\r)/gm, '')).replace(/False/g, false)).replace(/True/g, true)).replace(/'/g, '"'))
+          .replace(/</g, '');
+        if (passportData === 'null') {
+          return callback('null');
+        }
+
+        if (!passportData.includes('country')) {
+          return callback('empty');
+        }
+        let jsonPassport = JSON.parse(passportData);
+        const {
+          country, dateOfBirth, expire,
+          sex, names, surname, number, validScore
+        } = jsonPassport;
+
+        let countryName = convertIso3Code(country);
+        let nationality = '';
+        if (countryName) {
+          const { iso2 } = countryName;
+          const [countryInfo] = countries.filter(nation => nation.Code === iso2);
+          nationality = countryInfo.Nationality;
+          countryName = countryInfo.Country;
+        } else {
+          countryName = country;
+        }
+        const expires = moment(expire, 'YYMMDD').format('MM/DD/YYYY');
+        const dateOfIssue = moment(expires).subtract(10, 'year').format('MM/DD/YYYY');
+        const birthDay = moment(dateOfBirth, 'YYMMDD').format('MM/DD/YYYY');
+        jsonPassport = {
+          country: countryName,
+          names,
+          number,
+          birthDay,
+          expires,
+          dateOfIssue,
+          nationality,
+          validScore,
+          sex,
+          surname,
+          imageLink
+        };
+
+        if (validScore < 40) {
+          return callback('poor validity');
+        }
+        newObject = jsonPassport;
+        return callback(newObject);
+      });
+    } catch (error) {
+    /* istanbul ignore next */
+      return error;
+    }
+  }
+
+  static async envSpecific(solution, imageLink, callback) {
+    if (solution === 'python') {
+      await TravelReadinessController.PythonOCRSolution(imageLink, response => callback(response));
+    } else {
+      await TravelReadinessController.JsOCRSolution(imageLink, response => callback(response));
+    }
+  }
+
+  static async scanOCRPassport(req, res) {
+    try {
+      const { imageLink } = req.body;
+      await TravelReadinessController.envSpecific(process.env.OCRSOLUTION, imageLink, (dataReceived) => {
+        if (dataReceived === 'null') {
+          return res.status(400).json({
+            success: false,
+            message: 'Please upload a valid passport image and ensure the image is in landscape'
+          });
+        }
+        if (dataReceived === 'empty') {
+          return res.status(400).json({
+            success: false,
+            message: 'please upload a valid passport image'
+          });
+        }
+        if (dataReceived === 'poor validity') {
+          return res.status(400).json({
+            success: false,
+            message: 'Please provide a high resolution Image',
+          });
+        }
+        return res.status(201).json({
+          success: true,
+          message: 'passport succesfully scanned kindly confirm the details',
+          passportData: dataReceived
+        });
+      });
+    } catch (error) {
+    /* istanbul ignore next */
       CustomError.handleError(error.message, 500, res);
     }
   }

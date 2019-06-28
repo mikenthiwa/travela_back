@@ -62,4 +62,11 @@ TravelReadinessRouter.delete(
   TravelReadinessController.deleteTravelReadinessDocument
 );
 
+TravelReadinessRouter.post(
+  '/travelreadiness/documents/scan',
+  authenticate,
+  TravelReadinessDocumentValidator.checkScanDocument,
+  TravelReadinessController.scanOCRPassport
+);
+
 export default TravelReadinessRouter;

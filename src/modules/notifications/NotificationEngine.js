@@ -105,7 +105,6 @@ export default class NotificationEngine {
 
   static sendMailToMany(recipients, data) {
     const { emails, recipientVars } = NotificationEngine.prepareMultipleRecipients(recipients);
-
     const destination = '';
     NotificationEngine.verifyRedirectLink(data.redirectLink);
     const mailData = {

@@ -213,7 +213,6 @@ export default class travelReadinessDocumentsValidator {
     next();
   }
 
-
   static validateOtherDocument(req, res, next) {
     if (req.body.other) {
       req.checkBody('other.name', 'document name should be provided').notEmpty().ltrim();
@@ -236,7 +235,6 @@ export default class travelReadinessDocumentsValidator {
       Validator.errorHandler(res, errors, next);
     }
   }
-
 
   static validateDateWithExpiry(req, type) {
     req.checkBody(`${type}.dateOfIssue`, 'issue date date must be provided in the form  mm/dd/yyyy')
@@ -263,5 +261,19 @@ export default class travelReadinessDocumentsValidator {
         const issueDate = new Date(dateOfIssue);
         return expiryDate > issueDate;
       });
+  }
+
+  static async checkScanDocument(req, res, next) {
+    try {
+      const { imageLink } = req.body;
+      const extension = imageLink.substr(imageLink.lastIndexOf('.') + 1);
+      if (!['jpeg', 'png', 'jpg'].includes(extension)) {
+        return CustomError.handleError('Please provide a valid image', 400, res);
+      }
+      next();
+    } catch (error) {
+      /* istanbul ignore next */
+      return CustomError.handleError(error.message, 500, res);
+    }
   }
 }

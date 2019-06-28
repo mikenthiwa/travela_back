@@ -44,6 +44,7 @@ const middleware = {
     validateTeamMemberLocation: jest.fn(invokeNextMiddleware),
     verifyToken: jest.fn(invokeNextMiddleware),
     verifyLoginEmail: jest.fn(invokeNextMiddleware)
+
   },
   RoleValidator: {
     validateUpdateRole: jest.fn(() => invokeNextMiddleware),
@@ -125,7 +126,8 @@ const middleware = {
     validateInput: jest.fn(invokeNextMiddleware),
     validateUniqueVisa: jest.fn(invokeNextMiddleware),
     validateUniqueDocument: jest.fn(invokeNextMiddleware),
-    checkDocumentAndUser: jest.fn(invokeNextMiddleware)
+    checkDocumentAndUser: jest.fn(invokeNextMiddleware),
+    checkScanDocument: jest.fn(invokeNextMiddleware)
   },
   ReminderEmailTemplateValidator: {
     validateUniqueName: jest.fn(invokeNextMiddleware),

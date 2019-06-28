@@ -7,7 +7,7 @@ const passportDetail = {
     dateOfIssue: '11/06/1979',
     placeOfIssue: 'Kenya',
     expiryDate: '06/22/2018',
-    cloudinaryUrl: 'https://res.cloudinary.com/dbk8ky24f/image/upload/v1543520867/oga7x8ewofyyirrlk9hv.jpg'
+    cloudinaryUrl: 'https://res.cloudinary.com/skybound/image/upload/s--JluVPO5v--/v1558937822/frontend_upload/Kena_b5vuba.jpg'
   }
 };
 const invalidPassportDetail = {
@@ -60,10 +60,36 @@ const invalidDate = {
     cloudinaryUrl: 'https://res.cloudinary.com/dbk8ky24f/image/upload/v1543520867/oga8ewofyyirrlk9hv.jpg'
   }
 };
+
+const imageLink = {
+  imageLink: '/Users/nesh/Desktop/passport/New-Kenyan-Passport.jpg'
+};
+
+const passportData = {
+  success: true,
+  message: 'passport succesfully scanned kindly confirm the details',
+  passportData: {
+    country: 'Portugal',
+    names: 'INES',
+    number: '1700044',
+    birthDay: '04/07/1974',
+    expirationDate: '06/16/2022',
+    dateOfIssue: '06/16/2012',
+    nationality: 'Portugees',
+    validScore: 62,
+    sex: 'F',
+    surname: 'GARCAO DE MAGALHAES',
+    imageLink: 'https://res.cloudinary.com/skybound/image/upload/s--lgB7GcUj--/v1560983033/frontend_upload/passport_quqhg1.jpg'
+  }
+};
+
+
 export default {
   passportDetail,
   invalidPassportDetail,
   emptyPassportDetail,
   invalidCloudinaryPassportDetail,
-  invalidDate
+  invalidDate,
+  imageLink,
+  passportData
 };

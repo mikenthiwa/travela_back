@@ -83,7 +83,6 @@ export default class DocumentsController {
       const where = { id: documentId, userId };
       const document = await models.Document
         .update({ name }, { returning: true, where });
-
       const [rowsUpdated, [updatedDocument]] = document;
 
       if (!rowsUpdated) {

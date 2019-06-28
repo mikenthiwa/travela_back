@@ -4,6 +4,7 @@ import Utils from '../../../helpers/Utils';
 import models from '../../../database/models';
 import { role } from '../../userRole/__tests__/mocks/mockData';
 import NotificationEngine from '../../notifications/NotificationEngine';
+
 import {
   travelAdmin,
   travelAdminPayload,
@@ -19,6 +20,7 @@ import otherDocumentsMock from './__mocks__/otherDocumentsMock';
 
 const travelAdminToken = Utils.generateTestToken(travelAdminPayload);
 const requesterToken = Utils.generateTestToken(requesterPayload);
+
 
 const setUp = async () => {
   await models.UserRole.destroy({ force: true, truncate: { cascade: true } });

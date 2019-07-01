@@ -6,6 +6,7 @@ const dotenv = require('dotenv');
 const axios = require('axios');
 
 dotenv.config();
+const { Op } = models.Sequelize;
 
 class UserHelper {
   static authorizeRequests(token) {
@@ -34,7 +35,7 @@ class UserHelper {
 
   static async getDestinationTravelAdmin(centerIds) {
     const users = centerIds.map(async (centerId) => {
-      const travelAdmin = await models.UserRole.findAll({ where: { roleId: 29187, centerId }, include: [{ model: models.User, as: 'user' }] });
+      const travelAdmin = await models.UserRole.findAll({ where: { roleId: { [Op.in]: [29187, 339458] }, centerId }, include: [{ model: models.User, as: 'user' }] });
       if (travelAdmin.length) {
         return travelAdmin.map(user => user.dataValues.user);
       }

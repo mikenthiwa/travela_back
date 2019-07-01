@@ -178,15 +178,17 @@ export default class RequestUtils {
     centerIds, request, senderId, name, picture, userId, id
   }) {
     const travelAdmins = await Users.getDestinationTravelAdmin(centerIds);
-    const message = `This is to inform you that ${request.name}'s request ${request.id} to visit 
+    if (travelAdmins) {
+      const message = `This is to inform you that ${request.name}'s request ${request.id} to visit 
       your centre has just been verified by the local travel team. Please be aware of this request and plan for the traveller.`;
-    NotificationEngine.notifyMany({
-      users: travelAdmins, senderId, name, picture, id, message
-    });
-    NotificationEngine.sendMailToMany(
-      travelAdmins,
-      RequestUtils.notificationMessages(senderId, name, request, picture, userId, id).travelAdminEmailData
-    );
+      NotificationEngine.notifyMany({
+        users: travelAdmins, senderId, name, picture, id, message
+      });
+      NotificationEngine.sendMailToMany(
+        travelAdmins,
+        RequestUtils.notificationMessages(senderId, name, request, picture, userId, id).travelAdminEmailData
+      );
+    }
   }
 
   static async notifyRequester({

@@ -34,6 +34,4 @@ def passport_eye(image):
         print(e)
 
 
-# passport_eye(sys.argv[1])
-
-passport_eye('https://res.cloudinary.com/skybound/image/upload/s--lgB7GcUj--/v1560983033/frontend_upload/passport_quqhg1.jpg')
+passport_eye(sys.argv[1])

@@ -6,7 +6,7 @@ labels:
 spec:
   containers:
   - name: travela-backend-agent
-    image: eu.gcr.io/jenkins-apprenticeship/jenkins-travela-backend
+    image: eu.gcr.io/andela-learning/jenkins-travela-backend:latest
     resources:
       requests:
         cpu: "3000m"

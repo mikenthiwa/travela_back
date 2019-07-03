@@ -122,6 +122,11 @@ describe('TripModificationController', () => {
   });
 
   it('should create a successful modification request for modify dates type', (done) => {
+    global.io = {
+      sockets: {
+        emit: () => {}
+      }
+    };
     createModification(done, '0001111', 200, ({ modification }) => {
       expect(modification).toMatchObject({
         status: 'Approved',

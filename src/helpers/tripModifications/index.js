@@ -31,12 +31,24 @@ export const retrieveTravelAdminDetails = async (location) => {
   };
 };
 
+
+const sendNotification = (notificationData, requestId, admins, message, destination = false) => {
+  NotificationEngine.notify({
+    ...notificationData,
+    recipientId: admins.userId,
+    notificationLink: `/requests/my-verifications/${requestId}`,
+    message: message(destination)
+  });
+};
+
 export const notifyTravelAdmins = async ({
   requestId,
   requesterId,
   requesterName,
   requestDetails,
-  picture, allLocations
+  picture,
+  allLocations,
+  type
 }) => {
   allLocations.map(async (location) => {
     const localAdmins = await retrieveTravelAdminDetails(location[0]);
@@ -50,35 +62,51 @@ export const notifyTravelAdmins = async ({
       requestId,
     };
 
-    if (localAdmins) {
-      NotificationEngine.notify({
-        ...notificationData,
-        recipientId: localAdmins.userId,
-        notificationLink: `/requests/modifications/${requestId}`,
-        message: `This is to inform you that ${requesterName}, has just modified the dates on their ${requestDetails.dataValues.tripType} trip ${requestId} to ${location[1]}.`
-      });
-    }
-    if (destinationAdmins) {
-      NotificationEngine.notify({
-        ...notificationData,
-        recipientId: destinationAdmins.userId,
-        notificationLink: `/requests/my-verifications/${requestId}`,
-        message: `This is to inform you that ${requesterName}, has just modified the dates requested on their ${requestDetails.dataValues.tripType} trip ${requestId} to your centre.`
-      });
-    }
+    const message = (destination = false) => ({
+      'Modify Dates': `This is to inform you that ${requesterName}, has just modified the dates on their ${requestDetails.dataValues.tripType} trip ${requestId} to ${destination ? 'your center.' : location[1]}.`,
+      'Cancel Trip': `This is to inform you that ${requesterName}, has just cancelled their ${requestDetails.dataValues.tripType} trip ${requestId} to ${destination ? 'your center.' : location[1]}`
+    }[type]);
+
+    [localAdmins, destinationAdmins].forEach((admins) => {
+      if (admins) {
+        sendNotification(
+          notificationData, requestId, admins, message,
+          admins === destinationAdmins
+        );
+      }
+    });
   });
 };
 
+const sendMail = (admins, data, types, requestId, destination = false) => {
+  NotificationEngine.sendMailToMany([admins],
+    {
+      ...data,
+      type: types(destination),
+      redirectLink: `${process.env.REDIRECT_URL}/redirect/requests/modifications/${requestId}`
+    });
+};
+
 export const mailTravelAdmins = async ({
-  requestId, requesterName, allLocations, requestDetails
+  requestId, requesterName, allLocations, requestDetails, type
 }) => {
   allLocations.map(async (location) => {
     const localAdmins = await retrieveTravelAdminDetails(location[0]);
     const destinationAdmins = await retrieveTravelAdminDetails(location[1]);
 
+    const topics = {
+      'Modify Dates': 'Trip Modification',
+      'Cancel Trip': 'Trip Cancellation'
+    };
+
+    const types = destination => ({
+      'Modify Dates': `Notify Travel Administrator of Trip Modification ${destination ? 'Destination' : 'Origin'}`,
+      'Cancel Trip': `Notify Travel Administrator of Trip Cancellation ${destination ? 'Destination' : 'Origin'}`
+    }[type]);
+
     const data = {
       sender: requesterName,
-      topic: 'Trip Modification Request',
+      topic: topics[type],
       details: {
         requesterName,
         requestId,
@@ -88,29 +116,24 @@ export const mailTravelAdmins = async ({
       redirectLink: `${process.env.REDIRECT_URL}/redirect/requests/modifications/${requestId}`
     };
 
-    if (localAdmins) {
-      NotificationEngine.sendMailToMany([localAdmins],
-        {
-          ...data,
-          type: 'Notify Travel Administrator of Trip Modification Origin',
-          redirectLink: `${process.env.REDIRECT_URL}/redirect/requests/modifications/${requestId}`
-        });
-    }
-    if (destinationAdmins) {
-      NotificationEngine.sendMailToMany([destinationAdmins],
-        {
-          ...data,
-          type: 'Notify Travel Administrator of Trip Modification Destination',
-          redirectLink: `${process.env.REDIRECT_URL}/redirect/requests/my-verifications/${requestId}`
-        });
-    }
+    [localAdmins, destinationAdmins]
+      .forEach((admins) => {
+        if (admins) {
+          sendMail(admins, data, types, requestId, admins === destinationAdmins);
+        }
+      });
   });
 };
 
-export const notifyAndMailAdminsForTripModification = async (notificationData) => {
+export const notifyAndMailAdminsForTripModification = async (
+  notificationData, type = 'Modify Dates') => {
   const { allLocations } = await retrieveLocations(notificationData.requestId);
   const requestDetails = await models.Request.findByPk(notificationData.requestId);
 
-  await notifyTravelAdmins({ ...notificationData, requestDetails, allLocations, });
-  await mailTravelAdmins({ ...notificationData, requestDetails, allLocations });
+  await notifyTravelAdmins({
+    ...notificationData, requestDetails, allLocations, type
+  });
+  await mailTravelAdmins({
+    ...notificationData, requestDetails, allLocations, type
+  });
 };

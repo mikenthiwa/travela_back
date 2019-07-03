@@ -1,5 +1,6 @@
 import models from '../../database/models';
 import RequestsController from '../requests/RequestsController';
+import { notifyAndMailAdminsForTripModification } from '../../helpers/tripModifications';
 
 const include = [
   {
@@ -33,11 +34,19 @@ class TripModificationController {
       }
     );
 
-    return TripModificationController.performModification('Approved', user.UserInfo, modification, req, res);
+    return TripModificationController.performModification(
+      'Approved', user.UserInfo, modification, req, res
+    );
   }
 
   static async performModification(status, user, modification, req, res) {
-    const { user: { UserInfo: { email } } } = req;
+    const {
+      user: {
+        UserInfo: {
+          email, id: requesterId, fullName: requesterName, picture
+        }
+      }
+    } = req;
     const modifiedBy = await models.User.find({ where: { email } });
 
     await modification.update({
@@ -53,6 +62,12 @@ class TripModificationController {
     const { requestId, type } = modification;
 
     if (type === 'Cancel Trip') {
+      await notifyAndMailAdminsForTripModification({
+        requestId,
+        requesterId,
+        requesterName,
+        picture
+      }, 'Cancel Trip');
       return TripModificationController.cancelTrip(requestId, modification, req, res);
     }
 

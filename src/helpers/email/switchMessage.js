@@ -224,6 +224,10 @@ of budget for this trip.`;
       return `This is to inform you that <b>${msgDetail.details.requesterName}</b>, has just modified their <b>${msgDetail.details.tripType}</b> trip <b>${msgDetail.details.requestId}</b> to <b>${msgDetail.details.destination}</b>.`;
     case 'Notify Travel Administrator of Trip Modification Destination':
       return `This is to inform you that <b>${msgDetail.details.requesterName}</b>, has just modified their <b>${msgDetail.details.tripType}</b> trip <b>${msgDetail.details.requestId}</b> to <b>your centre</b>.`;
+    case 'Notify Travel Administrator of Trip Cancellation Origin':
+      return `This is to inform you that <b>${msgDetail.details.requesterName}</b>, has just cancelled their <b>${msgDetail.details.tripType}</b> trip <b>${msgDetail.details.requestId}</b> to <b>${msgDetail.details.destination}</b>.`;
+    case 'Notify Travel Administrator of Trip Cancellation Destination':
+      return `This is to inform you that <b>${msgDetail.details.requesterName}</b>, has just cancelled their <b>${msgDetail.details.tripType}</b> trip <b>${msgDetail.details.requestId}</b> to <b>your centre</b>.`;
     default:
       return '';
   }

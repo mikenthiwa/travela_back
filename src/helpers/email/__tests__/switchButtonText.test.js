@@ -58,7 +58,7 @@ describe('Switch Button helper', () => {
     done();
   });
   it('should show Modify Request button in case of modify trips local admin', (done) => {
-    expect(switchButtonText('Notify Travel Administrator of Trip Modification Origin')).toEqual('Modify Trip');
+    expect(switchButtonText('Notify Travel Administrator of Trip Modification Origin')).toEqual('View Request');
     done();
   });
   it('should show View Request button in case of modify trips destination admin', (done) => {

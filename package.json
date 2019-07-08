@@ -6,7 +6,7 @@
   "scripts": {
     "build-server": "babel src --out-dir dist -s",
     "clean": "rm -rf dist && mkdir dist",
-    "build": "yarn run clean && yarn run build-server",
+    "build": "yarn run clean && yarn run build-server && yarn run copy:python:passport",
     "serve": "node dist/index.js",
     "start": "NODE_ENV=production yarn run build && yarn run serve",
     "start:dev": "NODE_ENV=development  DEBUG=log  nodemon --exec babel-node src/index.js",
@@ -20,7 +20,8 @@
     "db:migrate:undo": "node_modules/.bin/sequelize db:migrate:undo",
     "db:rollback": "node_modules/.bin/sequelize db:migrate:undo:all",
     "db:rollmigrate": "yarn db:rollback && yarn db:migrate && yarn db:seed && babel-node migrator/fetchData",
-    "db:user:migrate": "babel-node migrator/fetchData"
+    "db:user:migrate": "babel-node migrator/fetchData",
+    "copy:python:passport": "cp `pwd`/src/modules/travelReadinessDocuments/passport.py  `pwd`/dist/modules/travelReadinessDocuments/passport.py"
   },
   "repository": {
     "type": "git",

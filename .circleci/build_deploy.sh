@@ -34,6 +34,11 @@ buildTagAndPushDockerImage() {
     info "Login to $DOCKER_REGISTRY container registry"
     is_success_or_fail $(docker login -u  $DOCKER_USERNAME --password-stdin https://${DOCKER_REGISTRY} < $SERVICE_KEY_PATH)
 
+    if [ "$CIRCLE_BRANCH" == 'develop' ]; then
+      info "Push $IMAGE_NAME to $DOCKER_REGISTRY container registry"
+      docker push $IMAGE_NAME
+    fi
+
     info "Push $TAGGED_IMAGE to $DOCKER_REGISTRY container registry"
     docker push $TAGGED_IMAGE
 

@@ -140,7 +140,7 @@ describe('User Role Test', () => {
       .send({ token: googleToken.token })
       .expect(201)
       .end((err, res) => {
-        expect(res.body.message).toEqual('User Found');
+        expect(res.body.message).toEqual('first user login');
         expect(res.body.success).toEqual(true);
         if (err) return done(err);
         done();

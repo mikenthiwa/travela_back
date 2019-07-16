@@ -39,7 +39,7 @@ class UserRoleController {
 
   static async updateUserProfile(req, res) {
     const {
-      department, passportName, occupation, gender, manager, location
+      fullName, department, passportName, occupation, gender, manager, location
     } = req.body;
     const user = await models.User.findOne({ where: { userId: req.params.id } });
     if (!user) {
@@ -47,6 +47,7 @@ class UserRoleController {
       return UserRoleController.response(res, message);
     }
     const result = await user.update({
+      fullName: fullName || user.fullName,
       passportName: passportName || user.passportName,
       department: department || user.department,
       occupation: occupation || user.occupation,
@@ -78,7 +79,11 @@ class UserRoleController {
         }
       }
       await result.update({ picture: userData.picture });
-      const message = [201, 'User Found', true];
+      let resMessage = 'User Found';
+      if (result.dataValues.lastLogin === null) {
+        resMessage = 'first user login';
+      }
+      const message = [201, resMessage, true];
       const token = await UserHelper.setToken(result);
       return UserRoleController.response(res, message, result, token);
     } catch (error) { /* istanbul ignore next */

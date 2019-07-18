@@ -24,6 +24,7 @@ import tripModificationsRouter from './tripModifications';
 import hotelEstimateRouter from './hotelEstimate';
 import travelCostsRouter from './travelCosts';
 import helpResourcesRouter from './helpResources';
+import FlightRouter from './flightEstimate/index';
 
 const apiPrefix = '/api/v1';
 
@@ -54,7 +55,8 @@ const routes = [
   tripModificationsRouter,
   hotelEstimateRouter,
   travelCostsRouter,
-  helpResourcesRouter
+  helpResourcesRouter,
+  FlightRouter
 ];
 export default (app) => {
   routes.forEach(route => app.use(apiPrefix, route));

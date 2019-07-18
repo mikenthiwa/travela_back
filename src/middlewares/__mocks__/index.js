@@ -196,6 +196,13 @@ const middleware = {
     validateRequest: jest.fn(invokeNextMiddleware),
     validateApproval: jest.fn(invokeNextMiddleware),
     validateDuplicateModification: jest.fn(invokeNextMiddleware)
+  },
+  FlightEstimateValidator: {
+    checkOrOriginDestination: jest.fn(invokeNextMiddleware),
+    validateQueryString: jest.fn(invokeNextMiddleware),
+    validateEstimateUpadate: jest.fn(invokeNextMiddleware),
+    validateFlightEstimate: jest.fn(invokeNextMiddleware),
+    validateId: jest.fn(invokeNextMiddleware)
   }
 };
 

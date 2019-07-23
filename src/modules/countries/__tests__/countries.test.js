@@ -135,3 +135,17 @@ describe('Countries controller tests', () => {
       });
   });
 });
+
+describe('Country list controller tests', () => {
+  it('should get all countries successfully', (done) => {
+    request
+      .get('/api/v1/countries')
+      .set('authorization', token)
+      .end((err, res) => {
+        if (err) return done(err);
+        expect(res.body.success).toEqual(true);
+        expect(res.body.countries.length).toBeGreaterThan(0);
+        done();
+      });
+  });
+});

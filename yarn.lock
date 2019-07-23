@@ -1818,6 +1818,25 @@ cors@^2.8.4:
     object-assign "^4"
     vary "^1"
 
+countries-list@^2.4.2:
+  version "2.4.2"
+  resolved "https://registry.yarnpkg.com/countries-list/-/countries-list-2.4.2.tgz#16d34de32ebd12b4f057ca4f6ee5e22fc6069f65"
+  integrity sha512-U8Hlh7L7ipmkCV53sukl7xI1fbwsfoKzvWEuyNSKFHVIDnG/uWmsUnhhKTlG8v4n2FfADhm+bYe1ia53c+J7lw==
+
+country-list@^2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/country-list/-/country-list-2.1.1.tgz#4cbccad6e10aa44d82f3e85caad18fcf5a439e64"
+  integrity sha512-MuPW7rwPBlND9iHXg73gO7O3kTGVCDXzW06KXXPYrUdXVc2JF3E4w9YiHm0I5GiOIm6VAhEUDZFWmiVBNyonlw==
+
+countryjs@^1.8.0:
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/countryjs/-/countryjs-1.8.0.tgz#9edaa342a79b262d9eaae0d407a43328d861ce87"
+  integrity sha1-ntqjQqebJi2equDUB6QzKNhhzoc=
+  dependencies:
+    lodash "^4.17.2"
+    minimatch "^3.0.3"
+    require-all "^2.2.0"
+
 crc32-stream@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/crc32-stream/-/crc32-stream-2.0.0.tgz#e3cdd3b4df3168dd74e3de3fbbcb7b297fe908f4"
@@ -4452,6 +4471,11 @@ lodash@^4.13.1, lodash@^4.17.1, lodash@^4.17.10, lodash@^4.17.11, lodash@^4.17.4
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.11.tgz#b39ea6229ef607ecd89e2c8df12536891cac9b8d"
   integrity sha512-cQKh8igo5QUhZ7lg38DYWAxMvjSAKG0A8wGSVimP07SIUEK2UO+arSRKbRZWtelMtN5V0Hkwh5ryOto/SshYIg==
 
+lodash@^4.17.2:
+  version "4.17.14"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.14.tgz#9ce487ae66c96254fe20b599f21b6816028078ba"
+  integrity sha512-mmKYbW3GLuJeX+iGP+Y7Gp1AiGHGbXHCOh/jZmrawMmsE7MS4znI3RL2FsjbqOyMayHInjOeykW7PEajUk1/xw==
+
 loose-envify@^1.0.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/loose-envify/-/loose-envify-1.4.0.tgz#71ee51fa7be4caec1a63839f7e682d8132d30caf"
@@ -5859,6 +5883,11 @@ request@^2.81.0, request@^2.87.0, request@^2.88.0:
     tough-cookie "~2.4.3"
     tunnel-agent "^0.6.0"
     uuid "^3.3.2"
+
+require-all@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/require-all/-/require-all-2.2.0.tgz#b4420c233ac0282d0ff49b277fb880a8b5de0894"
+  integrity sha1-tEIMIzrAKC0P9Jsnf7iAqLXeCJQ=
 
 require-directory@^2.1.1:
   version "2.1.1"

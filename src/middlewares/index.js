@@ -19,6 +19,7 @@ import BambooWebhookValidator from './BambooWebhookValidator';
 import TravelRegionsValidator from './travelRegionsValidator';
 import CountryValidator from './countryValidator';
 import HotelEstimateValidator from './hotelEstimateValidator';
+import DynamicChecklistValidator from './dynamicChecklistValidator';
 
 
 const middleware = {
@@ -42,7 +43,8 @@ const middleware = {
   BambooWebhookValidator,
   TravelRegionsValidator,
   CountryValidator,
-  HotelEstimateValidator
+  HotelEstimateValidator,
+  DynamicChecklistValidator,
 };
 
 export default middleware;

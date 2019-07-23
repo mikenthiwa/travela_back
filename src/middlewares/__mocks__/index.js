@@ -203,6 +203,10 @@ const middleware = {
     validateEstimateUpadate: jest.fn(invokeNextMiddleware),
     validateFlightEstimate: jest.fn(invokeNextMiddleware),
     validateId: jest.fn(invokeNextMiddleware)
+  },
+  DynamicChecklistValidator: {
+    validateChecklistRequest: jest.fn(invokeNextMiddleware),
+    validateChecklistOriginDestination: jest.fn(invokeNextMiddleware),
   }
 };
 

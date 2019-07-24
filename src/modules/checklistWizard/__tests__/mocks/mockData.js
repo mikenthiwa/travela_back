@@ -114,4 +114,52 @@ export const checklistDataInvalidKeys = {
   ]
 };
 
+export const checklistDataInvalidOrigin = {
+  origin: { region: 'West Africa' },
+  destinations: { regions: ['North Africa', 'West Africa'] },
+  config: [
+    {
+      order: 1,
+      prompt: 'Do you have a passport',
+      type: 'image',
+      url: '',
+      configuration: {
+        options: [],
+        url: '',
+        behaviour: {
+          name: 'preview image',
+          action: {
+            type: 'PREVIEW_IMAGE',
+            payload: 'http://url'
+          }
+        }
+      }
+    }
+  ]
+};
+
+export const checklistDataInvalidDestinationKey = {
+  origin: { region: 'West Africa' },
+  destinations: { regionsss: ['North Africa', 'West Africa'] },
+  config: [
+    {
+      order: 1,
+      prompt: 'Do you have a passport',
+      type: 'image',
+      url: '',
+      configuration: {
+        options: [],
+        url: '',
+        behaviour: {
+          name: 'preview image',
+          action: {
+            type: 'PREVIEW_IMAGE',
+            payload: 'http://url'
+          }
+        }
+      }
+    }
+  ]
+};
+
 export const travelRegion = { id: 9999, region: 'Default', description: 'defailt countries' };

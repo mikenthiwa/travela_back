@@ -34,7 +34,7 @@ class WizardUtils {
       [desinationName] = regions;
     }
 
-    return `${originName}-${desinationName}`.trim().replace(/\s/g, '');
+    return `${originName}-${desinationName}`.trim();
   }
 }
 

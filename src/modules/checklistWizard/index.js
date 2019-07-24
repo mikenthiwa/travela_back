@@ -17,5 +17,16 @@ Router.post(
   DynamicChecklistValidator.validateChecklistOriginDestination,
   ChecklistWizardController.createChecklist
 );
-  
+
+Router.get(
+  '/dynamic/checklist',
+  authenticate,
+  RoleValidator.checkUserRole([
+    'Super Administrator',
+    'Travel Administrator',
+    'Travel Team Member'
+  ]),
+  ChecklistWizardController.getAllChecklists
+);
+
 export default Router;

@@ -28,10 +28,10 @@ export default class dynamicChecklistValidator {
         existingDestinations.push(destination);
       }
     }));
-    
+
     return existingDestinations;
   }
-    
+
   static async validateChecklistOriginDestination(req, res, next) {
     const { origin: { country, region }, destinations: { countries, regions } } = req.body;
 

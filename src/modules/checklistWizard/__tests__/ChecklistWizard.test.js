@@ -11,6 +11,8 @@ import {
   checklistData2,
   travelRegion,
   checklistDataInvalidKeys,
+  checklistDataInvalidOrigin,
+  checklistDataInvalidDestinationKey
 } from './mocks/mockData';
 
 const request = supertest(app);
@@ -28,7 +30,7 @@ describe('Checklist wizard test', () => {
     await models.UserRole.bulkCreate(userRole);
     await models.TravelRegions.create(travelRegion);
   });
-  
+
   it('should create a checklist wizard',
     (done) => {
       request
@@ -85,6 +87,33 @@ describe('Checklist wizard test', () => {
         });
     });
 
+  it('should return error: Origin cannot be in the destination',
+    (done) => {
+      request
+        .post(url)
+        .set('authorization', token)
+        .send(checklistDataInvalidOrigin)
+        .end((err, res) => {
+          if (err) return done(err);
+          expect(res.body.success).toEqual(false);
+          expect(res.body.message).toEqual('Origin cannot be in the destination');
+          done();
+        });
+    });
+
+  it('should return error: Origin cannot be in the destination',
+    (done) => {
+      request
+        .post(url)
+        .set('authorization', token)
+        .send(checklistDataInvalidDestinationKey)
+        .end((err, res) => {
+          if (err) return done(err);
+          expect(res.body.success).toEqual(false);
+          expect(res.body.message).toEqual('Destinations must contain countries or regions as keys: regionsss is an invalid key');
+          done();
+        });
+    });
 
   it('should return error: invalid req.body',
     (done) => {
@@ -190,22 +219,6 @@ describe('Checklist wizard test', () => {
         });
     });
 
-  it('should return error: origin cannot be in the destinations',
-    (done) => {
-      checklistData.origin = { country: 'Nigeria' };
-      checklistData.destinations = { countries: ['Nigeria'] };
-      request
-        .post(url)
-        .set('authorization', token)
-        .send(checklistData)
-        .end((err, res) => {
-          if (err) return done(err);
-          expect(res.body.success).toEqual(false);
-          expect(res.body.message).toEqual('Origin cannot be in the destination');
-          done();
-        });
-    });
-
   it('should return error: regions array',
     (done) => {
       checklistData.destinations = { regions: [] };
@@ -232,37 +245,6 @@ describe('Checklist wizard test', () => {
           if (err) return done(err);
           expect(res.body.success).toEqual(false);
           expect(res.body.message).toEqual('Regions array should not contain empty string');
-          done();
-        });
-    });
-
-  it('should return error: origin cannot be in the destinations',
-    (done) => {
-      checklistData.origin = { region: 'West Africa' };
-      checklistData.destinations = { regions: ['West Africa'] };
-      request
-        .post(url)
-        .set('authorization', token)
-        .send(checklistData)
-        .end((err, res) => {
-          if (err) return done(err);
-          expect(res.body.success).toEqual(false);
-          expect(res.body.message).toEqual('Origin cannot be in the destination');
-          done();
-        });
-    });
-
-  it('should return error: invalid key in destinations object',
-    (done) => {
-      checklistData.destinations = { regionx: '' };
-      request
-        .post(url)
-        .set('authorization', token)
-        .send(checklistData)
-        .end((err, res) => {
-          if (err) return done(err);
-          expect(res.body.success).toEqual(false);
-          expect(res.body.message).toEqual('Destinations must contain countries or regions as keys: regionx is an invalid key');
           done();
         });
     });
@@ -296,4 +278,16 @@ describe('Checklist wizard test', () => {
           done();
         });
     });
+
+  it('should return all checklists', (done) => {
+    request
+      .get(url)
+      .set('authorization', token)
+      .end((err, res) => {
+        if (err) return done(err);
+        expect(res.body.checklists).toHaveLength(2);
+        expect(res.body.checklists[1].origin[0].country.country).toEqual('Nigeria');
+        done();
+      });
+  });
 });

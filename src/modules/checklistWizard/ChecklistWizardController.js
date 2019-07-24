@@ -1,6 +1,7 @@
 import models from '../../database/models';
 import WizardUtils from './wizardUtils';
 import Error from '../../helpers/Error';
+import circularReplacer from '../../helpers/circularReplacer';
 
 class ChecklistWizardController {
   static async createChecklist(req, res) {
@@ -52,6 +53,58 @@ class ChecklistWizardController {
         success: true,
         message: 'Checklist created successfully',
         newChecklist
+      });
+    } catch (error) { /* istanbul ignore next */
+      return Error.handleError('Server Error', 500, res);
+    }
+  }
+
+  static async getAllChecklists(req, res) {
+    try {
+      const row = await models.Checklist.findAll({
+        attributes: { exclude: ['createdBy'] },
+        include: [
+          {
+            model: models.ChecklistDestinations,
+            as: 'destinations',
+            include: [{
+              model: models.Country,
+              as: 'country'
+            }, {
+              model: models.TravelRegions,
+              as: 'region'
+            }]
+          },
+          {
+            model: models.ChecklistOrigin,
+            as: 'origin',
+            include: [{
+              model: models.Country,
+              as: 'country'
+            }, {
+              model: models.TravelRegions,
+              as: 'region'
+            }]
+          },
+          {
+            model: models.User,
+            as: 'user',
+          }
+        ]
+      });
+      const removeCyclicStructure = JSON.stringify(row, circularReplacer());
+      const newRow = JSON.parse(removeCyclicStructure);
+      const checklists = newRow.map((checklist) => {
+        const { user, ...rest } = checklist;
+        return {
+          ...rest,
+          createdBy: user
+        };
+      });
+      
+      return res.status(200).json({
+        success: true,
+        checklists
       });
     } catch (error) { /* istanbul ignore next */
       return Error.handleError('Server Error', 500, res);

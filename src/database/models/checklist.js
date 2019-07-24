@@ -30,6 +30,12 @@ export default (sequelize, DataTypes) => {
       foreignKey: 'checklistId',
       as: 'destinations'
     });
+    
+    Checklist.belongsTo(models.User, {
+      foreignKey: 'createdBy',
+      as: 'user',
+      targetKey: 'userId'
+    });
   };
   return Checklist;
 };

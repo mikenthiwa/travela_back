@@ -34,6 +34,8 @@ const switchButtonText = (type) => {
       return 'View Notification';
     case 'You were mentioned in a comment':
       return 'View Comment';
+    case 'NO_PASSPORT':
+      return 'View Dashboard';
     default:
       return 'View Request';
   }

@@ -21,7 +21,7 @@ describe('Countries controller tests', () => {
   beforeAll(async () => {
     await models.Role.destroy({ truncate: true, cascade: true });
     await models.UserRole.destroy({ truncate: true, cascade: true });
-    await models.User.destroy({ truncate: true, cascade: true });
+    await models.User.destroy({ truncate: true, cascade: true, force: true });
     await models.Country.destroy({ truncate: true, cascade: true });
     await models.TravelRegions.destroy({ truncate: true, cascade: true });
     await models.User.create(user);
@@ -131,6 +131,20 @@ describe('Countries controller tests', () => {
         if (err) return done(err);
         expect(res.body.success).toEqual(false);
         expect(res.body.message).toEqual('The region does not exist');
+        done();
+      });
+  });
+});
+
+describe('Country list controller tests', () => {
+  it('should get all countries successfully', (done) => {
+    request
+      .get('/api/v1/countries')
+      .set('authorization', token)
+      .end((err, res) => {
+        if (err) return done(err);
+        expect(res.body.success).toEqual(true);
+        expect(res.body.countries.length).toBeGreaterThan(0);
         done();
       });
   });

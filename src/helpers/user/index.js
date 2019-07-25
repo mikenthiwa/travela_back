@@ -33,6 +33,22 @@ class UserHelper {
     return countries[country] ? countries[country] : country;
   }
 
+  static getCenterId(location) {
+    const centerIds = {
+      Lagos: 12345,
+      Nigeria: 12345,
+      Nairobi: 23456,
+      Kenya: 23456,
+      Kampala: 34567,
+      Uganda: 34567,
+      Kigali: 56789,
+      Rwanda: 56789,
+      'New York': 45678,
+      USA: 45678,
+    };
+    return centerIds[location] || 0;
+  }
+
   static async getDestinationTravelAdmin(centerIds) {
     const users = centerIds.map(async (centerId) => {
       const travelAdmin = await models.UserRole.findAll({ where: { roleId: { [Op.in]: [29187, 339458] }, centerId }, include: [{ model: models.User, as: 'user' }] });
@@ -56,9 +72,9 @@ class UserHelper {
       name: userInfo.dataValues.fullName,
       email: userInfo.dataValues.email,
       picture: userInfo.dataValues.picture,
-      roles: userInfo.dataValues.occupation
+      roles: userInfo.dataValues.occupation,
+      location: userInfo.dataValues.location,
     };
-
     const token = jwt.sign({ UserInfo }, process.env.JWT_PUBLIC_KEY, { expiresIn: '30d' });
     return token;
   }

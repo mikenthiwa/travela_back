@@ -2,6 +2,7 @@ import models from '../../database/models';
 import Error from '../../helpers/Error';
 import getSearchQuery from './countriesUtils';
 import Pagination from '../../helpers/Pagination';
+import AllCountries from './AllCountries';
 
 export default class countriesController {
   static async addCountry(req, res) {
@@ -60,6 +61,18 @@ export default class countriesController {
       return res.status(200).json({
         success: false,
         message: 'No country records found'
+      });
+    } catch (error) {
+      /* istanbul ignore next */
+      Error.handleError(error, 500, res);
+    }
+  }
+
+  static async getCountriesList(req, res) {
+    try {
+      return res.status(200).json({
+        success: true,
+        countries: AllCountries
       });
     } catch (error) {
       /* istanbul ignore next */

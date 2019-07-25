@@ -266,7 +266,7 @@ export default class TripValidator {
   static async validateTripValidator(req, res, next) {
     req.checkBody('trips[*].origin', 'origin is required').ltrim().notEmpty();
     req.checkBody('trips[*].destination', 'destination is required').ltrim().notEmpty();
-    req.checkBody('trips[*].departureDate', 'destination is required').ltrim().notEmpty();
+    req.checkBody('trips[*].departureDate', 'departure date is required').ltrim().notEmpty();
     const errors = req.validationErrors();
     Validator.errorHandler(res, errors, next);
   }

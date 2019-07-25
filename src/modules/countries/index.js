@@ -33,4 +33,12 @@ Router.get(
   CountryValidator.regionExistsValidation,
   countriesController.getCountries
 );
+
+Router.get(
+  '/countries',
+  authenticate,
+  countriesController.getCountriesList
+);
+
+
 export default Router;

@@ -47,5 +47,5 @@ export const validCountryData = {
 export const emptyCountryData = {
   countries: []
 };
-export const travelRegion = { region: 'East-Africa', description: 'Kenya, Uganda, Tanzania' };
-export const travelRegion2 = { region: 'West-Africa', description: 'Nigeria, Benin' };
+export const travelRegion = { id: 1, region: 'East-Africa', description: 'Kenya, Uganda, Tanzania' };
+export const travelRegion2 = { id: 2, region: 'West-Africa', description: 'Nigeria, Benin' };

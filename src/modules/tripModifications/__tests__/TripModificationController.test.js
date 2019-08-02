@@ -129,14 +129,41 @@ describe('TripModificationController', () => {
     };
     createModification(done, '0001111', 200, ({ modification }) => {
       expect(modification).toMatchObject({
-        status: 'Approved',
+        status: 'Open',
         requestId: '0001111',
         reason: 'This is also a reason',
         type: 'Modify Dates',
-        approverId: 81110999
+        approverId: null
       });
     }, anotherModification(), tokens[2]);
   });
+
+  it('should edit the request and return 200 when modifying and updating a request', (done) => {
+    request
+      .put('/api/v1/requests/0001111')
+      .set('authorization', tokens[2])
+      .send({
+        ...requests[23],
+        trips: [{
+          ...trips[23],
+          departureDate: '2019-10-11',
+          returnDate: '2019-10-15',
+        }],
+        stipend: 600,
+        stipendBreakdown: [{
+          subTotal: 600,
+          location: 'New York, United States',
+          dailyRate: 300,
+          duration: 2,
+          centerExists: true
+        }],
+      })
+      .end((err, res) => {
+        expect(res.body.success).toEqual(true);
+        done();
+      });
+  });
+
 
   it('should ensure a user only submits a modification for their request', (done) => {
     createModification(done, requests[1].id, 401, ({ message }) => {
@@ -145,18 +172,21 @@ describe('TripModificationController', () => {
   });
 
   it('should return the list of modifications for a particular request', async (done) => {
-    console.log(requests[24], tokens[2]);
-    await createModificationAsync(requests[24].id, anotherModification(), tokens[2]);
-    testApi(done, 'get', `/requests/${requests[24].id}/modifications`, 200,
+    await createModificationAsync(requests[5].id, anotherModification(), tokens[0]);
+
+    await models.TripModification.update(
+      { status: 'Approved', approverId: 178912 },
+      { where: { requestId: requests[5].id } }
+    );
+
+    testApi(done, 'get', `/requests/${requests[5].id}/modifications`, 200,
       ({ pastModifications }) => {
         expect(pastModifications[0]).toMatchObject({
-          reason: 'This is also a reason',
           status: 'Approved',
           type: 'Modify Dates',
-          requestId: '0001112',
-          approverId: 81110999,
-          approvedBy: pastModifications[0].approvedBy,
-          request: { id: '0001112' }
+          requestId: '98733',
+          approverId: 178912,
+          request: { id: '98733' }
         });
       });
   });

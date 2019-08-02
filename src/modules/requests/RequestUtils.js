@@ -1,14 +1,16 @@
-
+import moment from 'moment';
 import _ from 'lodash';
 import { generateRangeQuery } from '../../helpers/requests';
 import models from '../../database/models';
 import BaseException from '../../exceptions/baseException';
 import RoomsManager from '../guestHouse/RoomsManager';
 import TravelReadinessUtils from '../travelReadinessDocuments/TravelReadinessUtils';
+import TripModificationController from '../tripModifications/TripModificationController';
 import UserRoleController from '../userRole/UserRoleController';
 import NotificationEngine from '../notifications/NotificationEngine';
 import Users from '../../helpers/user';
 import getRequests from './getRequests.data';
+import { notifyAndMailAdminsForTripModification } from '../../helpers/tripModifications';
 
 const { Op } = models.Sequelize;
 export default class RequestUtils {
@@ -65,7 +67,7 @@ export default class RequestUtils {
         `${process.env.REDIRECT_URL}${redirect}`,
     };
   }
-  
+
   static async getRequest(requestId, userId) {
     const request = await models.Request.find({
       where: { userId, id: requestId },
@@ -79,7 +81,7 @@ export default class RequestUtils {
     });
     return trips;
   }
-  
+
   static async sendEmailToFinanceTeam(request) {
     const {
       userId: requesterId, name: requesterName, id
@@ -145,6 +147,36 @@ export default class RequestUtils {
     return multipleRoomsData;
   }
 
+  static async determineModificationFlow(requestDetails, allTrips, request, requestId, userId, req) {
+    const { existingTripDetails, newTripDetails } = this.generateAndCompileTripDetails(allTrips, requestDetails);
+    const newTripDuration = moment(newTripDetails[0][1]).diff(moment(newTripDetails[0][0]), 'days');
+    const oldTripDuration = moment(existingTripDetails[0][1]).diff(moment(existingTripDetails[0][0]), 'days');
+    const modification = await models.TripModification.findByPk(request.tripModificationId);
+    if (newTripDuration > oldTripDuration) {
+      await TripModificationController.performModification('Approved', req.user.UserInfo, modification, req);
+      await RequestUtils.notifyAdminOnTripModification(existingTripDetails, newTripDetails, requestId, userId, req);
+    }
+  }
+
+  static generateAndCompileTripDetails(allTrips, requestDetails) {
+    const [existingTripDetails, newTripDetails] = [[], []];
+    allTrips.map(eachTrip => existingTripDetails.push([eachTrip.departureDate, eachTrip.returnDate]));
+    requestDetails.trips.map(eachTrip => newTripDetails.push([eachTrip.departureDate, eachTrip.returnDate]));
+    return { existingTripDetails, newTripDetails };
+  }
+
+  static async notifyAdminOnTripModification(existingTripDetails, newTripDetails, requestId, userId, req) {
+    if (!_.isEqual(existingTripDetails, newTripDetails)) {
+      const notificationData = {
+        requestId,
+        requesterId: userId,
+        requesterName: req.user.UserInfo.fullName,
+        picture: req.user.UserInfo.picture,
+      };
+      await notifyAndMailAdminsForTripModification(notificationData);
+    }
+  }
+
   static notificationMessages(senderId, name, request, picture, userId, id) {
     const travelAdminEmailData = {
       topic: 'Travel Request Verified',
@@ -173,7 +205,7 @@ export default class RequestUtils {
       notificationData
     };
   }
-  
+
   static async notifyTravelAdmins({
     centerIds, request, senderId, name, picture, userId, id
   }) {

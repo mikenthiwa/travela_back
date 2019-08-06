@@ -458,7 +458,7 @@ export default class TravelReadinessController {
         }
         return res.status(201).json({
           success: true,
-          message: 'passport succesfully scanned kindly confirm the details',
+          message: 'Passport succesfully scanned, kindly confirm the details',
           passportData: dataReceived
         });
       });

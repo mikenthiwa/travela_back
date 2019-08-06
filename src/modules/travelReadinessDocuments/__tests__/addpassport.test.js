@@ -379,14 +379,14 @@ describe('Create passport', () => {
     it('should return a success image', async (done) => {
       mockOCR(jsData);
       testOCR(done, (body) => {
-        expect(body.message).toEqual('passport succesfully scanned kindly confirm the details');
+        expect(body.message).toEqual('Passport succesfully scanned, kindly confirm the details');
       });
     });
 
     it('should return a success image but with the country name not changed', async (done) => {
       mockOCR(countryPassData);
       testOCR(done, (body) => {
-        expect(body.message).toEqual('passport succesfully scanned kindly confirm the details');
+        expect(body.message).toEqual('Passport succesfully scanned, kindly confirm the details');
       });
     });
 

@@ -154,7 +154,7 @@ describe('Checklist wizard test', () => {
         .end((err, res) => {
           if (err) return done(err);
           expect(res.body.success).toEqual(false);
-          expect(res.body.message).toEqual('Origin: country key must have a value');
+          expect(res.body.message).toEqual('Origin(Country) must be present');
           done();
         });
     });
@@ -169,7 +169,7 @@ describe('Checklist wizard test', () => {
         .end((err, res) => {
           if (err) return done(err);
           expect(res.body.success).toEqual(false);
-          expect(res.body.message).toEqual('Origin: region key must have a value');
+          expect(res.body.message).toEqual('Origin(Region) must be present');
           done();
         });
     });
@@ -199,7 +199,7 @@ describe('Checklist wizard test', () => {
         .end((err, res) => {
           if (err) return done(err);
           expect(res.body.success).toEqual(false);
-          expect(res.body.message).toEqual('Countries array must contain countries');
+          expect(res.body.message).toEqual('Destination must contain countries');
           done();
         });
     });
@@ -229,7 +229,7 @@ describe('Checklist wizard test', () => {
         .end((err, res) => {
           if (err) return done(err);
           expect(res.body.success).toEqual(false);
-          expect(res.body.message).toEqual('Regions array must contain regions');
+          expect(res.body.message).toEqual('Destination must contain regions');
           done();
         });
     });

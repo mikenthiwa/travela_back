@@ -207,6 +207,9 @@ const middleware = {
   DynamicChecklistValidator: {
     validateChecklistRequest: jest.fn(invokeNextMiddleware),
     validateChecklistOriginDestination: jest.fn(invokeNextMiddleware),
+  },
+  ErrorBoundaryValidator: {
+    validateCrashReport: jest.fn(invokeNextMiddleware)
   }
 };
 

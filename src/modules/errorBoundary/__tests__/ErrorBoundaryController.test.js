@@ -1,6 +1,7 @@
 import supertest from 'supertest';
 import axios from 'axios';
 import app from '../../../app';
+import Utils from '../../../helpers/Utils';
 
 const request = supertest(app);
 
@@ -19,9 +20,6 @@ describe('ErrorBoundaryController', () => {
 
   beforeEach(() => {
     global.crashReports = [];
-  });
-
-  beforeAll(() => {
     // mock axios
     axios.post = jest.fn();
     axios.post.mockImplementation(() => new Promise((resolve => resolve('ok'))));
@@ -85,5 +83,22 @@ describe('ErrorBoundaryController', () => {
       success: false,
       message: 'Unable to send message to the slack channel'
     });
+  });
+
+  it('should allow an authenticated user to clear existing crash reports', async () => {
+    const token = Utils.generateTestToken({
+      UserInfo: {
+        id: '-MUnaemKrxA90lPNQs1FOLNp',
+        fullName: 'Kayode Okunlade',
+        email: 'kayode.dev@andela.com',
+        name: 'Kayode Okunlade',
+        location: 'Kenya'
+      }
+    });
+    await api(data);
+    expect(global.crashReports.length).toEqual(1);
+
+    await request.delete('/api/v1/errorBoundary/crashReports').set('Authorization', token).send();
+    expect(global.crashReports.length).toEqual(0);
   });
 });

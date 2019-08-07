@@ -25,4 +25,12 @@ export default class ErrorBoundaryController {
       message: 'Crash reported successfully to the slack channel'
     });
   }
+
+  static async clearCrashReports(req, res) {
+    global.crashReports = [];
+    return res.status(200).json({
+      success: true,
+      message: 'Crash reports cleared successfully'
+    });
+  }
 }

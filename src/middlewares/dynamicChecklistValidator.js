@@ -74,6 +74,7 @@ export default class dynamicChecklistValidator {
     if (existingDestinations.length) {
       return res.status(409).json({
         success: false,
+        message: `${existingDestinations[0]} already exist as a destination to this origin`,
         errors: {
           destinations: {
             message: 'Some of the destinations already exist',
@@ -131,7 +132,7 @@ export default class dynamicChecklistValidator {
         originCheck = country;
         if (!country.trim().length) {
           valid = false;
-          message = 'Origin: country key must have a value';
+          message = 'Origin(Country) must be present';
         }
       }
 
@@ -139,7 +140,7 @@ export default class dynamicChecklistValidator {
         originCheck = region;
         if (!region.trim().length) {
           valid = false;
-          message = 'Origin: region key must have a value';
+          message = 'Origin(Region) must be present';
         }
       }
 
@@ -153,7 +154,7 @@ export default class dynamicChecklistValidator {
       if (item === 'countries') {
         if (!countries.length) {
           valid = false;
-          message = 'Countries array must contain countries';
+          message = 'Destination must contain countries';
         }
         validateArrayItem(countries, 'Countries');
         
@@ -166,7 +167,7 @@ export default class dynamicChecklistValidator {
       if (item === 'regions') {
         if (!regions.length) {
           valid = false;
-          message = 'Regions array must contain regions';
+          message = 'Destination must contain regions';
         }
         validateArrayItem(regions, 'Regions');
   

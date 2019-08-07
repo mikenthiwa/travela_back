@@ -1,3 +1,4 @@
+import shortid from 'shortid';
 import models from '../../database/models';
 
 class WizardUtils {
@@ -35,6 +36,58 @@ class WizardUtils {
     }
 
     return `${originName}-${desinationName}`.trim();
+  }
+
+  static getChecklistByTrip(trips) {
+    return new Promise((res, rej) => {
+      const resultArray = [];
+      let count = trips.length;
+      const getChecklist = async ({ id: tripId, destination, origin }, index) => {
+        try {
+          const checklist = await models.Checklist.findOne({
+            include: [
+              {
+                model: models.ChecklistDestinations,
+                as: 'destinations',
+                include: [{
+                  model: models.Country,
+                  as: 'country',
+                  where: { country: destination.split(', ')[1] }
+                }, {
+                  model: models.TravelRegions,
+                  as: 'region'
+                }]
+              },
+              {
+                model: models.ChecklistOrigin,
+                as: 'origin',
+                include: [{
+                  model: models.Country,
+                  as: 'country',
+                  where: { country: origin.split(', ')[1] }
+                }, {
+                  model: models.TravelRegions,
+                  as: 'region'
+                }]
+              }
+            ],
+          });
+          const fakeObj = () => ({
+            id: shortid.generate(),
+            name: `${origin.split(', ')[1]}-${destination.split(', ')[1]}`,
+            config: []
+          });
+
+          const newChecklist = checklist || fakeObj();
+          resultArray[index] = { tripId, ...newChecklist };
+          count -= 1;
+          if (!count) return res(resultArray);
+        } catch (error) { /* istanbul ignore next */
+          rej(error);
+        }
+      };
+      trips.forEach((trip, index) => getChecklist(trip, index));
+    });
   }
 }
 

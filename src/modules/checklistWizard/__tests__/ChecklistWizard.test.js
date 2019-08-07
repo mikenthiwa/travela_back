@@ -12,7 +12,9 @@ import {
   travelRegion,
   checklistDataInvalidKeys,
   checklistDataInvalidOrigin,
-  checklistDataInvalidDestinationKey
+  checklistDataInvalidDestinationKey,
+  tripsData,
+  requests
 } from './mocks/mockData';
 
 const request = supertest(app);
@@ -24,10 +26,14 @@ describe('Checklist wizard test', () => {
     await models.Role.destroy({ truncate: true, cascade: true });
     await models.UserRole.destroy({ truncate: true, cascade: true });
     await models.TravelRegions.destroy({ truncate: true, cascade: true });
+    await models.Request.destroy({ force: true, truncate: { cascade: true } });
+    await models.Trip.destroy({ force: true, truncate: true, cascade: true });
     await models.User.destroy({ truncate: true, cascade: true, force: true });
     await models.User.create(user);
     await models.Role.bulkCreate(role);
     await models.UserRole.bulkCreate(userRole);
+    await models.Request.bulkCreate(requests);
+    await models.Trip.bulkCreate(tripsData);
     await models.TravelRegions.create(travelRegion);
   });
 
@@ -287,6 +293,29 @@ describe('Checklist wizard test', () => {
         if (err) return done(err);
         expect(res.body.checklists).toHaveLength(2);
         expect(res.body.checklists[1].origin[0].country.country).toEqual('Nigeria');
+        done();
+      });
+  });
+
+  it('should return a single checklist', (done) => {
+    request
+      .get(`${url}/requests/${tripsData[0].requestId}`)
+      .set('authorization', token)
+      .end((err, res) => {
+        if (err) return done(err);
+        expect(res.body.message).toEqual('Successfully retrieved checklist');
+        expect(res.body.checklists[0].name).toEqual('Nigeria-Kenya');
+        done();
+      });
+  });
+
+  it('should return empty config array when there is no checklist for the trip', (done) => {
+    request
+      .get(`${url}/requests/${tripsData[1].requestId}`)
+      .set('authorization', token)
+      .end((err, res) => {
+        if (err) return done(err);
+        expect(res.body.checklists[0].config).toEqual([]);
         done();
       });
   });

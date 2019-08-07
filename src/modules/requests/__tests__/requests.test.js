@@ -415,6 +415,7 @@ describe('Requests Controller', () => {
     await models.Approval.destroy({ force: true, truncate: { cascade: true } });
     await models.Request.destroy({ force: true, truncate: { cascade: true } });
     await models.Trip.destroy({ force: true, truncate: { cascade: true } });
+    await models.TripModification.destroy({ truncate: { cascade: true }, force: true });
     await models.Notification.truncate();
     await models.Comment.destroy({ force: true, truncate: { cascade: true } });
 
@@ -439,6 +440,7 @@ describe('Requests Controller', () => {
     await models.Approval.destroy({ force: true, truncate: { cascade: true } });
     await models.Trip.destroy({ force: true, truncate: { cascade: true } });
     await models.Request.destroy({ force: true, truncate: { cascade: true } });
+    await models.TripModification.destroy({ truncate: { cascade: true }, force: true });
     await models.Notification.truncate();
     await models.Bed.destroy({ force: true, truncate: { cascade: true } });
     await models.Room.destroy({ force: true, truncate: { cascade: true } });
@@ -1215,6 +1217,7 @@ describe('Requests Controller', () => {
         await models.Trip.destroy({ force: true, truncate: { cascade: true } });
         await models.Approval.destroy({ force: true, truncate: { cascade: true } });
         await models.Request.destroy({ force: true, truncate: { cascade: true } });
+        await models.TripModification.destroy({ truncate: { cascade: true }, force: true });
         done();
       });
 
@@ -1384,22 +1387,6 @@ describe('Requests Controller', () => {
           });
       });
 
-      it('should not update trip if dates overlap', (done) => {
-        request(app)
-          .put('/api/v1/requests/abcd')
-          .set('authorization', requesterToken)
-          .send({
-            ...updateDetails,
-            stipendBreakdown: JSON.parse(updateDetails.stipendBreakdown)
-          })
-          .end((err, res) => {
-            expect(res.status).toEqual(400);
-            expect(res.body.success).toEqual(false);
-            expect(res.body.error).toEqual('Sorry, you already have a request for these dates.');
-            done();
-          });
-      });
-
       it('should update or create a new trip if it does not exist in the database', (done) => {
         const customUpdateDetails = {
           ...updateDetails,
@@ -1430,6 +1417,22 @@ describe('Requests Controller', () => {
             expect(res.body.trips).toHaveLength(2);
             expect(res.body.trips[0].id).toEqual(mockOpenRequest.trips[0].id);
             expect(res.body.trips[1].id).not.toEqual(mockOpenRequest.trips[0].id);
+            done();
+          });
+      });
+
+      it('should not update trip if dates overlap', (done) => {
+        request(app)
+          .put('/api/v1/requests/abcd')
+          .set('authorization', requesterToken)
+          .send({
+            ...updateDetails,
+            stipendBreakdown: JSON.parse(updateDetails.stipendBreakdown)
+          })
+          .end((err, res) => {
+            expect(res.status).toEqual(400);
+            expect(res.body.success).toEqual(false);
+            expect(res.body.error).toEqual('Sorry, you already have a request for these dates.');
             done();
           });
       });

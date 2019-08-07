@@ -1,4 +1,5 @@
 import models from '../../database/models';
+import RequestUtils from '../requests/RequestUtils';
 import RequestsController from '../requests/RequestsController';
 import { notifyAndMailAdminsForTripModification } from '../../helpers/tripModifications';
 
@@ -34,9 +35,17 @@ class TripModificationController {
       }
     );
 
-    return TripModificationController.performModification(
-      'Approved', user.UserInfo, modification, req, res
-    );
+    if (type === 'Cancel Trip') {
+      return TripModificationController.performModification(
+        'Approved', user.UserInfo, modification, req, res
+      );
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: `You can now modify Request ${requestId}'s details`,
+      modification
+    });
   }
 
   static async performModification(status, user, modification, req, res) {
@@ -55,7 +64,7 @@ class TripModificationController {
     });
 
     await models.Request.update(
-      { tripModificationId: null },
+      { tripModificationId: modification.id },
       { where: { id: modification.requestId } }
     );
 
@@ -90,27 +99,21 @@ class TripModificationController {
     });
   }
 
-  static async modifyTrip(requestId, modification, req, res) {
-    await models.sequelize.transaction(async () => {
-      const requests = await models.Request.findByPk(requestId);
-      const approvals = await models.Approval.findOne({
-        where: { requestId }, order: [['createdAt', 'DESC']]
-      });
-      await requests.update({
-        status: 'Open', budgetStatus: 'Open'
-      });
-      await approvals.update({
-        status: 'Open',
-        budgetStatus: 'Open',
-        budgetApprover: null,
-        budgetApprovedAt: null
-      });
+  static async modifyTrip(requestId, modification, req) {
+    const request = await RequestUtils.getRequest(requestId, req.user.UserInfo.id);
+    const approvals = await models.Approval.findOne({
+      where: { requestId }, order: [['createdAt', 'DESC']]
     });
 
-    return res.status(200).json({
-      success: true,
-      message: `Request ${requestId}'s modification has been successfully approved`,
-      modification
+    await request.update({
+      status: 'Open', budgetStatus: 'Open'
+    });
+
+    await approvals.update({
+      status: 'Open',
+      budgetStatus: 'Open',
+      budgetApprover: null,
+      budgetApprovedAt: null
     });
   }
 

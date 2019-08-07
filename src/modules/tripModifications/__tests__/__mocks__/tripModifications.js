@@ -14,7 +14,7 @@ const user = overrides => ({
   createdAt: '2019-03-25 18:19:46.763+03',
   updatedAt: '2019-03-25 18:19:46.763+03',
   bambooHrId: 0,
-  manager: 178912,
+  manager: '178912',
   ...overrides
 });
 
@@ -57,8 +57,8 @@ const trip = ({ id }, overrides) => ({
   requestId: id,
   origin: 'Nairobi, Kenya',
   destination: 'Kigali, Rwanda',
-  departureDate: '2019-01-08',
-  returnDate: '2019-01-09',
+  departureDate: '2019-10-08',
+  returnDate: '2019-10-09',
   createdAt: '2019-03-25 18:19:46.763+03',
   updatedAt: '2019-03-25 18:19:46.763+03',
   bedId: null,

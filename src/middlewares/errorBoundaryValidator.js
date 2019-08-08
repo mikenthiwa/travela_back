@@ -5,6 +5,7 @@ export default class ErrorBoundaryValidator {
     req.checkBody('link', 'The browser location link cannot be empty').notEmpty();
     req.checkBody('stackTrace', 'The stack trace is required').notEmpty();
     req.checkBody('stackTraceId', 'The stack trace id is required').notEmpty();
+    req.checkBody('info', 'The error information is required').notEmpty();
 
     const { body: { stackTraceId } } = req;
     if (global.crashReports.includes(stackTraceId)) {

@@ -77,7 +77,7 @@ export default class dynamicChecklistValidator {
         message: `${existingDestinations[0]} already exist as a destination to this origin`,
         errors: {
           destinations: {
-            message: 'Sorry, a checklist with this origin and destination already exists',
+            message: 'Some of the destinations already exist',
             meta: {
               destinations: existingDestinations,
               origin: country || region
@@ -93,7 +93,7 @@ export default class dynamicChecklistValidator {
     if (!Object.keys(req.body).length) {
       return res.status(400).json({
         success: false,
-        message: 'Checklist wizard must contain origin, destinations and config keys',
+        message: 'req.body must contains origin, destinations and config keys',
       });
     }
 
@@ -103,7 +103,7 @@ export default class dynamicChecklistValidator {
       if (!Object.prototype.hasOwnProperty.call(req.body, item)) {
         return res.status(400).json({
           success: false,
-          message: 'Checklist wizard must contain only origin, destinations and config keys',
+          message: 'req.body must contains only origin, destinations and config keys',
         });
       }
     });
@@ -185,20 +185,15 @@ export default class dynamicChecklistValidator {
 
     if (!config || !config.length) {
       valid = false;
-      message = 'Config must not be empty';
+      message = 'Config must be present';
     }
 
-    if (typeof config !== 'object') {
-      valid = false;
-      message = 'Config must be an array';
-    } else {
-      config.forEach((item) => {
-        if (typeof item !== 'object') {
-          valid = false;
-          message = 'Config value must be an object';
-        }
-      });
-    }
+    config.forEach((item) => {
+      if (typeof item !== 'object') {
+        valid = false;
+        message = 'Config value must be an object';
+      }
+    });
 
     if (!valid) {
       return res.status(400).json({

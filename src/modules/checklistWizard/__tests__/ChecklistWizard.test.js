@@ -9,8 +9,6 @@ import {
   user,
   checklistData,
   checklistData2,
-  updateChecklistData,
-  updateChecklistData2,
   travelRegion,
   checklistDataInvalidKeys,
   checklistDataInvalidOrigin,
@@ -22,8 +20,6 @@ import {
 const request = supertest(app);
 const token = Utils.generateTestToken(payload);
 const url = '/api/v1/dynamic/checklist';
-
-let checklistId;
 
 describe('Checklist wizard test', () => {
   beforeAll(async () => {
@@ -49,15 +45,13 @@ describe('Checklist wizard test', () => {
         .send(checklistData)
         .end((err, res) => {
           if (err) return done(err);
-          const { newChecklist: { id } } = res.body;
-          checklistId = id;
           expect(res.body.success).toEqual(true);
           expect(res.body.message).toEqual('Checklist created successfully');
           done();
         });
     });
 
-  it('should throw an error checklist realationship already exist',
+  it('should throw an error checklist realtionship already exist',
     (done) => {
       request
         .post(url)
@@ -66,7 +60,7 @@ describe('Checklist wizard test', () => {
         .end((err, res) => {
           if (err) return done(err);
           expect(res.body.success).toEqual(false);
-          expect(res.body.errors.destinations.message).toEqual('Sorry, a checklist with this origin and destination already exists');
+          expect(res.body.errors.destinations.message).toEqual('Some of the destinations already exist');
           done();
         });
     });
@@ -79,8 +73,6 @@ describe('Checklist wizard test', () => {
         .send(checklistData2)
         .end((err, res) => {
           if (err) return done(err);
-          const { newChecklist: { id } } = res.body;
-          checklistId = id;
           expect(res.body.success).toEqual(true);
           expect(res.body.message).toEqual('Checklist created successfully');
           done();
@@ -96,7 +88,7 @@ describe('Checklist wizard test', () => {
         .end((err, res) => {
           if (err) return done(err);
           expect(res.body.success).toEqual(false);
-          expect(res.body.message).toEqual('Checklist wizard must contain origin, destinations and config keys');
+          expect(res.body.message).toEqual('req.body must contains origin, destinations and config keys');
           done();
         });
     });
@@ -138,7 +130,7 @@ describe('Checklist wizard test', () => {
         .end((err, res) => {
           if (err) return done(err);
           expect(res.body.success).toEqual(false);
-          expect(res.body.message).toEqual('Checklist wizard must contain only origin, destinations and config keys');
+          expect(res.body.message).toEqual('req.body must contains only origin, destinations and config keys');
           done();
         });
     });
@@ -273,7 +265,7 @@ describe('Checklist wizard test', () => {
         .end((err, res) => {
           if (err) return done(err);
           expect(res.body.success).toEqual(false);
-          expect(res.body.message).toEqual('Config must not be empty');
+          expect(res.body.message).toEqual('Config must be present');
           done();
         });
     });
@@ -292,167 +284,15 @@ describe('Checklist wizard test', () => {
           done();
         });
     });
-  
+
   it('should return all checklists', (done) => {
     request
       .get(url)
       .set('authorization', token)
       .end((err, res) => {
         if (err) return done(err);
-        expect(res.body.success).toEqual(true);
-        done();
-      });
-  });
-
-  it('should return a single checklist', (done) => {
-    request
-      .get(`${url}/${checklistId}`)
-      .set('authorization', token)
-      .end((err, res) => {
-        if (err) return done(err);
-        expect(res.body.success).toEqual(true);
-        done();
-      });
-  });
-
-  it('should throw an error if checklist does not exist', (done) => {
-    request
-      .get(`${url}/${1000}`)
-      .set('authorization', token)
-      .end((err, res) => {
-        if (err) return done(err);
-        expect(res.body.message).toEqual('Checklist item not found');
-        done();
-      });
-  });
-
-  it('should delete a specific checklist', (done) => {
-    request
-      .delete(`${url}/${checklistId}`)
-      .set('authorization', token)
-      .end((err, res) => {
-        if (err) return done(err);
-        expect(res.body.success).toEqual(true);
-        done();
-      });
-  });
-
-  it('should throw an error if checklist does not exist', (done) => {
-    request
-      .delete(`${url}/${100}`)
-      .set('authorization', token)
-      .end((err, res) => {
-        if (err) return done(err);
-        expect(res.body.message).toEqual('Checklist item not found');
-        done();
-      });
-  });
-
-  it('should get all deleted checklist', (done) => {
-    request
-      .get(`${url}/deleted`)
-      .set('authorization', token)
-      .end((err, res) => {
-        if (err) return done(err);
-        expect(res.body.success).toEqual(true);
-        done();
-      });
-  });
-
-  it('should restore a deleted checklist', (done) => {
-    request
-      .patch(`${url}/restore/${checklistId}`)
-      .set('authorization', token)
-      .end((err, res) => {
-        if (err) return done(err);
-        expect(res.body.success).toEqual(true);
-        done();
-      });
-  });
-
-  it('should throw an error if checklist does not exist', (done) => {
-    request
-      .patch(`${url}/restore/${100}`)
-      .set('authorization', token)
-      .end((err, res) => {
-        if (err) return done(err);
-        expect(res.body.message).toEqual('Checklist item not found');
-        done();
-      });
-  });
-
-  it('should delete a specific checklist again', (done) => {
-    request
-      .delete(`${url}/${checklistId}`)
-      .set('authorization', token)
-      .end((err, res) => {
-        if (err) return done(err);
-        expect(res.body.success).toEqual(true);
-        done();
-      });
-  });
-
-  it('should restore all deleted checklist', (done) => {
-    request
-      .patch(`${url}/restore`)
-      .set('authorization', token)
-      .end((err, res) => {
-        if (err) return done(err);
-        expect(res.body.success).toEqual(true);
-        done();
-      });
-  });
-
-  it('should throw an error if checklist does not exist', (done) => {
-    request
-      .patch(`${url}/restore`)
-      .set('authorization', token)
-      .end((err, res) => {
-        if (err) return done(err);
-        expect(res.body.message).toEqual(
-          'There is no deleted checklist at the moment'
-        );
-        done();
-      });
-  });
-});
-
-describe('update a checklist', () => {
-  it('should update a checklist with region as origin and regions as destinations', (done) => {
-    request
-      .patch(`${url}/${checklistId}`)
-      .set('authorization', token)
-      .send(updateChecklistData)
-      .end((err, res) => {
-        if (err) return done(err);
-        expect(res.body.success).toEqual(true);
-        expect(res.body.message).toEqual('Checklist updated successfully');
-        done();
-      });
-  });
-
-  it('should update a checklist with country as origin and countries as destination', (done) => {
-    request
-      .patch(`${url}/${checklistId}`)
-      .set('authorization', token)
-      .send(updateChecklistData2)
-      .end((err, res) => {
-        if (err) return done(err);
-        expect(res.body.success).toEqual(true);
-        expect(res.body.message).toEqual('Checklist updated successfully');
-        done();
-      });
-  });
-
-  it('should return error if checklist to be updated does not exist', (done) => {
-    request
-      .patch(`${url}/${100}`)
-      .set('authorization', token)
-      .send(updateChecklistData)
-      .end((err, res) => {
-        if (err) return done(err);
-        expect(res.body.success).toEqual(false);
-        expect(res.body.message).toEqual('Checklist item not found');
+        expect(res.body.checklists).toHaveLength(2);
+        expect(res.body.checklists[1].origin[0].country.country).toEqual('Nigeria');
         done();
       });
   });
@@ -464,7 +304,7 @@ describe('update a checklist', () => {
       .end((err, res) => {
         if (err) return done(err);
         expect(res.body.message).toEqual('Successfully retrieved checklist');
-        expect(res.body.checklists[0].name).toEqual('Nigeria-Uganda');
+        expect(res.body.checklists[0].name).toEqual('Nigeria-Kenya');
         done();
       });
   });

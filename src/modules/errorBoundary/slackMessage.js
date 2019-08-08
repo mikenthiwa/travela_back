@@ -4,7 +4,9 @@ const environment = process.env.NODE_ENV;
 
 const atChannel = environment === 'production' ? '@channel' : '';
 
-export default ({ stackTrace, link, stackTraceId }) => ({
+export default ({
+  stackTrace, userAgent, message, link, stackTraceId
+}) => ({
   text: `Travela ${environment} crash alert`,
   blocks: [
     {
@@ -34,6 +36,13 @@ export default ({ stackTrace, link, stackTraceId }) => ({
       type: 'section',
       text: {
         type: 'mrkdwn',
+        text: `:internet-explorer: *${userAgent}* :internet-explorer:`
+      }
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
         text: `*Stack Trace* - \`${stackTraceId}\``
       }
     },
@@ -41,7 +50,7 @@ export default ({ stackTrace, link, stackTraceId }) => ({
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: `\`\`\`${stackTrace}\`\`\``
+        text: `\`\`\`${message}\n${stackTrace}\`\`\``
       }
     }
   ]

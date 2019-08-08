@@ -14,8 +14,10 @@ module.exports = {
       references: {
         model: 'Checklists',
         key: 'id',
-        as: 'checklist'
-      }
+        as: 'checklist',
+      },
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE'
     },
     countryId: {
       type: Sequelize.INTEGER,

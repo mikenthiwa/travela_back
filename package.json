@@ -73,6 +73,7 @@
     "jwt-decode": "^2.2.0",
     "lodash": "^4.17.11",
     "mailgun-js": "^0.21.0",
+    "mock-request": "^0.1.2",
     "moment": "^2.22.2",
     "morgan": "^1.9.0",
     "moxios": "^0.4.0",
@@ -86,6 +87,7 @@
     "sequelize": "^4.39.0",
     "shortid": "^2.2.13",
     "socket.io": "^2.1.1",
+    "stacktrace-gps": "^3.0.2",
     "stream-mock": "^2.0.2"
   },
   "jest": {

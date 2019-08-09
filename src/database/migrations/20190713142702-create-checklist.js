@@ -11,10 +11,8 @@ module.exports = {
       references: {
         model: 'Users',
         key: 'userId',
-        as: 'user',
-      },
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE'
+        as: 'user'
+      }
     },
     name: {
       type: Sequelize.STRING
@@ -29,12 +27,7 @@ module.exports = {
     updatedAt: {
       allowNull: false,
       type: Sequelize.DATE
-    },
-    deletedAt: {
-      allowNull: true,
-      type: Sequelize.DATE,
-      paranoid: true
-    },
+    }
   }),
   down: queryInterface => queryInterface.dropTable('Checklists')
 };

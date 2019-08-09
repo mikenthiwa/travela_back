@@ -22,9 +22,7 @@ export default (sequelize, DataTypes) => {
   ChecklistDestinations.associate = (models) => {
     ChecklistDestinations.belongsTo(models.Checklist, {
       foreignKey: 'checklistId',
-      as: 'checklist',
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE'
+      as: 'checklist'
     });
     
     ChecklistDestinations.belongsTo(models.Country, {

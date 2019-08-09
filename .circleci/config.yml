@@ -154,23 +154,32 @@ workflows:
   test_build_deploy:
     jobs:
       - checkout_code
+      - approve_build: 
+          type: approval 
+          requires: 
+            - checkout_code
       - run_vulnerability_check:
           requires:
+            - approve_build
             - checkout_code
       - test_and_report:
           requires:
+            - approve_build
             - checkout_code
       - build_application_artifacts:
           requires:
+            - approve_build
             - run_vulnerability_check
             - test_and_report
             - checkout_code
       - deploy:
           requires:
+            - approve_build
             - build_application_artifacts
           <<: *filters
       - deploy-qa:
           requires:
+            - approve_build
             - build_application_artifacts
           filters:
             branches:

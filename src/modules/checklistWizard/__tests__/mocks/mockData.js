@@ -66,6 +66,54 @@ export const checklistData = {
   ]
 };
 
+export const updateChecklistData = {
+  origin: { region: 'East Africa' },
+  destinations: { regions: ['West Africa'] },
+  config: [
+    {
+      order: 1,
+      prompt: 'Do you have a passport',
+      type: 'image',
+      url: '',
+      configuration: {
+        options: [],
+        url: '',
+        behaviour: {
+          name: 'preview image',
+          action: {
+            type: 'PREVIEW_IMAGE',
+            payload: 'http://url'
+          }
+        }
+      }
+    }
+  ]
+};
+
+export const updateChecklistData2 = {
+  origin: { country: 'Nigeria' },
+  destinations: { countries: ['Ghana'] },
+  config: [
+    {
+      order: 1,
+      prompt: 'Do you have a passport',
+      type: 'image',
+      url: '',
+      configuration: {
+        options: [],
+        url: '',
+        behaviour: {
+          name: 'preview image',
+          action: {
+            type: 'PREVIEW_IMAGE',
+            payload: 'http://url'
+          }
+        }
+      }
+    }
+  ]
+};
+
 export const checklistData2 = {
   origin: { country: 'Nigeria' },
   destinations: { countries: ['Kenya', 'Uganda', 'USA'] },

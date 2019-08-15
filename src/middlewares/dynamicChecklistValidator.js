@@ -6,6 +6,7 @@ export default class dynamicChecklistValidator {
     const existingDestinations = [];
     await Promise.all(destinationsArray.map(async (destination) => {
       const checklist = await models.Checklist.findOne({
+        paranoid: false,
         include: [{
           model: models.ChecklistOrigin,
           as: 'origin',

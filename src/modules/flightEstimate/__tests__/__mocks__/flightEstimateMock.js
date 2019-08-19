@@ -94,9 +94,8 @@ const flightEstimate = [{
   createdAt: new Date(),
   updatedAt: new Date(),
   createdBy: '-MUnaemKrxA90lPNQs1FOLNp',
-  originRegion: 'North America',
-  originCountry: '',
-  destinationCountry: 'Nigeria',
+  originRegionId: 1002,
+  destinationCountryId: 23456,
 },
 {
   id: 32249,
@@ -104,12 +103,9 @@ const flightEstimate = [{
   createdAt: new Date(),
   updatedAt: new Date(),
   createdBy: '-MUnaemKrxA90lPNQs1FOLNp',
-  originRegion: 'Default Region',
-  originCountry: '',
-  destinationRegion: 'Default Region',
-  destinationCountry: ''
+  originRegionId: 1001,
+  destinationRegionId: 1002,
 }];
-
 
 export default {
   userMock,

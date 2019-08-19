@@ -89,11 +89,10 @@ describe('Flight Estimate', () => {
       id: 1,
       amount: 233,
       createdBy: '-MUnaemKrxA90lPNQs1FOLNp',
-      originCountry: 'Nigeria',
-      destinationCountry: 'Uganda',
-      originRegion: null,
-      destinationRegion: null,
-      deletedAt: null
+      destinationCountryId: 23456,
+      deletedAt: null,
+      originRegionId: null,
+      destinationRegionId: null
     });
   });
   it('should return an error message for already existing flight estimate', async () => {
@@ -162,74 +161,36 @@ describe('Flight Estimate', () => {
     expect(res.status).toEqual(200);
     expect(res.body).toMatchObject({
       success: true,
-      totalEstimates: 3,
-      numberOfPages: 1,
       message: 'Flight Estimates fetched successfully',
       flightEstimates: [
         {
-          id: 32242,
-          originRegion: 'North America',
+          originCountry: null,
+          destinationCountry: 'Uganda',
+          originRegion: 'West Africa',
           destinationRegion: null,
-          originCountry: '',
-          destinationCountry: 'Nigeria',
-          createdBy: '-MUnaemKrxA90lPNQs1FOLNp',
           amount: 735,
-          deletedAt: null,
+          id: 32242
         },
         {
-          id: 32249,
-          originRegion: 'Default Region',
-          destinationRegion: 'Default Region',
-          originCountry: '',
-          destinationCountry: '',
-          createdBy: '-MUnaemKrxA90lPNQs1FOLNp',
-          amount: 750,
-          deletedAt: null,
-        },
-        {
-          id: 1,
-          originRegion: null,
-          destinationRegion: null,
           originCountry: 'Nigeria',
           destinationCountry: 'Uganda',
-          createdBy: '-MUnaemKrxA90lPNQs1FOLNp',
-          amount: 233,
-          deletedAt: null,
-        }
-      ]
-    });
-  });
-  it('should get all flight estimates with pagination', async () => {
-    const res = await request
-      .get(`${url}/?page=1&limit=1`)
-      .set('authorization', token);
-    expect(res.status).toEqual(200);
-    expect(res.body).toMatchObject({
-      success: true,
-      totalEstimates: 3,
-      estimatesOnPage: '1',
-      currentPage: '1',
-      numberOfPages: 3,
-      message: 'Flight Estimates fetched successfully',
-      flightEstimates: [
-        {
-          id: 32242,
-          originRegion: 'North America',
+          originRegion: null,
           destinationRegion: null,
-          originCountry: '',
-          destinationCountry: 'Nigeria',
-          createdBy: '-MUnaemKrxA90lPNQs1FOLNp',
-          amount: 735,
-          deletedAt: null,
-          creator: {
-            fullName: 'Kayode Okunlade',
-            id: 20000,
-          },
+          amount: 233,
+          id: 1
+        },
+        {
+          originCountry: null,
+          destinationCountry: null,
+          originRegion: 'East Africa',
+          destinationRegion: 'West Africa',
+          amount: 750,
+          id: 32249
         }
       ]
     });
   });
-
+  
   it('should get a particular flight estimate by id', async () => {
     const res = await request
       .get(`${url}/1`)
@@ -239,13 +200,12 @@ describe('Flight Estimate', () => {
       success: true,
       flightEstimate: {
         id: 1,
-        originRegion: null,
-        destinationRegion: null,
-        originCountry: 'Nigeria',
-        destinationCountry: 'Uganda',
         createdBy: '-MUnaemKrxA90lPNQs1FOLNp',
         amount: 233,
         deletedAt: null,
+        originRegionId: null,
+        destinationCountryId: 23456,
+        destinationRegionId: null,
         creator: {
           id: 20000,
           fullName: 'Kayode Okunlade',

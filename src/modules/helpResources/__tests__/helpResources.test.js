@@ -59,7 +59,6 @@ describe('Help Resources Controller', () => {
     await models.Role.bulkCreate(role);
     await models.UserRole.bulkCreate(userRole);
   });
-
   it('should create a resource successfully',
     (done) => {
       request
@@ -73,6 +72,18 @@ describe('Help Resources Controller', () => {
           done();
         });
     });
+  it('should create a resource successfully', (done) => {
+    request
+      .post('/api/v1/_help')
+      .set('authorization', admin)
+      .send({ link: 'Travel FAQ', address: 'www.google.com/andela.com/' })
+      .end((err, res) => {
+        if (err) return done(err);
+        expect(res.body.success).toEqual(true);
+        expect(res.body.message).toEqual('Resource created successfully');
+        done();
+      });
+  });
   it('should not create a resource that already exists', (done) => {
     request
       .post('/api/v1/_help')

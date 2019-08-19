@@ -16,7 +16,7 @@ export default class DocumentsController {
         message: 'Document uploaded successfully',
         addedDocument
       });
-    } catch (error) {
+    } catch (error) { /* istanbul ignore next */
       CustomError.handleError(error.message, 500, res);
     }
   }

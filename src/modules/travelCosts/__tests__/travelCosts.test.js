@@ -95,12 +95,23 @@ describe('GET /travelCosts', () => {
         estimate: 750
       });
     await request(app)
+      .post('/api/v1/flightEstimate')
+      .set('authorization', superAdminToken)
+      .send({
+        flightEstimate: '233',
+        originCountry: 'Portugal',
+        destinationCountry: 'Nigeria'
+        
+      });
+
+    await request(app)
       .post('/api/v1/hotelEstimate')
       .set('authorization', superAdminToken)
       .send({
         travelRegion: 'Europe',
         estimate: 750
       });
+
     request(app)
       .get(
         `/api/v1/travelCosts?${queryParams}`
@@ -110,6 +121,15 @@ describe('GET /travelCosts', () => {
         expect(res.status).toEqual(200);
         expect(res.body.success).toEqual(true);
         expect(res.body.message).toEqual('Travel Costs retrieved successfully');
+        expect(res.body).toMatchObject({
+          success: true,
+          message: 'Travel Costs retrieved successfully',
+          flightCosts: [{
+            cost: 233,
+            destination: 'Nigeria',
+            origin: 'Portugal',
+          }]
+        });
         done();
       });
   });

@@ -20,6 +20,7 @@ export default class TestSetup {
     const destroy = { force: true, truncate: true, cascade: true };
     await models.FlightEstimate.destroy(destroy);
     await models.TravelRegions.destroy(destroy);
+    await models.Country.destroy(destroy);
     await models.UserRole.destroy(destroy);
     await models.Role.destroy(destroy);
     await models.User.destroy(destroy);

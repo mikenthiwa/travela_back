@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import models from '../../database/models';
 import CustomError from '../../helpers/Error';
 
@@ -9,14 +10,33 @@ export default class FlightEstimateController {
       },
       user: { UserInfo: { id: createdBy } }
     } = req;
-
+    
     const origin = userInput.originCountry || userInput.originRegion;
     const destination = userInput.destinationCountry || userInput.destinationRegion;
-
     try {
+      const originCountryId = await FlightEstimateController
+        .getCountryId(userInput.originCountry);
+      const originRegionId = await FlightEstimateController
+        .getRegionId(userInput.originRegion);
+      const destinationCountryId = await FlightEstimateController
+        .getCountryId(userInput.destinationCountry);
+      const destinationRegionId = await FlightEstimateController
+        .getRegionId(userInput.destinationRegion);
+        
+      const removeNull = object => _.pickBy(object);
+
+      const locations = removeNull({
+        originCountryId,
+        originRegionId,
+        destinationCountryId,
+        destinationRegionId
+      });
       const [newFlightEstimate, isCreated] = await models.FlightEstimate.findOrCreate({
-        where: { ...userInput },
-        defaults: { amount: flightEstimate, createdBy }
+        where: locations,
+        defaults: {
+          amount: flightEstimate,
+          createdBy,
+        }
       });
       
 
@@ -40,34 +60,19 @@ export default class FlightEstimateController {
   }
 
   static async getAllFlightEstimates(req, res) {
-    const { query: { page, limit } } = req;
-    const offset = page ? limit * (page - 1) : null;
-
     try {
-      const { count, rows } = await models.FlightEstimate.findAndCountAll({
-        include: [{
-          model: models.User,
-          as: 'creator',
-          attributes: ['fullName', 'id']
-        }],
-        offset,
-        limit
-      });
-      const numberOfPages = limit ? (Math.ceil(count / limit)) : 1;
+      const flightEstimates = await FlightEstimateController.allFlightEstimates();
       return res.status(200).json({
         success: true,
-        totalEstimates: count,
-        estimatesOnPage: limit,
-        currentPage: page,
-        numberOfPages,
         message: 'Flight Estimates fetched successfully',
-        flightEstimates: rows
+        flightEstimates
       });
     } catch (err) {
-      /* istanbul ignore next */
+    /* istanbul ignore next */
       CustomError.handleError(err.message, 400, res);
     }
   }
+
 
   static async getOneFlightEstimate(req, res) {
     const { params: { id } } = req;
@@ -141,5 +146,71 @@ export default class FlightEstimateController {
       /* istanbul ignore next */
       CustomError.handleError(err.message, 400, res);
     }
+  }
+
+  static async getCountryId(country) {
+    if (country) {
+      const [checkedCountry] = await models.Country.findOrCreate({
+        where: { country },
+        defaults: { regionId: 9999 },
+        attributes: ['id']
+      });
+      return checkedCountry.id;
+    }
+  }
+
+  static async getRegionId(travelRegion) {
+    if (travelRegion) {
+      const [region] = await models.TravelRegions.findOrCreate({
+        where: { region: travelRegion },
+        attributes: ['id']
+      });
+      return region.id;
+    }
+  }
+
+  static async allFlightEstimates() {
+    const { rows } = await models.FlightEstimate.findAndCountAll({
+      include: [{
+        model: models.User,
+        as: 'creator',
+        attributes: ['id', 'fullName']
+      },
+      {
+        model: models.Country,
+        as: 'originCountry',
+        include: [{
+          model: models.TravelRegions,
+          as: 'region'
+        }]
+      },
+      {
+        model: models.TravelRegions,
+        as: 'originRegion',
+        attributes: ['region', 'id']
+      },
+      {
+        model: models.Country,
+        as: 'destinationCountry',
+        include: [{
+          model: models.TravelRegions,
+          as: 'region'
+        }]
+      },
+      {
+        model: models.TravelRegions,
+        as: 'destinationRegion',
+        attributes: ['region', 'id']
+      }],
+    });
+    const flightEstimates = rows.map(flightEstimate => ({
+      originCountry: flightEstimate.originCountry && flightEstimate.originCountry.country,
+      destinationCountry: flightEstimate.destinationCountry && flightEstimate.destinationCountry.country,
+      originRegion: flightEstimate.originRegion && flightEstimate.originRegion.region,
+      destinationRegion: flightEstimate.destinationRegion && flightEstimate.destinationRegion.region,
+      amount: flightEstimate.amount,
+      id: flightEstimate.id
+    }));
+    return flightEstimates;
   }
 }

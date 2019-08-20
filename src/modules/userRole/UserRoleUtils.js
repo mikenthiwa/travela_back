@@ -213,6 +213,11 @@ class UserRoleUtils {
           as: 'budgetCheckerDepartments',
           attributes: ['id', 'name'],
           through: { attributes: [] },
+        },
+        {
+          model: models.TravelReadinessDocuments,
+          as: 'travelDocuments',
+          attributes: ['id', 'type'],
         }
       ]
     });

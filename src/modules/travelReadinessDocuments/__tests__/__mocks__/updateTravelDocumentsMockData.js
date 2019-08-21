@@ -96,7 +96,7 @@ export const documentsSeeder = [
   },
   {
     id: 'pk42DLnujg',
-    type: 'other',
+    type: 'yellow fever document',
     data: {
       name: 'Autograph',
       dateOfIssue: '02-01-2018',
@@ -109,7 +109,7 @@ export const documentsSeeder = [
   },
   {
     id: 'pk42Dr90ops',
-    type: 'other',
+    type: 'yellow fever document',
     data: {
       name: 'Permit',
       dateOfIssue: '02-01-2018',
@@ -158,7 +158,7 @@ export const existingPassportData = {
 };
 
 export const existingOtherData = {
-  other:
+  'yellow fever document':
     {
       name: 'Autograph',
       dateOfIssue: '02-01-2018',

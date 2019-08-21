@@ -28,6 +28,7 @@ import FlightRouter from './flightEstimate/index';
 import checklistWizard from './checklistWizard';
 import NoPassportRouter from './onboarding';
 import errorBoundaryRouter from './errorBoundary';
+import DocumentTypesRouter from './documentTypes';
 
 const apiPrefix = '/api/v1';
 
@@ -62,7 +63,8 @@ const routes = [
   FlightRouter,
   checklistWizard,
   NoPassportRouter,
-  errorBoundaryRouter
+  errorBoundaryRouter,
+  DocumentTypesRouter,
 ];
 export default (app) => {
   routes.forEach(route => app.use(apiPrefix, route));

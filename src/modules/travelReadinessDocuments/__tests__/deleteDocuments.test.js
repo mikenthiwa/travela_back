@@ -10,6 +10,7 @@ import {
   travelAdmin,
   travelAdminPayload,
   travelAdminRole,
+  documentTypes,
 } from './__mocks__';
 
 const request = supertest;
@@ -23,6 +24,7 @@ const clearDatabase = async () => {
   await models.TravelReadinessDocuments.destroy({ force: true, truncate: { cascade: true } });
   await models.UserRole.destroy({ force: true, truncate: { cascade: true } });
   await models.Center.destroy({ force: true, truncate: { cascade: true } });
+  await models.DocumentTypes.destroy({ force: true, truncate: { cascade: true } });
 };
 
 describe('delete visa documents', () => {
@@ -47,6 +49,7 @@ describe('delete visa documents', () => {
     await models.User.create(travelTeamMember);
     await models.Center.bulkCreate(centers);
     await models.UserRole.create(travelTeamMemberRole);
+    await models.DocumentTypes.bulkCreate(documentTypes);
   });
 
   afterAll(async () => {

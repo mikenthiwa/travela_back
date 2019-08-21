@@ -4,14 +4,13 @@ import Utils from '../../../helpers/Utils';
 import models from '../../../database/models';
 import { role } from '../../userRole/__tests__/mocks/mockData';
 import {
-  usersData, requesterPayload, requester, requesterRole, travelAdmin, travelAdminRole
+  usersData, requesterPayload, requester, requesterRole, travelAdmin, travelAdminRole, documentTypes,
 } from './__mocks__';
 import {
   documentsSeeder,
   documentUpdateData,
   existingVisaData,
   existingPassportData,
-  existingOtherData,
 } from './__mocks__/updateTravelDocumentsMockData';
 
 const requesterToken = Utils.generateTestToken(requesterPayload);
@@ -22,6 +21,7 @@ const setUp = async () => {
   await models.Comment.destroy({ force: true, truncate: { cascade: true } });
   await models.TravelReadinessDocuments.destroy({ force: true, truncate: { cascade: true } });
   await models.User.destroy({ force: true, truncate: { cascade: true } });
+  await models.DocumentTypes.destroy({ force: true, truncate: { cascade: true } });
 };
 
 describe('TravelReadiness Controller', () => {
@@ -33,6 +33,7 @@ describe('TravelReadiness Controller', () => {
     await models.UserRole.bulkCreate(travelAdminRole);
     await models.User.create(requester);
     await models.UserRole.create(requesterRole);
+    await models.DocumentTypes.bulkCreate(documentTypes);
     await models.TravelReadinessDocuments.bulkCreate(documentsSeeder);
   });
 
@@ -112,23 +113,6 @@ describe('TravelReadiness Controller', () => {
           expect(res.body.success).toEqual(false);
           expect(res.body.errors[0].message)
             .toEqual('You already have a passport with the same number');
-          if (err) return done(err);
-          done();
-        });
-    });
-
-    it(`should throw an error message when a user tries to update unique values 
-    already existing in another record (for other documents)`, (done) => {
-      request(app)
-        .put('/api/v1/travelreadiness/documents/pk42Dr90ops')
-        .set('Content-Type', 'application/json')
-        .set('authorization', requesterToken)
-        .send(existingOtherData)
-        .end((err, res) => {
-          expect(res.statusCode).toEqual(409);
-          expect(res.body.success).toEqual(false);
-          expect(res.body.errors[0].message)
-            .toEqual('You already have a document with the same name');
           if (err) return done(err);
           done();
         });

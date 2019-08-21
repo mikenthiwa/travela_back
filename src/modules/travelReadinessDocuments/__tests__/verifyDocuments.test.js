@@ -11,6 +11,7 @@ import {
   travelAdmin,
   travelAdminPayload,
   travelAdminRole,
+  documentTypes,
 } from './__mocks__';
 
 const request = supertest;
@@ -21,6 +22,7 @@ const prepareDatabase = async () => {
   await models.Role.destroy({ force: true, truncate: { cascade: true } });
   await models.TravelReadinessDocuments.destroy({ force: true, truncate: { cascade: true } });
   await models.User.destroy({ force: true, truncate: { cascade: true } });
+  await models.DocumentTypes.destroy({ force: true, truncate: { cascade: true } });
 };
 
 describe('verify visa documents', () => {
@@ -34,6 +36,7 @@ describe('verify visa documents', () => {
     await models.Role.bulkCreate(role);
     await models.User.create(travelAdmin);
     await models.UserRole.bulkCreate(travelAdminRole);
+    await models.DocumentTypes.bulkCreate(documentTypes);
   });
 
   afterAll(async () => {

@@ -13,7 +13,7 @@ import {
   guestHouse,
   userData
 } from './mocks/mockData';
-import { documentsData } from './__mocks__/mockData';
+import { documentsData, documentTypes } from './__mocks__/mockData';
 import TravelChecklistController from '../TravelChecklistController';
 
 class Error {
@@ -52,6 +52,7 @@ describe('Travel Checklist Submission', () => {
       await models.ChecklistItem.sync({ force: true });
       await models.Comment.destroy({ force: true, truncate: { cascade: true } });
       await models.TravelReadinessDocuments.destroy({ force: true, truncate: { cascade: true } });
+      await models.DocumentTypes.destroy({ force: true, truncate: { cascade: true } });
       await models.Request.destroy({ force: true, truncate: { cascade: true } });
       await models.Trip.sync({ force: true });
       await models.User.sync({ force: true, truncate: { cascade: true } });
@@ -63,6 +64,7 @@ describe('Travel Checklist Submission', () => {
       await models.Bed.bulkCreate(bedData);
       await models.Trip.bulkCreate(tripsMock);
       await models.ChecklistItem.create(checklist);
+      await models.DocumentTypes.bulkCreate(documentTypes);
       await models.TravelReadinessDocuments.bulkCreate(documentsData);
       await models.ChecklistSubmission.create(checklistSubmission);
     });
@@ -277,6 +279,7 @@ describe('Travel Checklist Submission', () => {
       await models.ChecklistItem.sync({ force: true });
       await models.Comment.destroy({ force: true, truncate: { cascade: true } });
       await models.TravelReadinessDocuments.destroy({ force: true, truncate: { cascade: true } });
+      await models.DocumentTypes.destroy({ force: true, truncate: { cascade: true } });
       await models.Request.destroy({ force: true, truncate: { cascade: true } });
       await models.Trip.sync({ force: true });
       await models.User.destroy({ force: true, truncate: { cascade: true } });
@@ -288,6 +291,7 @@ describe('Travel Checklist Submission', () => {
       await models.Bed.bulkCreate(bedData);
       await models.Trip.bulkCreate(tripsMock);
       await models.ChecklistItem.create(checklist);
+      await models.DocumentTypes.bulkCreate(documentTypes);
       await models.TravelReadinessDocuments.bulkCreate(documentsData);
       await models.ChecklistSubmission.create(checklistSubmission);
     });

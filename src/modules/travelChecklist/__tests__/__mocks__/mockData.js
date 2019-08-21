@@ -928,3 +928,17 @@ export const commentMock = {
   documentId: null,
   userId: 10,
 };
+
+export const documentTypes = [{
+  name: 'passport',
+  createdAt: new Date(),
+  updatedAt: new Date(),
+}, {
+  name: 'visa',
+  createdAt: new Date(),
+  updatedAt: new Date(),
+}, {
+  name: 'yellow fever document',
+  createdAt: new Date(),
+  updatedAt: new Date(),
+}];

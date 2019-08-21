@@ -210,7 +210,10 @@ const middleware = {
   },
   ErrorBoundaryValidator: {
     validateCrashReport: jest.fn(invokeNextMiddleware)
-  }
+  },
+  documentTypeValidator: {
+    verifyBody: jest.fn(invokeNextMiddleware),
+  },
 };
 
 export default middleware;

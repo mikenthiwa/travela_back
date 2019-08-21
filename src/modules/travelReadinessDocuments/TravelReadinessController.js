@@ -21,7 +21,7 @@ export default class TravelReadinessController {
     const documentTypes = {
       passport: 'passport',
       visa: 'visa',
-      other: 'other',
+      other: 'other'
     };
     const document = Object.keys(documentTypes).find(type => req.body[type]);
     return { document, documentTypes };
@@ -40,14 +40,14 @@ export default class TravelReadinessController {
     try {
       let newDocument;
 
-      const { document, documentTypes } = await TravelReadinessController.getDocumentType(req);
+      const { document, documentTypes } = TravelReadinessController.getDocumentType(req);
       if (document) {
         const data = req.body[document];
         const newData = { ...data };
         TravelReadinessController.trimData(newData);
         newDocument = {
           id: Utils.generateUniqueId(),
-          type: documentTypes[document],
+          type: document === 'other' ? data.name : documentTypes[document],
           data: newData,
           userId: req.user.UserInfo.id
         };
@@ -235,7 +235,7 @@ export default class TravelReadinessController {
       const updateData = { ...data };
       TravelReadinessController.trimData(updateData);
       const documentUpdate = {
-        type: documentTypes[document],
+        type: document === 'other' ? data.name : documentTypes[document],
         data: updateData,
       };
 

@@ -43,6 +43,8 @@ describe('Comments controller', () => {
     await models.User.destroy({ truncate: true, cascade: true });
     await models.User.create(mockData.userMock);
     await models.Request.bulkCreate(mockData.requestsMock);
+    await models.DocumentTypes.destroy({ truncate: true, cascade: true });
+    await models.DocumentTypes.bulkCreate(mockData.documentTypes);
     await models.TravelReadinessDocuments.destroy({ truncate: true, cascade: true });
     await models.TravelReadinessDocuments.create(mockData.documentMock);
     request
@@ -57,6 +59,7 @@ describe('Comments controller', () => {
     await models.Request.destroy({ truncate: true, force: true, cascade: true });
     await models.Comment.destroy({ truncate: true, force: true, cascade: true });
     await models.TravelReadinessDocuments.destroy({ truncate: true, force: true, cascade: true });
+    await models.DocumentTypes.destroy({ truncate: true, cascade: true });
     await models.UserRole.destroy({ truncate: true, force: true, cascade: true });
     await models.User.destroy({ truncate: true, force: true, cascade: true });
     await models.Role.destroy({ truncate: true, force: true, cascade: true });

@@ -9,7 +9,8 @@ import {
   usersData,
   travelAdminRole,
   requester,
-  requesterRole
+  requesterRole,
+  documentTypes,
 } from '../../travelReadinessDocuments/__tests__/__mocks__/index';
 import {
   reminderPayloadTwo,
@@ -24,6 +25,7 @@ const setup = async () => {
   await models.Condition.destroy({ force: true, truncate: { cascade: true } });
   await models.Reminder.destroy({ force: true, truncate: { cascade: true } });
   await models.User.destroy({ force: true, truncate: { cascade: true } });
+  await models.DocumentTypes.destroy({ force: true, truncate: { cascade: true } });
 };
 
 let conditonIdTwo;
@@ -37,6 +39,7 @@ describe('reminderEmails', () => {
     await models.User.create(requester);
     await models.UserRole.create(requesterRole);
     await models.User.bulkCreate(usersData);
+    await models.DocumentTypes.bulkCreate(documentTypes);
     await models.TravelReadinessDocuments.bulkCreate(documentsData);
     await models.ReminderEmailTemplate.bulkCreate(reminderTemplates);
     const { conditionName, documentType } = reminderPayloadTwo.condition;

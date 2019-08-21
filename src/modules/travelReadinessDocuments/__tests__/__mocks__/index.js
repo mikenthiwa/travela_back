@@ -145,3 +145,21 @@ export const documentsData = [
     updatedAt: '2019-01-16 012:11:52.181+01',
   },
 ];
+
+export const documentTypes = [{
+  name: 'passport',
+  createdAt: new Date(),
+  updatedAt: new Date(),
+}, {
+  name: 'visa',
+  createdAt: new Date(),
+  updatedAt: new Date(),
+}, {
+  name: 'yellow fever document',
+  createdAt: new Date(),
+  updatedAt: new Date(),
+}, {
+  name: 'other',
+  createdAt: new Date(),
+  updatedAt: new Date(),
+}];

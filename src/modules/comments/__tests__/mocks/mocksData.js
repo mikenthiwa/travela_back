@@ -97,7 +97,20 @@ const mockData = {
     updatedAt: '2018-08-16 012:11:52.181+01',
     documentId: 'ss60B42oZd',
     userId: 10,
-  }
+  },
+  documentTypes: [{
+    name: 'passport',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  }, {
+    name: 'visa',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  }, {
+    name: 'yellow fever document',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  }],
 };
 
 export default mockData;

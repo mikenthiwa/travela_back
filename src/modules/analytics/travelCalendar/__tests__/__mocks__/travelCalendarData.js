@@ -119,7 +119,7 @@ export const superAdminRole = {
 
 export const tripsData = bedId => ([
   {
-    id: 1,
+    id: 'h20cul',
     requestId: 'xDh20cuGy',
     origin: 'Lagos, Nigeria',
     destination: 'Nairobi, Kenya',
@@ -128,7 +128,7 @@ export const tripsData = bedId => ([
     returnDate: '2018-11-21',
   },
   {
-    id: 2,
+    id: 'h20cup',
     requestId: 'xDh20cuGz',
     origin: 'Nairobi, Kenya',
     destination: 'Lagos, Nigeria',
@@ -137,7 +137,7 @@ export const tripsData = bedId => ([
     returnDate: '2018-11-21',
   },
   {
-    id: 3,
+    id: 'h20cui',
     requestId: 'xDh20cuGx',
     origin: 'Lagos, Nigeria',
     destination: 'Nairobi, Kenya',
@@ -146,7 +146,7 @@ export const tripsData = bedId => ([
     returnDate: '2018-11-21',
   },
   {
-    id: 4,
+    id: 'h20cuwe',
     requestId: 'xDh20cuGx',
     origin: 'Nairobi, Kenya',
     destination: 'Kigali, Rwanda',
@@ -160,7 +160,7 @@ export const submissionsData = [
   {
     id: 'Z9eWhF2ho',
     userUpload: '{"departureTime":"2018-01-01T00:00","arrivalTime":"2018-01-01T00:00","airline":"Kenya Airways","ticketNumber":"KQ 345","returnDepartureTime":"","returnTime":"","returnTicketNumber":"","returnAirline":""}',
-    tripId: '1',
+    tripId: 'h20cul',
     checklistItemId: '1',
     createdAt: '2018-11-21',
     updatedAt: '2018-11-21',
@@ -168,7 +168,7 @@ export const submissionsData = [
   {
     id: 'Z9eWhF2hi',
     userUpload: '{"departureTime":"2018-01-01T00:00","arrivalTime":"2018-01-01T00:00","airline":"Kenya Airways","ticketNumber":"KQ 345","returnDepartureTime":"2018-01-01T00:00","returnTime":"2018-01-01T00:00","returnTicketNumber":"KQ 173","returnAirline":"Kenya Airways"}',
-    tripId: '2',
+    tripId: 'h20cup',
     checklistItemId: '1',
     createdAt: '2018-11-21',
     updatedAt: '2018-11-21',
@@ -176,7 +176,7 @@ export const submissionsData = [
   {
     id: 'Z9eWhF2he',
     userUpload: '{"departureTime":"2018-01-01T00:00","arrivalTime":"2018-01-01T00:00","airline":"Kenya Airways","ticketNumber":"KQ 345","returnDepartureTime":"2018-01-01T00:00","returnTime":"2018-01-01T00:00","returnTicketNumber":"KQ 173","returnAirline":"Kenya Airways"}',
-    tripId: '3',
+    tripId: 'h20cui',
     checklistItemId: '1',
     createdAt: '2018-11-21',
     updatedAt: '2018-11-21',
@@ -184,7 +184,7 @@ export const submissionsData = [
   {
     id: 'Z9eWhF2hd',
     userUpload: '{"departureTime":"2018-01-01T00:00","arrivalTime":"2018-01-01T00:00","airline":"Kenya Airways","ticketNumber":"KQ 345","returnDepartureTime":"2018-01-01T00:00","returnTime":"2018-01-01T00:00","returnTicketNumber":"KQ 173","returnAirline":"Kenya Airways"}',
-    tripId: '4',
+    tripId: 'h20cuwe',
     checklistItemId: '1',
     createdAt: '2018-11-21',
     updatedAt: '2018-11-21',

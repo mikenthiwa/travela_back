@@ -19,7 +19,7 @@ const payload = {
 const validDocument = {
   other:
     {
-      name: 'Permit',
+      name: 'other',
       dateOfIssue: '02-01-2018',
       expiryDate: '06-01-2018',
       cloudinaryUrl: 'https://res.cloudinary.com/ined/image/upload/v1538568663/Logo_blue_2x.png'

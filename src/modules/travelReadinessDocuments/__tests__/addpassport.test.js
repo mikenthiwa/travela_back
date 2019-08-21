@@ -8,6 +8,7 @@ import mockPassport from './__mock__/mockPassport';
 import Utils from '../../../helpers/Utils';
 import models from '../../../database/models';
 import { role } from '../../userRole/__tests__/mocks/mockData';
+import { documentTypes } from './__mocks__/index';
 
 const request = supertest;
 
@@ -76,12 +77,14 @@ describe('Create passport', () => {
     await models.User.destroy({ force: true, truncate: { cascade: true } });
     await models.Role.bulkCreate(role);
     await models.User.create(user);
+    await models.DocumentTypes.bulkCreate(documentTypes);
   });
   afterAll(async () => {
     await models.UserRole.destroy({ force: true, truncate: { cascade: true } });
     await models.Role.destroy({ force: true, truncate: { cascade: true } });
     await models.TravelReadinessDocuments.destroy({ force: true, truncate: { cascade: true } });
     await models.User.destroy({ force: true, truncate: { cascade: true } });
+    await models.DocumentTypes.destroy({ force: true, truncate: { cascade: true } });
   });
   const response = (status, body) => ({
     status,

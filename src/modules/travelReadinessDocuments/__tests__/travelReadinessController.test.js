@@ -13,7 +13,8 @@ import {
   documentsData,
   requesterPayload,
   requester,
-  requesterRole
+  requesterRole,
+  documentTypes,
 } from './__mocks__';
 import TravelReadiness from '../TravelReadinessController';
 import otherDocumentsMock from './__mocks__/otherDocumentsMock';
@@ -28,6 +29,7 @@ const setUp = async () => {
   await models.Comment.destroy({ force: true, truncate: { cascade: true } });
   await models.TravelReadinessDocuments.destroy({ force: true, truncate: { cascade: true } });
   await models.User.destroy({ force: true, truncate: { cascade: true } });
+  await models.DocumentTypes.destroy({ force: true, truncate: { cascade: true } });
 };
 
 describe('TravelReadiness Controller', () => {
@@ -39,6 +41,7 @@ describe('TravelReadiness Controller', () => {
     await models.User.create(requester);
     await models.UserRole.create(requesterRole);
     await models.User.bulkCreate(usersData);
+    await models.DocumentTypes.bulkCreate(documentTypes);
     await models.TravelReadinessDocuments.bulkCreate(documentsData);
   });
 

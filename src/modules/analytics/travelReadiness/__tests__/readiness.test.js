@@ -83,6 +83,7 @@ describe.only('Test Suite for Trips Analytics => Get Travel Readiness of request
     await models.User.destroy({ truncate: true, cascade: true });
     await models.Center.destroy({ truncate: true, cascade: true });
     await models.Request.destroy({ truncate: true, cascade: true });
+    await models.Trip.destroy({ truncate: true, cascade: true });
     done();
   });
 

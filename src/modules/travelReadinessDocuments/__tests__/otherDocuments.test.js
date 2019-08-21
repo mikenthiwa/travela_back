@@ -4,6 +4,7 @@ import models from '../../../database/models';
 import { role } from '../../userRole/__tests__/mocks/mockData';
 import otherDocumentsMock from './__mocks__/otherDocumentsMock';
 import Utils from '../../../helpers/Utils';
+import { documentTypes } from './__mocks__/index';
 
 const request = supertest;
 
@@ -13,6 +14,7 @@ const clearDatabase = async () => {
   await models.Comment.destroy({ force: true, truncate: { cascade: true } });
   await models.TravelReadinessDocuments.destroy({ force: true, truncate: { cascade: true } });
   await models.User.destroy({ force: true, truncate: { cascade: true } });
+  await models.DocumentTypes.destroy({ force: true, truncate: { cascade: true } });
 };
 
 describe('create a visa document', () => {
@@ -25,6 +27,7 @@ describe('create a visa document', () => {
     await clearDatabase();
     await models.Role.bulkCreate(role);
     await models.User.create(user);
+    await models.DocumentTypes.bulkCreate(documentTypes);
   });
   
   afterAll(async () => {

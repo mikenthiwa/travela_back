@@ -128,3 +128,7 @@ export const travelReadinessValidators = [
   query('travelFlow', 'Travel flow should either be inflow or outflow')
     .isIn(['inflow', 'outflow'])
 ];
+
+export const documentTypeValidators = [
+  body('name', 'document type name is required').trim().not().isEmpty(),
+];

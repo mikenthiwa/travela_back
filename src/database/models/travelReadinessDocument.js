@@ -8,7 +8,7 @@ export default (sequelize, DataTypes) => {
       },
       type: {
         allowNull: false,
-        type: DataTypes.STRING
+        type: DataTypes.INTEGER
       },
       data: {
         type: DataTypes.JSONB
@@ -16,8 +16,8 @@ export default (sequelize, DataTypes) => {
       isVerified: {
         type: DataTypes.BOOLEAN,
         defaultValue: false
-      }
-    }, { paranoid: true }
+      },
+    },
   );
   TravelReadinessDocuments.associate = (models) => {
     // associations can be defined here
@@ -33,6 +33,9 @@ export default (sequelize, DataTypes) => {
     TravelReadinessDocuments.hasMany(models.ChecklistSubmission, {
       foreignKey: 'documentId',
       as: 'documentSubmission',
+    });
+    TravelReadinessDocuments.belongsTo(models.DocumentTypes, {
+      foreignKey: 'type',
     });
   };
   return TravelReadinessDocuments;

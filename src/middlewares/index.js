@@ -20,6 +20,7 @@ import TravelRegionsValidator from './travelRegionsValidator';
 import CountryValidator from './countryValidator';
 import HotelEstimateValidator from './hotelEstimateValidator';
 import DynamicChecklistValidator from './dynamicChecklistValidator';
+import documentTypeValidator from './documentTypeValidator';
 
 
 const middleware = {
@@ -45,6 +46,7 @@ const middleware = {
   CountryValidator,
   HotelEstimateValidator,
   DynamicChecklistValidator,
+  documentTypeValidator,
 };
 
 export default middleware;

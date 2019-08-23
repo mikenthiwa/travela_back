@@ -29,6 +29,7 @@ import checklistWizard from './checklistWizard';
 import NoPassportRouter from './onboarding';
 import errorBoundaryRouter from './errorBoundary';
 import DocumentTypesRouter from './documentTypes';
+import dynamicChecklistSubmissions from './dynamicChecklistSubmissions';
 
 const apiPrefix = '/api/v1';
 
@@ -65,6 +66,7 @@ const routes = [
   NoPassportRouter,
   errorBoundaryRouter,
   DocumentTypesRouter,
+  dynamicChecklistSubmissions,
 ];
 export default (app) => {
   routes.forEach(route => app.use(apiPrefix, route));

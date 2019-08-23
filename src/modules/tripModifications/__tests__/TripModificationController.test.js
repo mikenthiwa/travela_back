@@ -6,6 +6,12 @@ import app from '../../../app';
 
 const request = supertest(app);
 
+global.io = {
+  sockets: {
+    emit: (event, dataToBeEmitted) => dataToBeEmitted,
+  },
+};
+
 const {
   users, requests, trips, userRoles, tokens, approvalsList, centers
 } = mocks;

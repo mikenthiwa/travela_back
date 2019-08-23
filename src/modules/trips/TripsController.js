@@ -221,7 +221,15 @@ class TripsController {
 
   static async getTripsByRequestId(requestId, res) {
     try {
-      const trips = await models.Trip.findAll({ where: { requestId } });
+      const trips = await models.Trip.findAll({
+        where: { requestId },
+        include: {
+          model: models.Request,
+          as: 'request',
+          attributes: ['tripType'],
+          where: { id: requestId }
+        }
+      });
       return trips;
     } catch (error) { /* istanbul ignore next */
       return Error.handleError(error.toString(), 500, res);

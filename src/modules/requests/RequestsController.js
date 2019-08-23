@@ -126,7 +126,17 @@ class RequestsController {
   }
 
   static async getRequestsFromDb(subquery) {
-    const requests = await models.Request.findAndCountAll(subquery);
+    const { include, ...query } = subquery;
+    const newSubquery = {
+      include: [...include, {
+        model: models.DynamicChecklistSubmissions,
+        as: 'dynamicChecklistSubmission',
+        attributes: ['completionCount'],
+        where: undefined,
+      }],
+      ...query,
+    };
+    const requests = await models.Request.findAndCountAll(newSubquery);
     return requests;
   }
 

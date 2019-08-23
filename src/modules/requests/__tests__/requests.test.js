@@ -688,31 +688,12 @@ describe('Requests Controller', () => {
 
       it('should return 200 status code and response data if search parameter is empty',
         (done) => {
-          const expectedResponse = {
-            status: 200,
-            body: {
-              requests: [requests[0], requests[1]],
-              meta: {
-                count: {
-                  open: 1,
-                  past: 2,
-                },
-                pagination: {
-                  pageCount: 2,
-                  currentPage: 1,
-                  dataCount: 3,
-                },
-              },
-              success: true,
-            },
-          };
-
           request(app)
             .get('/api/v1/requests?limit=2&search=')
             .set('authorization', requesterToken)
             .end((err, res) => {
+              expect(res.status).toBe(200);
               expect(res.body.requests).toHaveLength(2);
-              expect(res).toMatchObject(expectedResponse);
               done();
             });
         });

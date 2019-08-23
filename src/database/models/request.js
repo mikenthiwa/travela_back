@@ -135,6 +135,10 @@ export default (sequelize, DataTypes) => {
       foreignKey: 'tripModificationId',
       as: 'currentModification'
     });
+    Request.hasOne(models.DynamicChecklistSubmissions, {
+      foreignKey: 'requestId',
+      as: 'dynamicChecklistSubmission',
+    });
   };
   return Request;
 };

@@ -11,7 +11,6 @@ export default class TravelCostsController {
       const travelStipends = await TravelCostsController.getTravelStipends(locations);
       const hotelEstimates = await TravelCostsController.getHotelEstimates(locations);
 
-      console.log('hotelEstimates', hotelEstimates);
       const flightCosts = await TravelCostsController.getFlightCosts(locations);
 
       return res.status(200).json({
@@ -32,7 +31,6 @@ export default class TravelCostsController {
   }
 
   static async getFlightCosts(locations) {
-    console.log('locations ==> ', locations);
     const allLocations = TravelCostsController.parseLocations(locations);
     
     const flightEstimates = await FlightEstimateController.allFlightEstimates();

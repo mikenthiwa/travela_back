@@ -464,7 +464,7 @@ describe('update a checklist', () => {
       .end((err, res) => {
         if (err) return done(err);
         expect(res.body.message).toEqual('Successfully retrieved checklist');
-        expect(res.body.checklists[0].name).toEqual('Nigeria-Uganda');
+        expect(res.body.checklist.checklists[0].name).toEqual('Nigeria-Uganda');
         done();
       });
   });
@@ -475,7 +475,7 @@ describe('update a checklist', () => {
       .set('authorization', token)
       .end((err, res) => {
         if (err) return done(err);
-        expect(res.body.checklists[0].config).toEqual([]);
+        expect(res.body.checklist.checklists[0].config).toEqual([]);
         done();
       });
   });

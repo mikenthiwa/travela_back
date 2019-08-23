@@ -2,8 +2,8 @@
 import models from '../../database/models';
 import WizardUtils from './wizardUtils';
 import Error from '../../helpers/Error';
-import circularReplacer from '../../helpers/circularReplacer';
 import TripsController from '../trips/TripsController';
+import Utils from '../../helpers/Utils';
 
 class ChecklistWizardController {
   static async createChecklist(req, res) {
@@ -240,10 +240,7 @@ class ChecklistWizardController {
       const trips = await TripsController.getTripsByRequestId(requestId, res);
       const row = await WizardUtils.getChecklistByTrip(trips);
 
-      const removeCyclicStructure = JSON.stringify(row, circularReplacer());
-      const newRow = JSON.parse(removeCyclicStructure);
-
-      const checklists = newRow.map(checklist => ({
+      const checklists = row.map(checklist => ({
         tripId: checklist.tripId,
         id: checklist.id,
         name: checklist.name,
@@ -254,7 +251,14 @@ class ChecklistWizardController {
       res.status(200).json({
         success: true,
         message: 'Successfully retrieved checklist',
-        checklists
+        checklist: {
+          id: Utils.generateUniqueId(),
+          isSubmitted: false,
+          notifications: {},
+          checklists,
+          trips,
+          updatedAt: new Date().toISOString(),
+        }
       });
     } catch (error) { /* istanbul ignore next */
       return Error.handleError(error, 500, res);

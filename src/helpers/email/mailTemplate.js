@@ -90,7 +90,7 @@ const mailTemplate = (
       margin-bottom: 30px;
       color: #333E44;"
     >
-      <b>Hi ${recipientName || '%recipient.name%!'}!</b>
+      <b>Hi ${recipientName || ''}!</b>
     </h2>
     <p
       style="width: 406px;

@@ -31,4 +31,31 @@ TravelRegionsRouter.get(
   ]),
   TravelRegionController.getRegion,
 );
+TravelRegionsRouter.put(
+  '/regions/travelregion/:id',
+  authenticate,
+  TravelRegionsValidator.inputValidation,
+  TravelRegionsValidator.conditionValidation,
+  TravelRegionsValidator.verifyTravelRegionBody,
+  TravelRegionsValidator.validateTravelRegion,
+  TravelRegionsValidator.checkTravelRegion,
+  RoleValidator.checkUserRole([
+    'Super Administrator',
+    'Travel Administrator',
+    'Travel Team Member'
+  ]),
+  TravelRegionController.updateTravelRegion,
+);
+TravelRegionsRouter.delete(
+  '/regions/:id',
+  authenticate,
+  TravelRegionsValidator.validateTravelRegionId,
+  TravelRegionsValidator.checkTravelRegion,
+  RoleValidator.checkUserRole([
+    'Super Administrator',
+    'Travel Administrator',
+    'Travel Team Member'
+  ]),
+  TravelRegionController.deleteTravelRegion,
+);
 export default TravelRegionsRouter;

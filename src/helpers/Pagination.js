@@ -42,12 +42,19 @@ class Pagination {
         attributes: ['email', 'fullName', 'userId']
       }]
     };
+    const parentOptions = {
+      ...countOptions,
+      include: [
+        { model: models.User, as: 'creator', attributes: ['email', 'fullName', 'userId'] },
+        { model: models.Department, as: 'parentDepartments' }],
+    };
     return {
       countOptions,
-      findOptions
+      findOptions,
+      parentOptions
     };
   }
-  
+
   static getPaginationParams(req, count) {
     const initialPage = Pagination.initializePagination(req);
     const { page, limit } = initialPage;

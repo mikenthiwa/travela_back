@@ -226,7 +226,7 @@ class UserRoleController {
   static async updateBudgetCheckerRole(req, res) {
     try {
       const { body: { email, departments } } = req;
-      
+
       await models.sequelize.transaction(async () => {
         const user = await UserRoleUtils.getUser(email);
         const { error, budgetCheckerDepartments } = await UserRoleHelper.getBudgetCheckerDepts(departments, user);

@@ -165,6 +165,13 @@ const middleware = {
     validateDepartment: jest.fn(invokeNextMiddleware),
     validateBudgetCheckerDepartments: jest.fn(() => invokeNextMiddleware),
     validateRoleDepartment: jest.fn(invokeNextMiddleware),
+    validateParentDepartmentName: jest.fn(invokeNextMiddleware),
+    validateDepartmentsExistence: jest.fn(invokeNextMiddleware),
+    validateIfDepartmentExists: jest.fn(invokeNextMiddleware),
+    validateDepartmentName: jest.fn(invokeNextMiddleware),
+    validateParams: jest.fn(invokeNextMiddleware),
+    checkField: jest.fn(invokeNextMiddleware),
+    validateDepartmentId: jest.fn(invokeNextMiddleware),
   },
   BambooWebhookValidator: {
     dataValidator: jest.fn(invokeNextMiddleware),

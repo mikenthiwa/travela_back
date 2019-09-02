@@ -32,10 +32,10 @@ export default class TravelCostsController {
 
   static async getFlightCosts(locations) {
     const allLocations = TravelCostsController.parseLocations(locations);
-    
+
     const flightEstimates = await FlightEstimateController.allFlightEstimates();
-    
-    
+
+
     let allEstimates = [];
     let regionEstimates = [];
     allLocations.forEach((location, index, arr) => {
@@ -48,7 +48,7 @@ export default class TravelCostsController {
     let newEstimates = [];
     if (regionEstimates.length) {
       const flightDetails = await TravelCostsController.addRegion(regionEstimates);
-  
+
       flightDetails.forEach((location) => {
         const regEstimates = flightEstimates.filter(
           s => (s.originRegion === location.flightOriginRegion && s.destinationRegion === location.flightDestinationRegion)
@@ -62,7 +62,7 @@ export default class TravelCostsController {
     }
 
     allEstimates = [...allEstimates, ...newEstimates];
-    
+
     if (allEstimates.length) {
       return allEstimates.map(flightEstimate => ({
         origin: flightEstimate.originCountry,
@@ -82,8 +82,8 @@ export default class TravelCostsController {
       };
       return flightDetails;
     });
-    
-    
+
+
     const resolvedflightDetails = await Promise.all(flightLocations);
     return resolvedflightDetails;
   }

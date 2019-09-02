@@ -23,14 +23,15 @@ const token = Utils.generateTestToken(payload);
 describe('Update Budget Checker role test', () => {
   beforeAll(async () => {
     moxios.install();
+    await models.Center.destroy({ truncate: true, cascade: true });
+    await models.Role.destroy({ truncate: true, cascade: true });
     await models.UserRole.destroy({ truncate: true, cascade: true });
     await models.UsersDepartments.destroy({ truncate: true, cascade: true });
-    await models.Role.destroy({ truncate: true, cascade: true });
-    await models.Role.bulkCreate(role);
-    await models.User.destroy({ truncate: true, cascade: true });
-    await models.Department.destroy({ truncate: true, cascade: true });
-    await models.Center.destroy({ truncate: true, cascade: true });
+    await models.Department.destroy({ truncate: { cascade: true }, force: true });
+    await models.User.destroy({ truncate: { cascade: true }, force: true });
+
     await models.Center.bulkCreate(centers);
+    await models.Role.bulkCreate(role);
     await models.User.create({
       fullName: 'Tester user',
       passportName: 'Tester user',
@@ -53,7 +54,9 @@ describe('Update Budget Checker role test', () => {
     }]);
     await models.Department.create({
       id: 1,
-      name: 'Test department'
+      name: 'Test department',
+      parentDepartment: null,
+      createdBy: 1
     });
     await models.UsersDepartments.create({
       id: 1,
@@ -65,12 +68,13 @@ describe('Update Budget Checker role test', () => {
 
   afterAll(async () => {
     moxios.uninstall();
-    await models.UserRole.destroy({ truncate: true, cascade: true });
-    await models.UsersDepartments.destroy({ truncate: true, cascade: true });
+    await models.Center.destroy({ truncate: true, cascade: true });
     await models.Role.destroy({ truncate: true, cascade: true });
     await models.User.destroy({ truncate: true, cascade: true });
-    await models.Department.destroy({ truncate: true, cascade: true });
-    await models.Center.destroy({ truncate: true, cascade: true });
+    await models.UserRole.destroy({ truncate: true, cascade: true });
+    await models.UsersDepartments.destroy({ truncate: true, cascade: true });
+    await models.Department.destroy({ truncate: { cascade: true }, force: true });
+    await models.User.destroy({ truncate: { cascade: true }, force: true });
   });
 
   describe('Authenticated user', () => {
@@ -149,7 +153,7 @@ describe('Update Budget Checker role test', () => {
       });
   });
 
-  it('should not asign a budget checker duplicate departments',
+  it('should not assign a budget checker duplicate departments',
     (done) => {
       request(app)
         .patch('/api/v1/user/roles/budgetChecker')

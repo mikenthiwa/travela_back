@@ -96,6 +96,10 @@ export default (sequelize, DataTypes) => {
       foreignKey: 'createdBy',
       sourceKey: 'id'
     });
+    User.hasMany(models.Department, {
+      foreignKey: 'createdBy',
+      sourceKey: 'id'
+    });
     User.belongsToMany(models.Department, {
       foreignKey: 'userId',
       as: 'budgetCheckerDepartments',

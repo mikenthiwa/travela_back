@@ -104,7 +104,9 @@ describe('Department Controller', () => {
     await models.Department.destroy({ force: true, truncate: { cascade: true } });
   });
 
-  it('should create a department successfully',
+  let departmentId = null;
+
+  it('should create a department successfully when theirs no parent department',
     (done) => {
       request
         .post('/api/v1/department')
@@ -115,6 +117,95 @@ describe('Department Controller', () => {
           if (err) return done(err);
           expect(res.body.success).toEqual(true);
           expect(res.body.message).toEqual('Successfully created a new Department');
+          done();
+        });
+    });
+
+  it('should create a department successfully when there\'s parent department',
+    (done) => {
+      request
+        .post('/api/v1/department')
+        .set('authorization', superAdminToken)
+        .send({ name: 'Facilities', parentDepartment: 'Operations' })
+        .expect(201)
+        .end((err, res) => {
+          if (err) return done(err);
+          departmentId = res.body.department.id;
+          expect(res.body.success).toEqual(true);
+          expect(res.body.message).toEqual('Successfully created a new Department');
+          done();
+        });
+    });
+
+  it('should edit a department successfully when there\'s parent department',
+    (done) => {
+      request
+        .put(`/api/v1/department/${departmentId}`)
+        .set('authorization', superAdminToken)
+        .send({ id: 2, name: 'Facilities', parentDepartment: 'Ops' })
+        .expect(200)
+        .end((err, res) => {
+          if (err) return done(err);
+          expect(res.body.success).toEqual(true);
+          expect(res.body.message).toEqual('Successfully modified existing Department');
+          done();
+        });
+    });
+
+  it('should edit a department successfully when there\'s no parent department',
+    (done) => {
+      request
+        .put(`/api/v1/department/${departmentId}`)
+        .set('authorization', superAdminToken)
+        .send({ id: 2, name: 'Facilities', parentDepartment: null })
+        .expect(200)
+        .end((err, res) => {
+          if (err) return done(err);
+          expect(res.body.success).toEqual(true);
+          expect(res.body.message).toEqual('Successfully modified existing Department');
+          done();
+        });
+    });
+
+  it('should get a department successfully',
+    (done) => {
+      request
+        .get(`/api/v1/department/${departmentId}`)
+        .set('authorization', superAdminToken)
+        .expect(200)
+        .end((err, res) => {
+          if (err) return done(err);
+          expect(res.body.success).toEqual(true);
+          expect(res.body.message).toEqual('Successfully retrieved Department');
+          done();
+        });
+    });
+
+  it('should get all departments successfully',
+    (done) => {
+      request
+        .get('/api/v1/all-departments')
+        .set('authorization', superAdminToken)
+        .expect(200)
+        .end((err, res) => {
+          if (err) return done(err);
+          expect(res.body.success).toEqual(true);
+          expect(res.body.message).toEqual('success');
+          done();
+        });
+    });
+
+  it('should get all departments successfully with pagination',
+    (done) => {
+      request
+        .get('/api/v1/all-departments')
+        .query({ limit: 11, page: 1 })
+        .set('authorization', superAdminToken)
+        .expect(200)
+        .end((err, res) => {
+          if (err) return done(err);
+          expect(res.body.success).toEqual(true);
+          expect(res.body.message).toEqual('success');
           done();
         });
     });
@@ -171,6 +262,20 @@ describe('Department Controller', () => {
         .end((err, res) => {
           if (err) return done(err);
           expect(res.body.success).toEqual(true);
+          done();
+        });
+    });
+
+  it('should delete a department successfully',
+    (done) => {
+      request
+        .delete(`/api/v1/department/${departmentId}`)
+        .set('authorization', superAdminToken)
+        .expect(200)
+        .end((err, res) => {
+          if (err) return done(err);
+          expect(res.body.success).toEqual(true);
+          expect(res.body.message).toEqual('Successfully deleted department');
           done();
         });
     });

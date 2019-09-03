@@ -13,7 +13,7 @@ spec:
         memory: "3Gi"
       limits:
         cpu: "3000m"
-        memory: "3Gi"
+        memory: "4Gi"
     command:
     - cat
     tty: true

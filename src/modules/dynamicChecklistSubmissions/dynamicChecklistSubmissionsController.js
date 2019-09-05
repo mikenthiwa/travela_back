@@ -13,7 +13,7 @@ class DynamicChecklistSubmissionsController {
     const { requestId } = req.params;
     try {
       const checklist = await models.DynamicChecklistSubmissions.findOne({
-        where: { userId: req.user.UserInfo.id, requestId },
+        where: { requestId },
       });
       
       if (!checklist) {

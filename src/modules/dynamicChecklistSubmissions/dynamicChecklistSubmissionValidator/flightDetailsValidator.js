@@ -5,7 +5,7 @@ const tripValidator = (trip) => {
     departureTime: joi.date().min(new Date(trip.departureDate).getUTCDate()).required(),
     arrivalTime: joi.date().min(new Date(trip.departureDate).getUTCDate()).when('departureTime', {
       is: joi.date().required(),
-      then: joi.date().min(joi.ref('departureTime'))
+      then: joi.date().min(new Date(trip.flightDetails.departureTime || Date.now()).getUTCDate()),
     }).required(),
     flightNumber: joi.string().required(),
     airline: joi.string().required(),
@@ -18,7 +18,7 @@ const tripValidator = (trip) => {
       returnDepartureTime: joi.date().min(new Date(trip.returnDate).getUTCDate()).required(),
       returnArrivalTime: joi.date().min(new Date(trip.returnDate).getUTCDate()).when('returnDepartureTime', {
         is: joi.date().required(),
-        then: joi.date().min(joi.ref('returnDepartureTime'))
+        then: joi.date().min(new Date(trip.flightDetails.returnDepartureTime || Date.now()).getUTCDate()),
       }).required(),
       returnFlightNumber: joi.string().required(),
       returnAirline: joi.string().required(),

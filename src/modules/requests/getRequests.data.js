@@ -40,6 +40,11 @@ const getRequests = (requestId, models) => models.Request.find({
             }]
           }]
         }]
+    }, {
+      model: models.DynamicChecklistSubmissions,
+      as: 'dynamicChecklistSubmission',
+      attributes: ['completionCount', 'isSubmitted'],
+      where: undefined,
     }],
   order: [
     [{ model: models.Trip, as: 'trips' }, 'returnDate', 'ASC'],

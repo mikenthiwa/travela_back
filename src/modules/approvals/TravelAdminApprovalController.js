@@ -71,12 +71,18 @@ class TravelAdminApprovalController {
       }
       const { page, limit, offset } = await Pagination.initializePagination(req);
       const includeQuery = whereObject.whereTrips(center ? [center] : centers, flow);
+      const include = [...includeQuery, {
+        model: models.DynamicChecklistSubmissions,
+        as: 'dynamicChecklistSubmission',
+        attributes: ['completionCount'],
+        where: undefined,
+      }];
       const requests = await models.Request.findAndCountAll({
         offset,
         limit,
         where: { ...whereObject.whereRequest(status, search) },
         distinct: true,
-        include: includeQuery,
+        include,
         order: [['createdAt', 'DESC']]
       });
 

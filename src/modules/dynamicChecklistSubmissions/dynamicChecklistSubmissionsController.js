@@ -14,20 +14,18 @@ class DynamicChecklistSubmissionsController {
     try {
       const checklist = await models.DynamicChecklistSubmissions.findOne({
         where: { userId: req.user.UserInfo.id, requestId },
-        attributes: ['checklist', 'updatedAt', 'completionCount'],
       });
       
       if (!checklist) {
         return await ChecklistWizardController.getChecklistByRequest(req, res);
       }
-      
       return res.status(200).json({
         success: true,
         checklist: {
           ...checklist.checklist,
           updatedAt: checklist.updatedAt,
           completionCount: checklist.completionCount,
-          isSubmitted: checklist.isSubmitted
+          isSubmitted: checklist.isSubmitted,
         },
       });
     } catch (error) { /* istanbul ignore next */

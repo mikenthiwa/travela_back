@@ -106,7 +106,11 @@ export default class RequestValidator {
     try {
       const { requestId } = req.params;
       const percentage = await TravelChecklist.checkListPercentageNumber(req, res, requestId);
-      if (percentage === 100) {
+      const dynamicChecklist = await models.DynamicChecklistSubmissions.findOne({
+        where: { requestId, isSubmitted: true },
+        attributes: ['isSubmitted'],
+      });
+      if ((percentage === 100) || (dynamicChecklist && dynamicChecklist.isSubmitted)) {
         return next();
       }
       return res.status(400).json({

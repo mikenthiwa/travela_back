@@ -257,6 +257,7 @@ class ChecklistWizardController {
           notifications: {},
           checklists,
           trips,
+          completionCount: 0,
           updatedAt: new Date().toISOString(),
         }
       });

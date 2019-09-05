@@ -232,6 +232,9 @@ of budget for this trip.`;
       return `This is to inform you that <b>${msgDetail.details.requesterName}</b>, does not have a valid passport at time of onboarding`;
     case 'NOTIFY_EMAIL_BEHAVIOUR':
       return msgDetail.details;
+    case 'Notify budget checker to approve pending requests':
+      return `This is to remind you to approve travel request <b>${msgDetail.details.id}</b> for <b>${msgDetail.senderName}</b>. Please login to Travela to review the details and advise on availability
+                of budget for this trip.`;
     default:
       return '';
   }

@@ -266,3 +266,51 @@ export const keys = {
 };
 
 export const nonAndelaToken = { token: 'eyJhbGciOiJSUzI1NiIsImtpZCI6IjVkODg3ZjI2Y2UzMjU3N2M0YjVhOGExZTFhNTJlMTlkMzAxZjgxODEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJhY2NvdW50cy5nb29nbGUuY29tIiwiYXpwIjoiMTQ0NzE0MjU3NDEzLWdzbmY4dmQ3amRkb2Nocm0yaG4yMTJkMzZiYzNrZmppLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwiYXVkIjoiMTQ0NzE0MjU3NDEzLWdzbmY4dmQ3amRkb2Nocm0yaG4yMTJkMzZiYzNrZmppLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwic3ViIjoiMTExNDk0MzQ3NzEwNzg3NjQxODEwIiwiZW1haWwiOiJ3aWxzb25nYXR1cnVAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImF0X2hhc2giOiJWdEhfczlCSTE3MC1sN3VmT1hPd1N3IiwibmFtZSI6IldpbHNvbiBHYXR1cnUiLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDYuZ29vZ2xldXNlcmNvbnRlbnQuY29tLy1UNDZxU1pWNklnTS9BQUFBQUFBQUFBSS9BQUFBQUFBQUFKQS9qMmRYYjJNT2JRYy9zOTYtYy9waG90by5qcGciLCJnaXZlbl9uYW1lIjoiV2lsc29uIiwiZmFtaWx5X25hbWUiOiJHYXR1cnUiLCJsb2NhbGUiOiJlbiIsImlhdCI6MTU1NjU1OTk0NywiZXhwIjoxNTU2NTYzNTQ3LCJqdGkiOiJmZjFiZjBiZWY2ZGQ1NTk0MjA4OTk3Yjk1NzlmYmYzOGM0M2RlYTExIn0.I1I9CewP15Z85IfDI7AdiYom_VdPzD7OkLAAeF6fJ0_6rDQq5vkkvKvkdqxibMc-0_RSMrqWXHUrtEXSG6_isutfz6SkU-gQ-Sxnzu6Wvfp0myUzTTE8D0sS6_ENAZKU-G-agXJhhWoW0Gqm__Voke9y5nFVe5DgDgzlc-CvRoD1VJEGsM1GvmgyCnmKLFQEt8bpguQ03l5dJ29CWiw2gyr1vGP4LeiiCnF_kQLBpmax33ihrPAsiCs0tIipspq49Cq6UPPxraJUX5-p8X8l3P3BeIh0j5R6rSBRfjTsxzmc02jsmebmdYKCoMfRAqza2yZAvF3nP3sh8BGByqu4_Q' };
+
+export const subscriptions = [
+  {
+    endpoint: 'https://fcm.googleapis.com/fcm/send/egombY0NeNw:APA91bFozyKI0tAGrcZw-dZT3BNzoSmXlSqUrlbrOrdvJDZfydx146z2UyOgHRGlix_-mCoxX981INKn2e5RVN2Iv1zqj-Af7R9bhSvD2Ltzylx40qD3PpCtNOhrnNeSTqNgZ0xuMD6s',
+    p256dh: 'BJh4IlWwH1gVJll2tmVkbH1du41EeVdNBg-RBfNVkaFR2SZwN2bTpHFznjAl7_mEHXvNBQ5OSpb_jSFUuS8qNqk',
+    auth: 'w3nlzhn2nGyMq9Pqq48WSw',
+    userId: '2244'
+  },
+  {
+    endpoint: 'https://fcm.googleapis.com/fcm/send/egombY0NeNw:APA91bFozyKI0tAGrcZw-dZT3BNzoSmXlSqUrlbrOrdvJDZfydx146z2UyOgHRGlix_-mCoxX981INKn2e5RVN2Iv1zqj-Af7R9bhSvD2Ltzylx40qD3PpCtNOhrnNeSTqNgZ0xuMD6s',
+    p256dh: 'sklcmlksmclxzmlmslddd',
+    auth: 'dfdfdsfsdfdsfsfsfdsf',
+    userId: '3222'
+  }
+];
+
+export const subscription1 = {
+  subscription: {
+    endpoint: 345,
+    keys: {
+      p256dh: 678,
+      auth: 345
+    }
+  },
+  userId: 3222
+};
+
+export const subscription2 = {
+  subscription: {
+    endpoint: 'https://fcm.googleapis.com/fcm/send/egombY0NeNw:APA91bFozyKI0tAGrcZw-dZT3BNzoSmXlSqUrlbrOrdvJDZfydx146z2UyOgHRGlix_-mCoxX981INKn2e5RVN2Iv1zqj-Af7R9bhSvD2Ltzylx40qD3PpCtNOhrnNeSTqNgZ0xuMD6s',
+    keys: {
+      p256dh: 'sklcmlksmclxzmlmslddd',
+      auth: 'dfdfdsfsdfdsfsfsfdsf',
+    }
+  },
+  userId: '1234',
+};
+
+export const subscription3 = {
+  subscription: {
+    endpoint: 'https://fcm.googleapis.com/fcm/send/egombY0NeNw:APA91bFozyKI0tAGrcZw-dZT3BNzoSmXlSqUrlbrOrdvJDZfydx146z2UyOgHRGlix_-mCoxX981INKn2e5RVN2Iv1zqj-Af7R9bhSvD2Ltzylx40qD3PpCtNOhrnNeSTqNgZ0xuMD6s',
+    keys: {
+      p256dh: 'sklcmlksmclxzmlmslddd',
+      auth: 'dfdfdsfsdfdsfsfsfdsf',
+    },
+  },
+  userId: '',
+};

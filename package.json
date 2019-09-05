@@ -90,7 +90,8 @@
     "shortid": "^2.2.13",
     "socket.io": "^2.1.1",
     "stacktrace-gps": "^3.0.2",
-    "stream-mock": "^2.0.2"
+    "stream-mock": "^2.0.2",
+    "web-push": "^3.3.5"
   },
   "jest": {
     "collectCoverage": true,

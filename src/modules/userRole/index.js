@@ -96,4 +96,11 @@ Router.patch(
   UserRoleController.updateBudgetCheckerRole
 );
 
+Router.post(
+  '/pushNotification',
+  RoleValidator.validateSubscription,
+  RoleValidator.checkSubscription,
+  UserRoleController.addSubscription
+);
+
 export default Router;

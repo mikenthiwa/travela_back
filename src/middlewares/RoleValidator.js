@@ -183,4 +183,29 @@ export default class RoleValidator {
       'manager'
     );
   }
+
+  static validateSubscription(req, res, next) {
+    req.checkBody('userId').notEmpty()
+      .withMessage('userId field cannot be blank.');
+    const errors = req.validationErrors();
+    Validator.errorHandler(res, errors, next);
+  }
+
+  static async checkSubscription(req, res, next) {
+    const { body: { userId } } = req;
+    const prevSubscription = await models.Subscription.findAll({
+      where: {
+        userId
+      },
+    });
+
+    if (prevSubscription.length === 0) {
+      next();
+    } else {
+      return res.status(409).json({
+        success: false,
+        error: 'user already has a subscription'
+      });
+    }
+  }
 }

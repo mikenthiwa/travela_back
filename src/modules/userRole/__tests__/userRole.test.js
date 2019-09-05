@@ -14,7 +14,10 @@ import {
   center,
   googleToken,
   keys,
-  nonAndelaToken
+  nonAndelaToken,
+  subscriptions,
+  subscription2,
+  subscription3
 } from './mocks/mockData';
 import Utils from '../../../helpers/Utils';
 
@@ -777,6 +780,54 @@ describe('User Role Test', () => {
             done();
           });
       });
+    });
+  });
+
+  describe('Push Notification subscription', () => {
+    beforeEach(async () => {
+      await models.Subscription.destroy({ force: true, truncate: { cascade: true } });
+      await models.Subscription.bulkCreate(subscriptions);
+    });
+
+    afterEach(async () => {
+      await models.Subscription.destroy({ force: true, truncate: { cascade: true } });
+    });
+
+    const testClient = () => request(app).post('/api/v1/pushNotification').set('authorization', token2);
+
+    it('should add new subscription if user allows push notifications', (done) => {
+      testClient()
+        .send(subscription2)
+        .end((err, res) => {
+          expect(res.status).toEqual(201);
+          expect(res.body.success).toEqual(true);
+          expect(res.body.message).toEqual('Subscription created successfully');
+          if (err) return done(err);
+          done();
+        });
+    });
+
+    it('should return 409 for duplicate requests', (done) => {
+      testClient()
+        .send(subscriptions[1])
+        .end((err, res) => {
+          expect(res.body.success).toEqual(false);
+          if (err) return done(err);
+          expect(res.status).toEqual(409);
+          done();
+        });
+    });
+
+    it('should throw error if user already has subscription', (done) => {
+      testClient()
+        .send(subscription3)
+        .end((err, res) => {
+          const objectResponse = JSON.parse(res.text);
+          expect(res.body.success).toEqual(false);
+          expect(objectResponse.message).toBe('Validation failed');
+          if (err) return done(err);
+          done();
+        });
     });
   });
 });

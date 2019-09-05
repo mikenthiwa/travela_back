@@ -41,6 +41,7 @@ app.use(passport.initialize());
 
 MailTravelMembers.sendMail();
 ReminderEmails.sendMail();
+ReminderEmails.sendMailToBudgetChecker();
 updateUserCron.userUpdate();
 
 

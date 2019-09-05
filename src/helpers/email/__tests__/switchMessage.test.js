@@ -195,6 +195,7 @@ describe('switchMessage helper', () => {
     expect(budgetRejectedMsg.split(' ')[0]).toContain('Your');
     done();
   });
+
   it('should return email deletion message on requet deletion', (done) => {
     const budgetRejectedMsg = switchMessage({
       type: 'Notify Origin Tavel Team On Request Deletion',
@@ -222,6 +223,7 @@ describe('switchMessage helper', () => {
     expect(emailMsg).toContain('This');
     done();
   });
+
   it('should return email verification message', (done) => {
     const emailMsg = switchMessage({
       type: 'Travel Request Verified',
@@ -270,6 +272,57 @@ describe('switchMessage helper', () => {
       },
     });
     expect(emailMsg.split(' ')).toContain('This', 'center');
+    done();
+  });
+
+  it('should notify budget checker to approve pending requests', (done) => {
+    const emailMsg = switchMessage({
+      type: 'Notify budget checker to approve pending requests',
+      details: {
+        id: 1,
+      },
+      senderName: 'Travela'
+    });
+    expect(emailMsg.split(' ')).toContain('remind', 'approve');
+    done();
+  });
+
+  it('should notify Travel Administrator of Trip Cancellation Origin', (done) => {
+    const emailMsg = switchMessage({
+      type: 'Notify Travel Administrator of Trip Cancellation Origin',
+      details: {
+        requestId: 1,
+        requesterName: 'cate',
+        tripType: 'multi',
+        destination: 'kigali, rwanda',
+      },
+    });
+    expect(emailMsg.split(' ')).toContain('cancelled', 'trip');
+    done();
+  });
+
+  it('should notify Travel Administrator of Trip Cancellation Destination', (done) => {
+    const emailMsg = switchMessage({
+      type: 'Notify Travel Administrator of Trip Cancellation Destination',
+      details: {
+        requestId: 1,
+        requesterName: 'cate',
+        tripType: 'multi',
+        destination: 'nairobi, kenya',
+      },
+    });
+    expect(emailMsg.split(' ')).toContain('cancelled', 'centre');
+    done();
+  });
+
+  it('should notify that a requestor has no passport', (done) => {
+    const emailMsg = switchMessage({
+      type: 'NO_PASSPORT',
+      details: {
+        requesterName: 'cate',
+      },
+    });
+    expect(emailMsg.split(' ')).toContain('passport', 'onboarding');
     done();
   });
 });

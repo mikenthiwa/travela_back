@@ -8,6 +8,7 @@ import models from '../../database/models';
 import Error from '../../helpers/Error';
 import ApprovalsController from './ApprovalsController';
 import { createSearchClause, getModelSearchColumns } from '../../helpers/requests';
+import Utils from '../../helpers/Utils';
 
 const { Op } = models.Sequelize;
 const noResult = 'No records found';
@@ -30,45 +31,12 @@ export default class BudgetApprovalsController {
     return findDepartment.users;
   }
 
-  static async notifyBudgetChecker({
-    id, name, manager, department, picture
-  }) {
-    try {
-      const budgetCheckerMembers = await BudgetApprovalsController.findBudgetCheckerDepartment(
-        department
-      );
-
-      const managerDetails = await UserRoleController.getRecipient(null, null, manager);
-      if (budgetCheckerMembers.length > 0) {
-        const data = {
-          sender: name,
-          topic: 'Travel Request Approval',
-          type: 'Notify budget checker',
-          details: { RequesterManager: managerDetails.fullName, id },
-          redirectLink: `${process.env.REDIRECT_URL}/redirect/requests/budgets/${id}`
-        };
-
-        budgetCheckerMembers.forEach((budgetChecker) => {
-          const notificationData = {
-            senderId: managerDetails.userId,
-            senderName: name,
-            recipientId: budgetChecker.dataValues.userId,
-            senderImage: picture,
-            notificationType: 'general',
-            requestId: id,
-            message: `Hi ${budgetChecker.dataValues.fullName}, Please click on  ${id} to confirm availability of budget for this trip. You will be required to take an approval decision by clicking on Approve or Reject `,
-            notificationLink: `/requests/budgets/${id}`
-          };
-
-          NotificationEngine.notify(notificationData);
-        });
-
-        NotificationEngine.sendMailToMany(budgetCheckerMembers, data);
-      }
-    } catch (error) {
-      /* istanbul ignore next */
-      return error;
-    }
+  static async notifyBudgetChecker(updatedRequest) {
+    const messageType = 'Notify budget checker';
+    const messageTopic = 'Travel Request Approval';
+    const messageNotificationType = 'general';
+    Utils.sendNotificationToBudgetChecker(updatedRequest, messageType,
+      messageTopic, messageNotificationType);
   }
 
   static async calculateApprovals(status, where, requestWhere, tripWhere) {

@@ -7,7 +7,6 @@ import UserRoleUtils from './UserRoleUtils';
 import DepartmentController from '../department/DepartmentController';
 import UserRoleHelper from '../../helpers/userRole/index';
 
-
 dotenv.config();
 
 class UserRoleController {
@@ -239,6 +238,22 @@ class UserRoleController {
         });
       });
     } catch (error) { // istanbul ignore next
+      return CustomError.handleError(error.toString(), 500, res);
+    }
+  }
+
+  static async addSubscription(req, res) {
+    try {
+      const { body: { userId, subscription: { endpoint, keys: { p256dh, auth } } } } = req;
+      const result = await models.Subscription.create({
+        userId,
+        p256dh,
+        auth,
+        endpoint
+      });
+      const message = [201, 'Subscription created successfully', true];
+      UserRoleController.response(res, message, result);
+    } catch (error) {
       return CustomError.handleError(error.toString(), 500, res);
     }
   }

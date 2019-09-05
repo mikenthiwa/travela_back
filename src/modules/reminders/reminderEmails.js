@@ -4,6 +4,7 @@ import { Op } from 'sequelize';
 import NotificationEngine from '../notifications/NotificationEngine';
 import CustomError from '../../helpers/Error';
 import models from '../../database/models';
+import Utils from '../../helpers/Utils';
 
 export default class ReminderEmails {
   static sendMail() {
@@ -14,19 +15,32 @@ export default class ReminderEmails {
     task.start();
   }
 
+  static sendMailToBudgetChecker() {
+    const task = cron.schedule('5 * * * * *', () => {
+      ReminderEmails.remindBudgetChecker();
+    });
+    task.start();
+  }
+
+  static async getOpenBudgetStatusRequests() {
+    const openRequests = await models.Request.findAll({
+      where: { status: 'Approved', budgetStatus: 'Open' }
+    });
+    return openRequests;
+  }
+
   static async executeMailSend() {
     try {
       const reminders = await models.Reminder.findAll({
-        include: [
-          {
-            model: models.Condition,
-            as: 'condition',
-            where: { disabled: false },
-          }, {
-            model: models.ReminderEmailTemplate,
-            as: 'emailTemplate',
-            where: { disabled: false }
-          }]
+        include: [{
+          model: models.Condition,
+          as: 'condition',
+          where: { disabled: false },
+        }, {
+          model: models.ReminderEmailTemplate,
+          as: 'emailTemplate',
+          where: { disabled: false }
+        }]
       });
 
       const userGroup = await Promise.all(reminders.map(async (reminder) => {
@@ -34,22 +48,31 @@ export default class ReminderEmails {
           where: {
             type: reminder.condition.documentType.toLowerCase(),
             data: {
-              expiryDate: {
-                [Op.eq]: ReminderEmails.dayRange(reminder.frequency)
-              }
+              expiryDate: { [Op.eq]: ReminderEmails.dayRange(reminder.frequency) }
             },
           },
           attributes: ['id', 'type', 'userId'],
-          include: [
-            {
-              model: models.User,
-              as: 'user'
-            }]
+          include: [{
+            model: models.User,
+            as: 'user'
+          }]
         });
         return usergroup;
       }));
       return await NotificationEngine.sendReminderEmail(userGroup, reminders);
     } catch (error) { /* istanbul ignore next */ CustomError.handleError(error.message, 500); }
+  }
+
+  static async remindBudgetChecker() {
+    const openRequests = await ReminderEmails.getOpenBudgetStatusRequests();
+
+    openRequests.forEach(async (openRequest) => {
+      const messageType = 'Notify budget checker to approve pending requests';
+      const messageTopic = 'Reminder for Travel Request Approval';
+      const messageNotificationType = 'pending';
+      Utils.sendNotificationToBudgetChecker(openRequest.dataValues, messageType,
+        messageTopic, messageNotificationType);
+    });
   }
 
   static dayRange(frequency) {

@@ -3,6 +3,7 @@ import ReminderEmails from '../reminderEmails';
 import models from '../../../database/models';
 import Utils from '../../../helpers/Utils';
 import BudgetApprovalsController from '../../approvals/BudgetApprovalsController';
+import { today } from '../../requests/__tests__/mocks/teammatesMock';
 
 describe('test send reminder email to budget checker', () => {
   beforeAll(async () => {
@@ -13,6 +14,7 @@ describe('test send reminder email to budget checker', () => {
     await models.UserRole.destroy({ force: true, truncate: { cascade: true } });
     await models.User.destroy({ force: true, truncate: { cascade: true } });
     await models.Role.destroy({ force: true, truncate: { cascade: true } });
+    await models.Trip.destroy({ force: true, truncate: { cascade: true } });
     const mockUser = {
       fullName: 'Test User 1',
       passportName: 'Test User 1',
@@ -56,6 +58,17 @@ describe('test send reminder email to budget checker', () => {
       department: 'Fellowship-Programs',
       id: 'mock-request-id-1',
     };
+    const mockTrip = {
+      id: 3,
+      origin: 'Nairobi, Kenya',
+      destination: 'Lagos, Nigeria',
+      departureDate: today(1),
+      returnDate: '2018-05-25',
+      createdAt: '2018-05-20',
+      updatedAt: '2018-05-20',
+      bedId: null,
+      requestId: 'mock-request-id-1'
+    };
     await models.Request.create(mockRequest);
     await models.Department.create({
       id: 1, name: 'Fellowship-Programs', createdAt: new Date(), updatedAt: new Date()
@@ -67,6 +80,7 @@ describe('test send reminder email to budget checker', () => {
       createdAt: new Date(),
       updatedAt: new Date()
     });
+    await models.Trip.create(mockTrip);
   });
 
   it('test sends notification to budget checker', async (done) => {

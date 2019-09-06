@@ -22,11 +22,41 @@ export default class ReminderEmails {
     task.start();
   }
 
-  static async getOpenBudgetStatusRequests() {
-    const openRequests = await models.Request.findAll({
-      where: { status: 'Approved', budgetStatus: 'Open' }
+  static async getCurrentTrips(where) {
+    const query = sign => ({
+      raw: true,
+      where,
+      include: [{
+        model: models.Trip,
+        as: 'trips',
+        attributes: ['departureDate'],
+        where: {
+          departureDate: {
+            [Op[`${sign}`]]: moment().format('YYYY-MM-DD')
+          }
+        }
+      }]
     });
-    return openRequests;
+    const futureOpenTripRequests = await models.Request.findAll(
+      query('gte')
+    );
+
+    const pastOpenTripRequests = await models.Request.findAll(
+      query('lt')
+    );
+    const futureRequestIds = [...new Set(futureOpenTripRequests.map(request => request.id))
+    ];
+    const pastRequestIds = [...new Set(pastOpenTripRequests.map(request => request.id))
+    ];
+    const requiredTripsIds = futureRequestIds.filter(id => !pastRequestIds.includes(id));
+    const requiredTrips = futureOpenTripRequests.filter(request => requiredTripsIds.includes(request.id));
+    return requiredTrips;
+  }
+
+  static async getOpenBudgetStatusRequests() {
+    const where = { status: 'Approved', budgetStatus: 'Open' };
+    const openBudgetStatusRequests = await ReminderEmails.getCurrentTrips(where);
+    return openBudgetStatusRequests;
   }
 
   static async executeMailSend() {
@@ -70,7 +100,7 @@ export default class ReminderEmails {
       const messageType = 'Notify budget checker to approve pending requests';
       const messageTopic = 'Reminder for Travel Request Approval';
       const messageNotificationType = 'pending';
-      Utils.sendNotificationToBudgetChecker(openRequest.dataValues, messageType,
+      Utils.sendNotificationToBudgetChecker(openRequest, messageType,
         messageTopic, messageNotificationType);
     });
   }

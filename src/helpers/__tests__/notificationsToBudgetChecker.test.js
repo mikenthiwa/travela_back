@@ -85,7 +85,7 @@ describe('test email to budget checker', () => {
     jest.mock('web-push', () => ({
       sendNotification: jest.fn()
     }));
-    await Utils.sendNotificationToBudgetChecker(request.dataValues, messageType, messageTopic, messageNotificationType);
+    await Utils.sendNotificationToBudgetChecker(request, messageType, messageTopic, messageNotificationType);
     expect(NotificationEngine.notify).toBeCalledTimes(1);
     done();
   });

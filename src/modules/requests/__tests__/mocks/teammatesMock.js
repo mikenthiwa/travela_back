@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-const today = days => moment(new Date(), 'YYYY-MM-DD').add(days, 'days');
+export const today = days => moment(new Date(), 'YYYY-MM-DD').add(days, 'days');
 
 export const requestsMock = [
   {

@@ -30,10 +30,7 @@ export default (sequelize, DataTypes) => {
       allowNull: true,
       type: DataTypes.STRING,
       get() {
-        if (this.getDataValue('cc').length < 1) {
-          return [];
-        }
-        return this.getDataValue('cc').split(',');
+        return (this.getDataValue('cc') || '').split(',');
       }
     },
     subject: {

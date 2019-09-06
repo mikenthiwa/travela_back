@@ -1,5 +1,9 @@
 import jwt from 'jsonwebtoken';
+import SimpleCrypto from 'simple-crypto-js';
 import models from '../database/models';
+import UserHelper from '../helpers/user';
+
+const simpleCrypto = new SimpleCrypto(process.env.JWT_PUBLIC_KEY);
 
 const setPublicKey = (nodeEnv) => {
   switch (nodeEnv) {
@@ -13,6 +17,15 @@ const setPublicKey = (nodeEnv) => {
 const updateLastLogin = async (req) => {
   const { user: { UserInfo: { email } } } = req;
   await models.User.update({ lastLogin: new Date() }, { where: { email } });
+};
+
+
+export const authenticateEmailApproval = async (req, res, next) => {
+  const { body: { approvalToken = '' } } = req;
+  const email = simpleCrypto.decrypt(decodeURIComponent(approvalToken));
+  const user = await models.User.findOne({ where: { email } });
+  req.headers.authorization = user ? await UserHelper.setToken(user) : req.headers.authorization;
+  return next();
 };
 
 const authenticate = (req, res, next) => {

@@ -5,6 +5,7 @@ import DepartmentController from '../../modules/department/DepartmentController'
 import UserRoleUtils from '../../modules/userRole/UserRoleUtils';
 import UserRoleController from '../../modules/userRole/UserRoleController';
 
+
 dotenv.config();
 
 class UserRole {
@@ -88,7 +89,7 @@ class UserRole {
     const isRequestUserSuperAdmin = RequestUserRoleIds.includes(superAdminId);
     if (parseInt(roleId, 10) === superAdminId && !isRequestUserSuperAdmin) {
       const errorMsg = `Only a 'Super Administrator' can change the role of another 'Super Administrator'`; // eslint-disable-line
-      
+
       return { error: { msg: errorMsg, status: 403 } };
     }
     const query = { where: { userId, roleId } };

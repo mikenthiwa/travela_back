@@ -546,7 +546,7 @@ describe('Should allow the budget checker to view requests by budget status', ()
         done();
       });
   });
-  
+
   it('Should return a list of approvals searched in past approvals', (done) => {
     request
       .get('/api/v1/approvals/budget?&budgetStatus=past&search=moses')

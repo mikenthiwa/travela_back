@@ -51,7 +51,7 @@ export default class NotificationEngine {
     }
     return false;
   }
-  
+
   static verifyRedirectLink(redirectLink) {
     if (redirectLink) {
       const redirectLinkRegex = `${process.env.REDIRECT_URL}/redirect/*`;

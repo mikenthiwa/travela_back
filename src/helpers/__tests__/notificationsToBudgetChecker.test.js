@@ -87,7 +87,6 @@ describe('test email to budget checker', () => {
     }));
     await Utils.sendNotificationToBudgetChecker(request.dataValues, messageType, messageTopic, messageNotificationType);
     expect(NotificationEngine.notify).toBeCalledTimes(1);
-    expect(NotificationEngine.sendMailToMany).toBeCalledTimes(1);
     done();
   });
 });

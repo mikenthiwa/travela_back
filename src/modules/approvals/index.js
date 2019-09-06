@@ -4,6 +4,7 @@ import { getRequestsValidators } from '../../helpers/validators';
 import ApprovalsController from './ApprovalsController';
 import BudgetApprovalsController from './BudgetApprovalsController';
 import TravelAdminApprovalController from './TravelAdminApprovalController';
+import { authenticateEmailApproval } from '../../middlewares/authenticate';
 
 const ApprovalsRouter = express.Router();
 
@@ -49,6 +50,7 @@ ApprovalsRouter.get(
 
 ApprovalsRouter.put(
   '/approvals/:requestId',
+  authenticateEmailApproval,
   authenticate,
   Validator.validateStatus,
   RequestValidator.getTravelaUser,
@@ -58,6 +60,7 @@ ApprovalsRouter.put(
 
 ApprovalsRouter.put(
   '/approvals/budgetStatus/:requestId',
+  authenticateEmailApproval,
   authenticate,
   RoleValidator.checkUserRole(
     ['Budget Checker']

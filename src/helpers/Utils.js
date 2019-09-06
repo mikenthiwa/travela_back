@@ -1,15 +1,19 @@
 import shortid from 'shortid';
 import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
+import SimpleCrypto from 'simple-crypto-js';
 import webPush from 'web-push';
 import models from '../database/models';
 import UserRoleController from '../modules/userRole/UserRoleController';
 import TravelAdminApprovalController from '../modules/approvals/TravelAdminApprovalController';
 import BudgetApprovalsController from '../modules/approvals/BudgetApprovalsController';
 import NotificationEngine from '../modules/notifications/NotificationEngine';
+import { BudgetCheckerEmail } from './email/RequestEmail';
 
 
 dotenv.config();
+
+const simpleCrypto = new SimpleCrypto(process.env.JWT_PUBLIC_KEY);
 
 webPush.setVapidDetails(
   `mailto:${process.env.MAIL_SENDER}`,
@@ -69,17 +73,15 @@ class Utils {
         userId
       }
     });
-    if (sub) {
-      const subscription = {
-        endpoint: sub.dataValues.endpoint,
-        keys: {
-          p256dh: sub.dataValues.p256dh,
-          auth: sub.dataValues.auth
-        }
-      };
-      const payload = Buffer.from(JSON.stringify(params), 'utf8');
-      webPush.sendNotification(subscription, payload);
-    }
+    const subscription = {
+      endpoint: sub.dataValues.endpoint,
+      keys: {
+        p256dh: sub.dataValues.p256dh,
+        auth: sub.dataValues.auth
+      }
+    };
+    const payload = Buffer.from(JSON.stringify(params), 'utf8');
+    webPush.sendNotification(subscription, payload);
   }
 
   static async sendNotificationToBudgetChecker(request, messageType, messageTopic, messageNotificationType) {
@@ -94,13 +96,6 @@ class Utils {
       const budgetCheckerMembers = await BudgetApprovalsController.findBudgetCheckerDepartment(department);
       const managerDetails = await UserRoleController.getRecipient(null, null, manager);
       if (budgetCheckerMembers.length > 0) {
-        const data = {
-          sender: name,
-          topic: messageTopic,
-          type: messageType,
-          details: { RequesterManager: managerDetails.fullName, id },
-          redirectLink: `${process.env.REDIRECT_URL}/redirect/requests/budgets/${id}`
-        };
         await Promise.all(budgetCheckerMembers.map(async (budgetChecker) => {
           const notificationData = {
             senderId: managerDetails.userId,
@@ -113,9 +108,17 @@ class Utils {
             notificationLink: `/requests/budgets/${id}`
           };
           NotificationEngine.notify(notificationData);
+
+          const approvalToken = encodeURIComponent(simpleCrypto.encrypt(budgetChecker.email));
+
+          new BudgetCheckerEmail(request.id).send(budgetChecker, messageTopic, {
+            managerName: managerDetails.fullName,
+            redirectLink: `${process.env.REDIRECT_URL}/redirect/requests/budgets/${id}`,
+            approvalLink: `${process.env.REDIRECT_URL}/email-approval/budget/${id}/Approved/${approvalToken}`,
+            rejectLink: `${process.env.REDIRECT_URL}/email-approval/budget/${id}/Rejected/${approvalToken}`
+          });
           return Utils.pushNotifications(budgetChecker.dataValues.userId, params);
         }));
-        NotificationEngine.sendMailToMany(budgetCheckerMembers, data);
       }
     } catch (error) { /* istanbul ignore next */ return error; }
   }

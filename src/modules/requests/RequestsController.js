@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+import SimpleCrypto from 'simple-crypto-js';
 
 import models from '../../database/models';
 import {
@@ -13,6 +14,10 @@ import Error from '../../helpers/Error';
 import RequestTransactions from './RequestTransactions';
 import RequestUtils from './RequestUtils';
 import RequestServices from './RequestServices';
+import RequestEmail from '../../helpers/email/RequestEmail';
+
+
+const simpleCrypto = new SimpleCrypto(process.env.JWT_PUBLIC_KEY);
 
 dotenv.config();
 let params = {};
@@ -81,6 +86,20 @@ class RequestsController {
       senderImage: req.user.UserInfo.picture
     };
     NotificationEngine.notify(notificationData);
+    if (mailType === 'New Request') {
+      const approverToken = recipient.email ? encodeURIComponent(simpleCrypto.encrypt(recipient.email)) : null;
+
+      const requestEmail = new RequestEmail(request.id);
+      return requestEmail.send(recipient, mailTopic, {
+        redirectLink: `${process.env.REDIRECT_URL}/redirect/requests/my-approvals/${request.id}`,
+        approvalLink: `${
+          process.env.REDIRECT_URL
+        }/email-approval/manager/${request.id}/Approved/${approverToken}`,
+        rejectLink: `${
+          process.env.REDIRECT_URL
+        }/email-approval/manager/${request.id}/Rejected/${approverToken}`
+      });
+    }
     return NotificationEngine.sendMail(
       RequestUtils.getMailData(request, recipient, mailTopic, mailType)
     );

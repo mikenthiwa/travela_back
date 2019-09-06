@@ -11,6 +11,7 @@ import NotificationEngine from '../../notifications/NotificationEngine';
 import TravelChecklistController from '../../travelChecklist/TravelChecklistController';
 import ApprovalsController from '../../approvals/ApprovalsController';
 import RequestUtils from '../RequestUtils';
+import RequestEmailMock from '../../../helpers/email/__tests__/RequestEmailMock';
 
 const request = supertest;
 
@@ -1953,6 +1954,7 @@ describe('Requests Controller', () => {
         const {
           req, res, travelRequest, message, mailTopic, mailType
         } = generateMock.mailData('New Request');
+        RequestEmailMock();
         await RequestsController.sendNotificationToManager(
           req, res, travelRequest, message, mailTopic, mailType
         );

@@ -144,7 +144,7 @@ class RequestEmail {
             </td>
             <td>
               <a href="${rejectLink}" class="button"
-                style=" width:100px; border-radius: 4px; border: 1px solid green; text-decoration: none; color: black; font-size: 0.8em; text-align: center; display: block; padding: 10px 10px; ">
+                style=" width:100px; border-radius: 4px; border: 1px solid red; text-decoration: none; color: black; font-size: 0.8em; text-align: center; display: block; padding: 10px 10px; ">
                 Reject
               </a>
             </td>

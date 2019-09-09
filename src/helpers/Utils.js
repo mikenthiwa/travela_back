@@ -89,7 +89,8 @@ class Utils {
       id, name, manager, department, picture
     } = request;
     const params = {
-      title: 'Reminder to approve pending requests',
+      title: 'Approve pending requests.',
+      body: 'You have pending requests that require your approval.',
       tag: '/requests/budgets/?page=1&budgetStatus=open',
     };
     try {
@@ -117,7 +118,7 @@ class Utils {
             approvalLink: `${process.env.REDIRECT_URL}/email-approval/budget/${id}/Approved/${approvalToken}`,
             rejectLink: `${process.env.REDIRECT_URL}/email-approval/budget/${id}/Rejected/${approvalToken}`
           });
-          return Utils.pushNotifications(budgetChecker.dataValues.userId, params);
+          Utils.pushNotifications(budgetChecker.dataValues.userId, params);
         }));
       }
     } catch (error) { /* istanbul ignore next */ return error; }

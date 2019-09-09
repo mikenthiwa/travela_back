@@ -14,11 +14,6 @@ global.io = {
   }
 };
 
-jest.mock('web-push', () => ({
-  sendNotification: jest.fn(),
-  setVapidDetails: jest.fn()
-}));
-
 const payload = {
   UserInfo: {
     id: 1,
@@ -105,14 +100,6 @@ const requestData = {
   newStatus: 'Approved'
 };
 
-const subscription = {
-  id: 1,
-  endpoint: 'https://fcm.googleapis.com/fcm/send/e4mM6_Kz6vU:APA91bEWRCug0ExaDvhwvhtaDejn9timKAollDdDh6WH8HWn2ff9TUui4KGPnHlHuuwXkoiRTYMpGeyjUrZ77VpbWhDfXuM2AtEjCpXVD-l8ofkM8g-ctsIaTsdF4-eDn70Y9QLTXIhd',
-  p256dh: 'BCAKqfPeev9Q4W7kC1Zak2UwCGuCvJ2wkSxDN-Zx5obazTiLH-P8prcYIZMnMd8P8EzDssI1ejeh7Qt3a3Tcuyt',
-  auth: '-_M6xdln15CP7MZp3kQ2_Q',
-  userId: '-LTI9_PM3tV39gffhUIE',
-};
-
 const mockApproval = [
   {
     id: 1,
@@ -164,19 +151,18 @@ describe('Budget checker', () => {
   beforeAll(async () => {
     moxios.install();
 
+    await models.UserRole.destroy({ force: true, truncate: { cascade: true } });
+    await models.Role.destroy({ force: true, truncate: { cascade: true } });
+    await models.Department.destroy({ force: true, truncate: { cascade: true } });
+    await models.UsersDepartments.destroy({ force: true, truncate: { cascade: true } });
+    await models.Center.destroy({ force: true, truncate: { cascade: true } });
     await models.Approval.destroy({ force: true, truncate: { cascade: true } });
-    await models.Request.destroy({ force: true, truncate: { cascade: true } });
-    await models.Subscription.destroy({ force: true, truncate: { cascade: true } });
+    await models.Request.sync({ force: true, truncate: { cascade: true } });
     await models.Notification.destroy({
       force: true,
       truncate: { cascade: true }
     });
-    await models.Center.destroy({ force: true, truncate: { cascade: true } });
-    await models.UsersDepartments.destroy({ force: true, truncate: { cascade: true } });
-    await models.Department.destroy({ force: true, truncate: { cascade: true } });
-    await models.UserRole.destroy({ force: true, truncate: { cascade: true } });
-    await models.User.destroy({ force: true, truncate: { cascade: true } });
-    await models.Role.destroy({ force: true, truncate: { cascade: true } });
+    await models.User.sync({ force: true, truncate: { cascade: true } });
 
     process.env.DEFAULT_ADMIN = 'peter.paul@andela.com';
     await models.Role.bulkCreate(role);
@@ -186,7 +172,6 @@ describe('Budget checker', () => {
     await models.Approval.bulkCreate(mockApproval);
     await models.Department.bulkCreate(DepartmentMock);
     await models.UsersDepartments.bulkCreate(UsersDepartmentsMock);
-    await models.Subscription.create(subscription);
   });
 
   afterAll(async () => {
@@ -194,17 +179,16 @@ describe('Budget checker', () => {
 
     await models.Approval.destroy({ force: true, truncate: { cascade: true } });
     await models.Request.destroy({ force: true, truncate: { cascade: true } });
-    await models.Subscription.destroy({ force: true, truncate: { cascade: true } });
     await models.Notification.destroy({
       force: true,
       truncate: { cascade: true }
     });
-    await models.Center.destroy({ force: true, truncate: { cascade: true } });
-    await models.UsersDepartments.destroy({ force: true, truncate: { cascade: true } });
-    await models.Department.destroy({ force: true, truncate: { cascade: true } });
     await models.UserRole.destroy({ force: true, truncate: { cascade: true } });
-    await models.User.destroy({ force: true, truncate: { cascade: true } });
     await models.Role.destroy({ force: true, truncate: { cascade: true } });
+    await models.User.destroy({ force: true, truncate: { cascade: true } });
+    await models.Center.destroy({ force: true, truncate: { cascade: true } });
+    await models.Department.destroy({ force: true, truncate: { cascade: true } });
+    await models.UsersDepartments.destroy({ force: true, truncate: { cascade: true } });
   });
 
   it('Should send email notification to budget checker', (done) => {

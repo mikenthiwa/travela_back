@@ -21,11 +21,6 @@ global.io = {
   },
 };
 
-jest.mock('web-push', () => ({
-  sendNotification: jest.fn(),
-  setVapidDetails: jest.fn()
-}));
-
 const mockAndelaOrigin = generateMock.center();
 const mockAndelaDestination = generateMock.center({
   id: 2,
@@ -93,13 +88,6 @@ const mockTravelTeamMember = generateMock.user({
   roleId: 339458,
   id: 4
 });
-const subscription = {
-  id: 1,
-  endpoint: 'https://fcm.googleapis.com/fcm/send/e4mM6_Kz6vU:APA91bEWRCug0ExaDvhwvhtaDejn9timKAollDdDh6WH8HWn2ff9TUui4KGPnHlHuuwXkoiRTYMpGeyjUrZ77VpbWhDfXuM2AtEjCpXVD-l8ofkM8g-ctsIaTsdF4-eDn70Y9QLTXIhd',
-  p256dh: 'BCAKqfPeev9Q4W7kC1Zak2UwCGuCvJ2wkSxDN-Zx5obazTiLH-P8prcYIZMnMd8P8EzDssI1ejeh7Qt3a3Tcuyt',
-  auth: '-_M6xdln15CP7MZp3kQ2_Q',
-  userId: 'saved-manager-1',
-};
 
 const mockFinanceTeamMember = generateMock.user({
   fullName: 'Finance Team Member',
@@ -427,7 +415,6 @@ describe('Requests Controller', () => {
     await models.Role.destroy({ force: true, truncate: { cascade: true } });
     await models.Approval.destroy({ force: true, truncate: { cascade: true } });
     await models.Request.destroy({ force: true, truncate: { cascade: true } });
-    await models.Subscription.destroy({ force: true, truncate: { cascade: true } });
     await models.Trip.destroy({ force: true, truncate: { cascade: true } });
     await models.TripModification.destroy({ truncate: { cascade: true }, force: true });
     await models.Notification.truncate();
@@ -443,7 +430,6 @@ describe('Requests Controller', () => {
     await models.Bed.bulkCreate(allMockBeds);
     await models.Department.bulkCreate(DepartmentMock);
     await models.UsersDepartments.bulkCreate(UsersDepartmentsMock);
-    await models.Subscription.create(subscription);
     done();
   });
 
@@ -454,7 +440,6 @@ describe('Requests Controller', () => {
     await models.Role.destroy({ force: true, truncate: { cascade: true } });
     await models.Approval.destroy({ force: true, truncate: { cascade: true } });
     await models.Trip.destroy({ force: true, truncate: { cascade: true } });
-    await models.Subscription.destroy({ force: true, truncate: { cascade: true } });
     await models.Request.destroy({ force: true, truncate: { cascade: true } });
     await models.TripModification.destroy({ truncate: { cascade: true }, force: true });
     await models.Notification.truncate();

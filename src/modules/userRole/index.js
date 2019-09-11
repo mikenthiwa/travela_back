@@ -99,7 +99,6 @@ Router.patch(
 Router.post(
   '/pushNotification',
   RoleValidator.validateSubscription,
-  RoleValidator.checkSubscription,
   UserRoleController.addSubscription
 );
 

@@ -74,10 +74,10 @@ class Utils {
       }
     });
     const subscription = {
-      endpoint: sub.dataValues.endpoint,
+      endpoint: sub.endpoint,
       keys: {
-        p256dh: sub.dataValues.p256dh,
-        auth: sub.dataValues.auth
+        p256dh: sub.p256dh,
+        auth: sub.auth
       }
     };
     const payload = Buffer.from(JSON.stringify(params), 'utf8');
@@ -89,38 +89,37 @@ class Utils {
       id, name, manager, department, picture
     } = request;
     const params = {
-      title: 'Reminder to approve pending requests',
+      title: 'Approve pending requests.',
+      body: 'Confirm availability of budget of trip(s).',
       tag: '/requests/budgets/?page=1&budgetStatus=open',
     };
-    try {
-      const budgetCheckerMembers = await BudgetApprovalsController.findBudgetCheckerDepartment(department);
-      const managerDetails = await UserRoleController.getRecipient(null, null, manager);
-      if (budgetCheckerMembers.length > 0) {
-        await Promise.all(budgetCheckerMembers.map(async (budgetChecker) => {
-          const notificationData = {
-            senderId: managerDetails.userId,
-            senderName: name,
-            recipientId: budgetChecker.dataValues.userId,
-            senderImage: picture,
-            notificationType: messageNotificationType,
-            requestId: id,
-            message: `Hi ${budgetChecker.dataValues.fullName}, Please click on ${id} to confirm availability of budget for this trip. You will be required to take an approval decision by clicking on Approve or Reject `,
-            notificationLink: `/requests/budgets/${id}`
-          };
-          NotificationEngine.notify(notificationData);
+    const budgetCheckerMembers = await BudgetApprovalsController.findBudgetCheckerDepartment(department);
+    const managerDetails = await UserRoleController.getRecipient(null, null, manager);
+    if (budgetCheckerMembers.length > 0) {
+      await Promise.all(budgetCheckerMembers.map(async (budgetChecker) => {
+        const notificationData = {
+          senderId: managerDetails.userId,
+          senderName: name,
+          recipientId: budgetChecker.userId,
+          senderImage: picture,
+          notificationType: messageNotificationType,
+          requestId: id,
+          message: `Hi ${budgetChecker.dataValues.fullName}, Please click on ${id} to confirm availability of budget for this trip. You will be required to take an approval decision by clicking on Approve or Reject `,
+          notificationLink: `/requests/budgets/${id}`
+        };
+        NotificationEngine.notify(notificationData);
 
-          const approvalToken = encodeURIComponent(simpleCrypto.encrypt(budgetChecker.email));
+        const approvalToken = encodeURIComponent(simpleCrypto.encrypt(budgetChecker.email));
 
-          new BudgetCheckerEmail(request.id).send(budgetChecker, messageTopic, {
-            managerName: managerDetails.fullName,
-            redirectLink: `${process.env.REDIRECT_URL}/redirect/requests/budgets/${id}`,
-            approvalLink: `${process.env.REDIRECT_URL}/email-approval/budget/${id}/Approved/${approvalToken}`,
-            rejectLink: `${process.env.REDIRECT_URL}/email-approval/budget/${id}/Rejected/${approvalToken}`
-          });
-          return Utils.pushNotifications(budgetChecker.dataValues.userId, params);
-        }));
-      }
-    } catch (error) { /* istanbul ignore next */ return error; }
+        new BudgetCheckerEmail(request.id).send(budgetChecker, messageTopic, {
+          managerName: managerDetails.fullName,
+          redirectLink: `${process.env.REDIRECT_URL}/redirect/requests/budgets/${id}`,
+          approvalLink: `${process.env.REDIRECT_URL}/email-approval/budget/${id}/Approved/${approvalToken}`,
+          rejectLink: `${process.env.REDIRECT_URL}/email-approval/budget/${id}/Rejected/${approvalToken}`
+        });
+        return Utils.pushNotifications(budgetChecker.userId, params);
+      })).catch(err => (err));
+    }
   }
 }
 

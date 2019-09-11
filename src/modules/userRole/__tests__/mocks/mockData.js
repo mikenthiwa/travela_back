@@ -303,14 +303,3 @@ export const subscription2 = {
   },
   userId: '1234',
 };
-
-export const subscription3 = {
-  subscription: {
-    endpoint: 'https://fcm.googleapis.com/fcm/send/egombY0NeNw:APA91bFozyKI0tAGrcZw-dZT3BNzoSmXlSqUrlbrOrdvJDZfydx146z2UyOgHRGlix_-mCoxX981INKn2e5RVN2Iv1zqj-Af7R9bhSvD2Ltzylx40qD3PpCtNOhrnNeSTqNgZ0xuMD6s',
-    keys: {
-      p256dh: 'sklcmlksmclxzmlmslddd',
-      auth: 'dfdfdsfsdfdsfsfsfdsf',
-    },
-  },
-  userId: '',
-};

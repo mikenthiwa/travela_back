@@ -17,7 +17,6 @@ import {
   nonAndelaToken,
   subscriptions,
   subscription2,
-  subscription3
 } from './mocks/mockData';
 import Utils from '../../../helpers/Utils';
 
@@ -802,29 +801,6 @@ describe('User Role Test', () => {
           expect(res.status).toEqual(201);
           expect(res.body.success).toEqual(true);
           expect(res.body.message).toEqual('Subscription created successfully');
-          if (err) return done(err);
-          done();
-        });
-    });
-
-    it('should return 409 for duplicate requests', (done) => {
-      testClient()
-        .send(subscriptions[1])
-        .end((err, res) => {
-          expect(res.body.success).toEqual(false);
-          if (err) return done(err);
-          expect(res.status).toEqual(409);
-          done();
-        });
-    });
-
-    it('should throw error if user already has subscription', (done) => {
-      testClient()
-        .send(subscription3)
-        .end((err, res) => {
-          const objectResponse = JSON.parse(res.text);
-          expect(res.body.success).toEqual(false);
-          expect(objectResponse.message).toBe('Validation failed');
           if (err) return done(err);
           done();
         });

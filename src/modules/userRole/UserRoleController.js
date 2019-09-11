@@ -245,12 +245,20 @@ class UserRoleController {
   static async addSubscription(req, res) {
     try {
       const { body: { userId, subscription: { endpoint, keys: { p256dh, auth } } } } = req;
-      const result = await models.Subscription.create({
+      let result = await models.Subscription.findOne({ where: { userId } });
+      const data = {
         userId,
         p256dh,
         auth,
         endpoint
-      });
+      };
+      if (result) {
+        await result.update({ ...data });
+      } else {
+        result = await models.Subscription.create({
+          ...data
+        });
+      }
       const message = [201, 'Subscription created successfully', true];
       UserRoleController.response(res, message, result);
     } catch (error) {

@@ -16,7 +16,7 @@ export default class ReminderEmails {
   }
 
   static sendMailToBudgetChecker() {
-    const task = cron.schedule('0 0 * * *', () => {
+    const task = cron.schedule('0 0 9 * * *', () => {
       ReminderEmails.remindBudgetChecker();
     });
     task.start();
